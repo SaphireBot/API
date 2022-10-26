@@ -30,4 +30,7 @@ app.get("/saphire", (_, res) => {
   return res.status(200).send("OK");
 });
 
-app.listen({ port: 8080 }, (err, address) => console.log(200, err ?? address));
+app.listen({
+  port: 8080,
+  host: "0.0.0.0"
+}, (err, address) => console.log(200, err ?? address));
