@@ -12,6 +12,11 @@
     "url": "https://github.com/SaphireBot/Saphire-API/issues"
   },
   "homepage": "https://github.com/SaphireBot/Saphire-API#readme",
+  "dependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "fastify": "^4.9.2"
+  },
   "devDependencies": {
     "@types/eslint": "^8.4.8",
     "@types/node": "^18.11.5",
