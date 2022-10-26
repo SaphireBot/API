@@ -1,0 +1,23 @@
+{
+  "name": "saphire-api",
+  "version": "1.0.0",
+  "description": "Saphire API",
+  "main": "src",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SaphireBot/Saphire-API.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SaphireBot/Saphire-API/issues"
+  },
+  "homepage": "https://github.com/SaphireBot/Saphire-API#readme",
+  "devDependencies": {
+    "@types/eslint": "^8.4.8",
+    "@types/node": "^18.11.5",
+    "@typescript-eslint/eslint-plugin": "^5.41.0",
+    "@typescript-eslint/parser": "^5.41.0",
+    "eslint": "^8.26.0",
+    "typescript": "^4.8.4"
+  }
+}
