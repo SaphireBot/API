@@ -2,8 +2,12 @@
   "name": "saphire-api",
   "version": "1.0.0",
   "description": "Saphire API",
-  "main": "src",
-  "scripts": {},
+  "main": "dist",
+  "scripts": {
+    "start": "node .",
+    "build": "tsc",
+    "start:test": "ts-node-test src"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SaphireBot/Saphire-API.git"
@@ -13,6 +17,8 @@
   },
   "homepage": "https://github.com/SaphireBot/Saphire-API#readme",
   "dependencies": {
+    "@fastify/websocket": "^7.1.0",
+    "@top-gg/sdk": "^3.1.3",
     "@tsconfig/recommended": "^1.0.1",
     "dotenv": "^16.0.3",
     "fastify": "^4.9.2"
@@ -20,9 +26,11 @@
   "devDependencies": {
     "@types/eslint": "^8.4.8",
     "@types/node": "^18.11.5",
+    "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.41.0",
     "@typescript-eslint/parser": "^5.41.0",
     "eslint": "^8.26.0",
+    "ts-node-test": "^0.2.0",
     "typescript": "^4.8.4"
   }
 }
