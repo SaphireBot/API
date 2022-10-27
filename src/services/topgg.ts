@@ -15,17 +15,17 @@ export default async (req: any, res: any) => {
     if (bot !== "912509487984812043")
         return res
             .status(400)
-            .send("It's a bad request")
+            .send("It's a bad request");
 
     if (type === "test")
         return res
             .status(302)
-            .send("Test completed successfully")
+            .send("Test completed successfully");
 
     if (!/(\d{17,})/.test(user))
         return res
             .status(406)
-            .send("Content is not acceptable")
+            .send("Content is not acceptable");
 
     return await request("https://saphire.discloud.app/topgg", {
         method: "POST",

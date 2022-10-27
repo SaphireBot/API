@@ -4,10 +4,14 @@ import topGGHandler from "./services/topgg";
 
 const app = fastify();
 
-app.post("/topgg", topGGHandler)
+app.post("/topgg", topGGHandler);
 
 app.get("/", (_, res) => {
   return res.status(200).send({ status: "Saphire's API Online" });
+});
+
+app.get("/connections", (req, res) => {
+  return res.send(req.headers)
 });
 
 app.listen({
