@@ -1,42 +1,13 @@
-import fastifyWebSocket from "@fastify/websocket";
+import "dotenv/config"
 import fastify from "fastify";
-import { env } from "process";
-import { topggWebhook } from "./services";
+import topGGHandler from "./services/topgg";
 
 const app = fastify();
-app.register(fastifyWebSocket);
 
-app.post("/topgg", (req, res) => {
-
-  if (req.headers.authorization !== env.TOP_GG_AUTHORIZATION)
-    return res.status(401);
-
-  topggWebhook.listener(vote => console.log(`TopGG - ${vote}`));
-  return res.status(200);
-});
-
-app.get("/ws", { websocket: true }, (connection) => {
-  console.log("Linha 10");
-
-  connection.socket.on("message", () => {
-    console.log("Linha 13");
-    connection.socket.send("Hello World!");
-  });
-});
-
-// app.get("/topgg", { websocket: true }, (connection) => {
-//   topggWebhook.listener((vote) => {
-//     console.log(`TopGG - ${vote}`);
-//     connection.socket.send(vote);
-//   });
-// });
+app.post("/topgg", topGGHandler)
 
 app.get("/", (_, res) => {
-  return res.status(200).send({ status: "Online" });
-});
-
-app.get("/saphire", (_, res) => {
-  return res.status(200).send("OK");
+  return res.status(200).send({ status: "Saphire's API Online" });
 });
 
 app.listen({
