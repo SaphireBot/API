@@ -1,6 +1,7 @@
 import "dotenv/config"
 import fastify from "fastify";
 import topGGHandler from "./services/topgg";
+import webhookHandler from "./services/topgg";
 
 const app = fastify();
 
@@ -11,8 +12,10 @@ app.get("/", (_, res) => {
 });
 
 app.get("/connections", (req, res) => {
-  return res.send(req.headers)
+  return res.send("https://discord.gg/2EMVCbJxuC")
 });
+
+app.post("/webhooks", webhookHandler)
 
 app.listen({
   port: 8080,
