@@ -1,5 +1,5 @@
-import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable } from "discord.js"
-import { Stream } from "node:stream"
+import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable } from "discord.js";
+import { Stream } from "node:stream";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 export interface TopGGWebhookPostResult {
