@@ -9,26 +9,26 @@ export interface TopGGWebhookPostResult {
   bot: string
 }
 
-export interface WebhookBodyRequestBody {
-  url: string,
+export interface WebhookBodyRequest extends FastifyRequest {
+  webhookUrl: string,
   content: string,
   embeds: APIEmbed[],
   avatarURL: string,
   username: string,
   files: (
-      | Stream
-      | BufferResolvable
-      | JSONEncodable<APIAttachment> 
-      | Attachment
-      | AttachmentBuilder
-      | AttachmentPayload
-    )[]
+    | Stream
+    | BufferResolvable
+    | JSONEncodable<APIAttachment>
+    | Attachment
+    | AttachmentBuilder
+    | AttachmentPayload
+  )[]
 }
 
-export interface Response {
+export interface Response extends FastifyReply {
   FastifyReply: FastifyReply
 }
 
-export interface Request {
+export interface Request extends FastifyRequest {
   FastifyRequest: FastifyRequest
 }

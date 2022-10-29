@@ -5,7 +5,7 @@ declare namespace NodeJS {
     TOP_GG_AUTHORIZATION?: string
     TOP_GG_TOKEN?: string,
     ROUTE_TOP_GG?: string,
-    WEBHOOK_ACESS?: string,
+    WEBHOOK_ACCESS?: string,
     WEBHOOK_TOP_GG_COUNTER?: string,
     TOP_GG_WEBHOOK_AVATAR?: string,
     SAPHIRE_ROUTE_TOP_GG?: string
