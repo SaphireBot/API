@@ -1,7 +1,7 @@
 {
   "compileOnSave": true,
   "extends": "@tsconfig/recommended/tsconfig.json",
-  "exclude": ["node_modules", "**/.ignore_*"],
+  "exclude": ["node_modules", "**/.ignore_*", "public"],
   "include": ["src", "**.d.ts"],
   "ts-node": { "transpileOnly": true },
   "compilerOptions": {

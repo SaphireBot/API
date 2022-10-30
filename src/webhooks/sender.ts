@@ -19,16 +19,16 @@ export default async (
                 | AttachmentPayload
             )[]
         },
-    res: FastifyReply
+    res?: FastifyReply
 ) => {
 
     const webhook = new WebhookClient({ url })
 
     return webhook.send({ username, avatarURL, content, embeds, files })
-        .then(() => res.status(200).send("Ok"))
+        .then(() => res?.status(200).send("Ok"))
         .catch(error => res
-            .status(500)
-            .send({ response: "Error to execute the sender", error })
+            ?.status(500)
+            ?.send({ response: "Error to execute the sender", error })
         )
 
 }

@@ -1,15 +1,28 @@
 import "dotenv/config";
-import server from "./server";
 import "./services";
 import "./webhooks";
+import server from "./server";
+import dataJSON from "./json/data.json";
+import sender from "./webhooks/sender";
+import { env } from "node:process";
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
-server.get("/connections", (_, res) => res.send("https://discord.gg/2EMVCbJxuC"));
+server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalServer));
 
 server.listen({
   port: 8080,
   host: "0.0.0.0"
-}, (err) => err
-  ? console.log(err)
-  : console.log("Saphire's API Connected")
-);
+}, async (err, address): Promise<void> => {
+
+  if (err)
+    return console.log(err, address);
+
+  await sender({
+    url: `${env.WEBHOOK_STATUS}`,
+    username: "[API] Connection Status",
+    content: `${dataJSON.emojis.check} | API conectada com sucesso.\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`
+  }).catch(() => null);
+
+  console.log("Saphire's API Connected")
+
+});
