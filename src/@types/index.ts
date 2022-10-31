@@ -32,3 +32,9 @@ export interface Response extends FastifyReply {
 export interface Request extends FastifyRequest {
   FastifyRequest: FastifyRequest
 }
+
+export interface CommandsSaphire {
+  name: string,
+  id: string,
+  description: string
+}
