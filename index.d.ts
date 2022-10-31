@@ -9,7 +9,8 @@ declare namespace NodeJS {
     WEBHOOK_TOP_GG_COUNTER?: string,
     TOP_GG_WEBHOOK_AVATAR?: string,
     ROUTE_SAPHIRE_TOP_GG?: string,
-    ROUTE_SAPHIRE_COMMANDS?: string
+    ROUTE_SAPHIRE_COMMANDS?: string,
+    PHRASES_ACCESS?: string
   }
 }
 

@@ -18,7 +18,7 @@ server.listen({
     return console.log(err, address);
 
   await sender({
-    url: <string>env.WEBHOOK_STATUS,
+    url: env.WEBHOOK_STATUS!,
     username: "[API] Connection Status",
     content: `${dataJSON.emojis.check} | API conectada com sucesso.\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`
   }).catch(() => null);
