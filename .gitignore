@@ -1,4 +1,5 @@
 # Ignored by developer
+package-lock.json
 
 # ignore average files with this pattern
 **/.ignore.*
