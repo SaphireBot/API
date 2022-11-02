@@ -28,7 +28,7 @@ server.post("/topgg", async (req, res) => {
       .status(406)
       .send("Content is not acceptable");
 
-  return await request(env.SAPHIRE_ROUTE_TOP_GG || "", {
+  return await request(env.ROUTE_SAPHIRE_TOP_GG || "", {
     method: "POST",
     headers: {
       user: user

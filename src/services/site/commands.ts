@@ -11,11 +11,11 @@ server.get("/commands", async (req, res) => {
             .send("Authorization is not defined correctly.");
 
     const commands = <CommandsSaphire[] | object>await fetch(
-        <string>env.SAPHIRE_COMMANDS,
+        env.ROUTE_SAPHIRE_COMMANDS!,
         {
             method: "GET",
             headers: {
-                authorization: <string>env.COMMAND_ACCESS,
+                authorization: env.COMMAND_ACCESS!,
             }
         }
     )

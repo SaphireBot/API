@@ -1,5 +1,6 @@
 # Ignored by developer
 package-lock.json
+discloud
 
 # ignore average files with this pattern
 **/.ignore.*
