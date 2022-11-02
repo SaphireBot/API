@@ -9,6 +9,7 @@ import { env } from "node:process"
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
 server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalServer));
+server.get("/ping", (_, res) => res.status(200).send("OK"))
 
 server.listen({
   port: Number(String(<string>env.SERVER_PORT)),
