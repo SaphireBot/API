@@ -5,7 +5,7 @@ import "./routes"
 import server from "./server";
 import dataJSON from "./json/data.json";
 import sender from "./webhooks/sender";
-import connect from "./database/functions/connect"
+import { CallbackError, connect } from "mongoose";
 import { env } from "node:process";
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
@@ -16,16 +16,22 @@ server.listen({
   host: "0.0.0.0"
 }, async (err, address): Promise<void> => {
 
-  const databaseResponse = connect() || "No Logged"
-
   if (err)
     return console.log("AQUI", err, address);
 
-  await sender({
-    url: <string>env.WEBHOOK_STATUS,
-    username: "[API] Connection Status",
-    content: `${dataJSON.emojis.check} | API conectada com sucesso.\n${dataJSON.emojis.database} | ${databaseResponse}\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`
-  }).catch(() => null);
+  return connect(<string>env.DB_LOGIN,
+    async function logger(error: CallbackError | null) {
 
-  return console.log(`Saphire's API Connected\n${databaseResponse}`);
+      const databaseResponse = error
+        ? `Houve um erro ao me conectar com o banco de dados!\nError: ${error}`
+        : "Conexão efetuada com sucesso!"
+
+      await sender({
+        url: <string>env.WEBHOOK_STATUS,
+        username: "[API] Connection Status",
+        content: `${dataJSON.emojis.check} | API conectada com sucesso.\n${dataJSON.emojis.database} | ${databaseResponse}\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`
+      }).catch(() => null);
+
+      return console.log(`Saphire's API Connected\n${databaseResponse}`);
+    });
 });
