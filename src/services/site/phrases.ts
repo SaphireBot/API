@@ -11,6 +11,6 @@ server.get("/phrases", async (req, res) => {
 
     return res
         .status(200)
-        .send(SiteHomePhrases[Math.floor(Math.random() * SiteHomePhrases.length)])
+        .send(SiteHomePhrases[Math.floor(Math.random() * SiteHomePhrases.length)]);
 
 })

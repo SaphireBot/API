@@ -1,6 +1,7 @@
 {
     "emojis": {
-        "check": "<:check:889181556646768671>"
+        "check": "<:check:889181556646768671>",
+        "database": "<:Database:928130726438776883>"
     },
     "urls": {
         "discordPrincipalServer": "https://discord.gg/2EMVCbJxuC"

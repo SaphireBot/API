@@ -1,6 +1,8 @@
-import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable } from "discord.js";
+import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, APIUser } from "discord.js";
 import { Stream } from "node:stream";
-import { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyRequest, FastifyReply } from "fastify";
+import { Response as UndiciResponse } from "undici"
+import { DocumentSetOptions } from "mongoose";
 
 export interface TopGGWebhookPostResult {
   user: string
@@ -30,11 +32,46 @@ export interface Response extends FastifyReply {
 }
 
 export interface Request extends FastifyRequest {
-  FastifyRequest: FastifyRequest
+  query: {
+    code?: string
+  }
 }
 
 export interface CommandsSaphire {
   name: string,
   id: string,
   description: string
+}
+
+export interface ResponseGetIp extends UndiciResponse {
+  ip: string
+}
+
+export interface ModelType extends DocumentSetOptions {
+  ip: string,
+  id: string,
+  username: string,
+  avatar: string,
+  discriminator: string,
+  email: string,
+  guildsOwner: object[],
+  loginDate: number
+}
+
+export interface UserData {
+  id: string,
+  username: string,
+  avatar: string | null,
+  avatar_decoration: string | null,
+  discriminator: string,
+  public_flags: number,
+  flags: number,
+  banner: string,
+  banner_color: string,
+  accent_color: number,
+  locale: string,
+  mfa_enabled: boolean,
+  premium_type: number,
+  email: string,
+  verified: boolean
 }
