@@ -1,4 +1,4 @@
-import sender from "./sender"
+import sender from "./sender";
 import { CallbackError, connect } from "mongoose";
 import { env } from "node:process";
 import dataJSON from "../json/data.json";
@@ -27,7 +27,7 @@ export default async (err: Error | null, address: string): Promise<void> => {
 
 async function errorAtEnableListen(err: Error | null, address: string): Promise<void> {
 
-    console.log(err, address)
+    console.log(err, address);
 
     await sender({
         url: <string>env.WEBHOOK_STATUS,
