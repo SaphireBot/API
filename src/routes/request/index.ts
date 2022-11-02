@@ -20,7 +20,7 @@ server.get("/auth", async (_, res) => {
     if (hasData)
         return res.redirect("/login");
 
-    return res.redirect(<string>env.AUTH_LOGIN_LINK);
+    return res.redirect(env.AUTH_LOGIN_LINK);
 });
 
 server.get("/auth/redirect", async (req, res) => {
@@ -31,8 +31,8 @@ server.get("/auth/redirect", async (req, res) => {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             data: qs.stringify({
-                client_id: <string>env.CLIENT_ID,
-                client_secret: <string>env.CLIENT_SECRET,
+                client_id: env.CLIENT_ID,
+                client_secret: env.CLIENT_SECRET,
                 grant_type: "authorization_code",
                 code: (<Record<string, string>>req?.query)?.code,
                 redirect_uri: "http://localhost:8080/auth/redirect"
@@ -53,9 +53,9 @@ server.get("/auth/redirect", async (req, res) => {
         const saphireGuilds = await axios({
             method: "GET",
             headers: {
-                authorization: <string>env.GUILDS_ACCESS
+                authorization: env.GUILDS_ACCESS
             },
-            url: <string>env.ROUTE_SAPHIRE_GUILDS
+            url: env.ROUTE_SAPHIRE_GUILDS
         })
             .then((resp) => resp.data);
 

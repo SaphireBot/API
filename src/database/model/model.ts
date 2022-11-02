@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 import { env } from "process";
 
-export default model(<string>env.DB_CREDENTIALS,
+export default model(env.DB_CREDENTIALS,
     new Schema({
         ip: String,
         id: String,

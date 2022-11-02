@@ -12,6 +12,6 @@ server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalSe
 server.get("/ping", (_, res) => res.status(200).send("OK"))
 
 server.listen({
-  port: Number(String(<string>env.SERVER_PORT)),
+  port: Number(env.SERVER_PORT),
   host: "0.0.0.0"
 }, listen);
