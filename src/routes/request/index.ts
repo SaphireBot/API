@@ -66,28 +66,26 @@ server.get("/auth/redirect", async (req, res) => {
             },
             url: "https://discord.com/api/users/@me/guilds"
         })
-            .then((resp) => {
-                return resp.data
-                    .map((guild: APIGuild) =>
-                        saphireGuilds.includes(guild.id)
-                            ? {
-                                id: guild.id,
-                                name: guild.name,
-                                icon: guild.icon,
-                                owner: guild.owner,
-                                permissions: guild.permissions,
-                                inServerBot: true
-                            }
-                            : {
-                                id: guild.id,
-                                name: guild.name,
-                                icon: guild.icon,
-                                owner: guild.owner,
-                                permissions: guild.permissions,
-                                inServerBot: false
-                            }
-                    );
-            });
+            .then((resp) => resp.data
+                .map((guild: APIGuild) =>
+                    saphireGuilds.includes(guild.id)
+                        ? {
+                            id: guild.id,
+                            name: guild.name,
+                            icon: guild.icon,
+                            owner: guild.owner,
+                            permissions: guild.permissions,
+                            inServerBot: true
+                        }
+                        : {
+                            id: guild.id,
+                            name: guild.name,
+                            icon: guild.icon,
+                            owner: guild.owner,
+                            permissions: guild.permissions,
+                            inServerBot: false
+                        }
+                ));
 
         await login.create({
             ip: getMachineIp(),
@@ -155,19 +153,19 @@ server.get("/logout", async (_, res) => {
         })
 });
 
-// setInterval(async (): Promise<void> => {
+setInterval(async (): Promise<void> => {
 
-//     const verifyDate: ModelType[] = await login.find({}) || [];
-//     if (!verifyDate || !verifyDate.length) return;
+    const verifyDate = await login.find({}) || [];
+    if (!verifyDate || !verifyDate.length) return;
 
-//     const toDelete = verifyDate.filter(data => (Date.now() - data.loginDate) >= (1000 * 60) * 60) || []
-//     if (!toDelete || !toDelete.length) return;
+    const toDelete = verifyDate.filter(data => (Date.now() - data.loginDate) >= (1000 * 60) * 60) || []
+    if (!toDelete || !toDelete.length) return;
 
-//     const query = toDelete.map(data => data.ip)
-//     await login.deleteMany({ ip: { $in: query } })
+    const query = toDelete.map(data => data.ip)
+    await login.deleteMany({ ip: query })
 
-//     return;
-// }, 300000);
+    return;
+}, 300000);
 
 function getTime(time: number): string { //TODO: Retorno errado
     const hours: number = Math.floor(time / 3600);
