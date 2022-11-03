@@ -20,7 +20,7 @@ GET - `/commands`
     "category": "admin",
     "description": "[admin] Comandos administrativos"
   },
-  ...
+  ...{}
 ]
 ```
 *A field at header with name "authorization" is required*
