@@ -15,11 +15,15 @@ GET - `/commands`
 
 ```json
 [
-  "return json example",
   {
     "name": "admin",
     "category": "admin",
     "description": "[admin] Comandos administrativos"
+  },
+  {
+    "name": "invite",
+    "category": "bot",
+    "description": "[bot] Um link rápido para me colocar no seu servidor"
   }
 ]
 ```
