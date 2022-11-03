@@ -1,4 +1,4 @@
-import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, APIUser } from "discord.js";
+import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable } from "discord.js";
 import { Stream } from "node:stream";
 import { FastifyRequest, FastifyReply } from "fastify";
 import { Response as UndiciResponse } from "undici"
@@ -40,6 +40,7 @@ export interface Request extends FastifyRequest {
 export interface CommandsSaphire {
   name: string,
   id: string,
+  category: string,
   description: string
 }
 
@@ -74,4 +75,9 @@ export interface UserData {
   premium_type: number,
   email: string,
   verified: boolean
+}
+
+export interface DatabaseType {
+  saphireResult: string | Error
+  cacheResult: string | Error
 }

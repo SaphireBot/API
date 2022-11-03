@@ -5,7 +5,7 @@ import server from "../server";
 import sender from "../webhooks/sender";
 
 server.post("/topgg", async (req, res) => {
-  
+
   if (req.headers?.authorization !== env.TOP_GG_AUTHORIZATION)
     return res
       .status(401)
@@ -36,13 +36,11 @@ server.post("/topgg", async (req, res) => {
   })
     .then(async result => {
 
-      const { content } = result.headers
-
       return sender({
         url: env.WEBHOOK_TOP_GG_COUNTER || "",
         avatarURL: env.TOP_GG_WEBHOOK_AVATAR,
         username: "[API] Top GG Vote Notification",
-        content: <string>content
+        content: result.headers.content as string
       }, res)
         .then(() => res
           .status(200)

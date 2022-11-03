@@ -20,7 +20,7 @@ server.get("/auth", async (_, res) => {
     if (hasData)
         return res.redirect("/login");
 
-    return res.redirect(<string>env.AUTH_LOGIN_LINK);
+    return res.redirect(env.AUTH_LOGIN_LINK);
 });
 
 server.get("/auth/redirect", async (req, res) => {
@@ -31,8 +31,8 @@ server.get("/auth/redirect", async (req, res) => {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             data: qs.stringify({
-                client_id: <string>env.CLIENT_ID,
-                client_secret: <string>env.CLIENT_SECRET,
+                client_id: env.CLIENT_ID,
+                client_secret: env.CLIENT_SECRET,
                 grant_type: "authorization_code",
                 code: (<Record<string, string>>req?.query)?.code,
                 redirect_uri: "http://localhost:8080/auth/redirect"
@@ -53,9 +53,9 @@ server.get("/auth/redirect", async (req, res) => {
         const saphireGuilds = await axios({
             method: "GET",
             headers: {
-                authorization: <string>env.GUILDS_ACCESS
+                authorization: env.GUILDS_ACCESS
             },
-            url: <string>env.ROUTE_SAPHIRE_GUILDS
+            url: env.ROUTE_SAPHIRE_GUILDS
         })
             .then((resp) => resp.data);
 
@@ -66,28 +66,26 @@ server.get("/auth/redirect", async (req, res) => {
             },
             url: "https://discord.com/api/users/@me/guilds"
         })
-            .then((resp) => {
-                return resp.data
-                    .map((guild: APIGuild) =>
-                        saphireGuilds.includes(guild.id)
-                            ? {
-                                id: guild.id,
-                                name: guild.name,
-                                icon: guild.icon,
-                                owner: guild.owner,
-                                permissions: guild.permissions,
-                                inServerBot: true
-                            }
-                            : {
-                                id: guild.id,
-                                name: guild.name,
-                                icon: guild.icon,
-                                owner: guild.owner,
-                                permissions: guild.permissions,
-                                inServerBot: false
-                            }
-                    );
-            });
+            .then((resp) => resp.data
+                .map((guild: APIGuild) =>
+                    saphireGuilds.includes(guild.id)
+                        ? {
+                            id: guild.id,
+                            name: guild.name,
+                            icon: guild.icon,
+                            owner: guild.owner,
+                            permissions: guild.permissions,
+                            inServerBot: true
+                        }
+                        : {
+                            id: guild.id,
+                            name: guild.name,
+                            icon: guild.icon,
+                            owner: guild.owner,
+                            permissions: guild.permissions,
+                            inServerBot: false
+                        }
+                ));
 
         await login.create({
             ip: getMachineIp(),
@@ -155,19 +153,19 @@ server.get("/logout", async (_, res) => {
         })
 });
 
-// setInterval(async (): Promise<void> => {
+setInterval(async (): Promise<void> => {
 
-//     const verifyDate: ModelType[] = await login.find({}) || [];
-//     if (!verifyDate || !verifyDate.length) return;
+    const verifyDate = await login.find({}) || [];
+    if (!verifyDate || !verifyDate.length) return;
 
-//     const toDelete = verifyDate.filter(data => (Date.now() - data.loginDate) >= (1000 * 60) * 60) || []
-//     if (!toDelete || !toDelete.length) return;
+    const toDelete = verifyDate.filter(data => (Date.now() - data.loginDate) >= (1000 * 60) * 60) || []
+    if (!toDelete || !toDelete.length) return;
 
-//     const query = toDelete.map(data => data.ip)
-//     await login.deleteMany({ ip: { $in: query } })
+    const query = toDelete.map(data => data.ip)
+    await login.deleteMany({ ip: query })
 
-//     return;
-// }, 300000);
+    return;
+}, 300000);
 
 function getTime(time: number): string { //TODO: Retorno errado
     const hours: number = Math.floor(time / 3600);
