@@ -14,13 +14,13 @@ GET - `/commands`
 > returns an object array containing all Saphire Bot's Commands with name, category and description
 
 ```json
-[      
+[
+  "return json example",
   {
     "name": "admin",
     "category": "admin",
     "description": "[admin] Comandos administrativos"
-  },
-  ...{}
+  }
 ]
 ```
 *A field at header with name "authorization" is required*
