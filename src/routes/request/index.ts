@@ -6,7 +6,7 @@ import axios from "axios"
 import { UserData } from "../../@types"
 import { APIGuild } from "discord.js"
 import { env } from "node:process"
-// TODO: [object Promise] dropping at console.log
+
 function getMachineIp(): string | void {
     const networkInfo = os.networkInterfaces();
     if (!networkInfo?.Ethernet?.[0]?.address) return
