@@ -6,9 +6,8 @@
 - NewLayer#0333 - 732954224090021920 - Login System, Routers Designer and Database Login Documents
 - Gorniaky#2023 - 395669252121821227 - Initing and Maintenence
 
-> Base URL: `https://ways.discloud.app`
-
 # Routes and Methods
+> Base URL: `https://ways.discloud.app`
 ### **GET - `/commands`**
 > Return an object array containing all Saphire Bot's Commands with name, category and description.
 
