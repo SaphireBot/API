@@ -22,7 +22,10 @@ export default async (
     res?: FastifyReply
 ) => {
 
+    if (!url) return
+
     const webhook = new WebhookClient({ url })
+    if (!webhook) return
 
     return webhook.send({ username, avatarURL, content, embeds, files })
         .then(() => res?.status(200).send("Ok"))
