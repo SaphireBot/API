@@ -20,25 +20,22 @@ server.post("/topgg", async (req, res) => {
 
   return request(env.ROUTE_SAPHIRE_TOP_GG || "", {
     method: "POST",
-    headers: {
-      user: user
-    }
+    headers: { 
+      user,
+      authorization: env.TOP_GG_AUTHORIZATION
+     }
   })
-    .then(async result => sender({
+    .then(result => sender({
       url: env.WEBHOOK_TOP_GG_COUNTER || "",
       avatarURL: env.TOP_GG_WEBHOOK_AVATAR,
       username: "[API] Top GG Vote Notification",
       content: result.headers.content as string
     }, res)
-      .then(() => res
-        .status(200)
-        .send("Ok")
-      ))
+      .then(() => res.status(200).send("Ok")))
     .catch(err => {
       console.log(res)
       return res
         .status(500)
         .send(err || "Internal Server Error Not Found")
-    }
-    )
+    })
 })
