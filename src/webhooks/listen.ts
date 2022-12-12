@@ -1,5 +1,5 @@
 import sender from "./sender";
-import { CallbackError, connect } from "mongoose";
+import { CallbackError, connect, set } from "mongoose"
 import { env } from "node:process";
 import dataJSON from "../json/data.json";
 
@@ -7,6 +7,8 @@ export default async (err: Error | null, address: string): Promise<void> => {
 
     if (err)
         return errorAtEnableListen(err, address);
+
+    set("strictQuery", true)
 
     return connect(env.DB_LOGIN,
         async function logger(error: CallbackError | null) {
