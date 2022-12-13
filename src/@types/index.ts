@@ -59,6 +59,53 @@ export interface ModelType extends DocumentSetOptions {
   loginDate: number
 }
 
+export interface SaphireApiBotResponse {
+  status: string
+}
+
+export interface SquareCloudStartBot {
+  status: string
+  code: string
+  message: string
+}
+
+export interface SquareCloudAppStatus {
+  status: string
+  code: string
+  response: {
+    cpu: string
+    ram: string
+    status: string
+    running: boolean
+    storage: string
+    network: {
+      total: string
+      now: string
+    },
+    requests: number
+    uptime: number
+    time: number
+  }
+}
+
+export interface DiscloudAppStatus {
+  status: string
+  message: string
+  apps: {
+    id: string
+    name: string
+    online: boolean,
+    ramKilled: boolean,
+    exitCode: number,
+    ram: number,
+    mainFile: string
+    lang: string
+    mods: [string]
+    autoDeployGit: string
+    autoRestart: boolean
+  }
+}
+
 export interface UserData {
   id: string,
   username: string,

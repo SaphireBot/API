@@ -2,6 +2,7 @@ import sender from "./sender";
 import { CallbackError, connect, set } from "mongoose"
 import { env } from "node:process";
 import dataJSON from "../json/data.json";
+import initCheckerInterval from "../checker";
 
 export default async (err: Error | null, address: string): Promise<void> => {
 
@@ -23,13 +24,12 @@ export default async (err: Error | null, address: string): Promise<void> => {
                 content: `${dataJSON.emojis.check} | API conectada com sucesso.\n${dataJSON.emojis.database} | ${databaseResponse}\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`
             }).catch(() => null);
 
+            initCheckerInterval("Discloud")
             return console.log(`Saphire's API Connected\n${databaseResponse}`);
         });
 }
 
 async function errorAtEnableListen(err: Error | null, address: string): Promise<void> {
-
-    console.log(err, address);
 
     await sender({
         url: env.WEBHOOK_STATUS,

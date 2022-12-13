@@ -24,6 +24,10 @@ declare global {
       CLIENT_ID: string
       CLIENT_SECRET: string
       SERVER_PORT: number
+      APP_ID: string
+      SQUARE_API_TOKEN: string
+      DISCLOUD_TOKEN: string
+      DISCLOUD_APP_ID: string
     }
   }
 }
