@@ -6,7 +6,24 @@ import discloud from "./discloud"
 import { env } from "process"
 import { SaphireApiBotResponse, SquareCloudStartBot } from "../@types"
 
-export default async (): Promise<void> => {
+export default (): void => {
+
+    setTimeout(async (): Promise<void> => {
+
+        const anotherCheck = await discloudCheck()
+
+        if (anotherCheck && ["Online", "success"].includes(anotherCheck?.status)) {
+            setTimeout(() => initCheckerInterval("Discloud"), 5000)
+            return;
+        }
+
+        return execute()
+
+    }, 5000)
+
+}
+
+async function execute(): Promise<void> {
 
     sender({
         url: env.WEBHOOK_STATUS,
@@ -17,7 +34,7 @@ export default async (): Promise<void> => {
 
     const req: SaphireApiBotResponse | null = await axios.get("https://bot.squareweb.app/", { timeout: 5000 })
         .then((data): SaphireApiBotResponse => data.data)
-        .catch((): null =>  null)
+        .catch((): null => null)
 
     if (req && req.status === "Online") {
         sender({
@@ -32,6 +49,15 @@ export default async (): Promise<void> => {
     }
 
     return connect()
+}
+
+async function discloudCheck(): Promise<SaphireApiBotResponse | null> {
+
+    const req: SaphireApiBotResponse | null = await axios.get("https://saphire.discloud.app/", { timeout: 5000 })
+        .then((data): SaphireApiBotResponse => data.data)
+        .catch((): null => null)
+
+    return req
 }
 
 async function connect(): Promise<void> {
