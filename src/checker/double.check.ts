@@ -8,7 +8,7 @@ export default (): void => {
     if (checked) return
 
     checked = true
-    setTimeout(() => doubleCheck(), 5000)
+    setTimeout(() => doubleCheck(), 30000)
     return;
 }
 
