@@ -30,6 +30,7 @@ declare global {
       DISCLOUD_APP_ID: string
       COMMIT_AUTHORIZATION: string
       SAPHIRE_ID: string
+      SAPHIRE_API_ID: string
     }
   }
 }
