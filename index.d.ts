@@ -28,6 +28,8 @@ declare global {
       SQUARE_API_TOKEN: string
       DISCLOUD_TOKEN: string
       DISCLOUD_APP_ID: string
+      COMMIT_AUTHORIZATION: string
+      SAPHIRE_ID: string
     }
   }
 }
