@@ -25,7 +25,8 @@ export default async (
     if (!url) return
 
     const webhook = new WebhookClient({ url })
-    if (!webhook || (!content && !embeds)) return
+    if (!webhook || (!content && !embeds))
+        return res?.status(500).send("Webhook, content or embeds are missing.")
 
     return webhook.send({ username, avatarURL, content, embeds, files })
         .then(() => res?.status(200).send("Ok"))
