@@ -29,7 +29,7 @@ export default async (
         return res?.status(500).send("Webhook, content or embeds are missing.")
 
     return webhook.send({ username, avatarURL, content, embeds, files })
-        .then(() => res?.status(200).send("Ok"))
+        .then(() => res?.status(200).send("Webhook message sended"))
         .catch(error => res
             ?.status(500)
             ?.send({ response: "Error to execute the sender", error })

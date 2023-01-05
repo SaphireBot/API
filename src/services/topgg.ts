@@ -11,14 +11,21 @@ server.post("/topgg", async (req, res) => {
       .status(401)
       .send("Authorization is not defined correctly.");
 
-  const { user } = <TopGGWebhookPostResult>req.body
+  // type: "upvote" | "test"
+  const { user, bot, type } = req.body as TopGGWebhookPostResult
+
+  if (!user || !bot || !type)
+    return res.status(206).send("Content are missing")
+
+  if (bot !== env.SAPHIRE_BOT_ID || type === "test")
+    return res.status(200).send("Test OK")
 
   if (!/(\d{17,})/.test(user))
     return res
       .status(406)
       .send("Content is not acceptable");
 
-  return request(env.ROUTE_SAPHIRE_TOP_GG || "", {
+  const webhookSended: number = await request(env.ROUTE_SAPHIRE_TOP_GG || "", {
     method: "POST",
     headers: {
       user,
@@ -27,24 +34,33 @@ server.post("/topgg", async (req, res) => {
   })
     .then(result => {
 
-      if (!result)
-        return res
-          .status(200)
+      if (!result || !result.headers.content) {
+        res
+          .status(206)
           .send("It's ok, but it didn't announce.")
+        return 206
+      }
 
       sender({
         url: env.WEBHOOK_TOP_GG_COUNTER as string,
-        avatarURL: result.headers.avatarURL as string,
-        username: result.headers.username as string,
+        avatarURL: env.TOP_GG_WEBHOOK_AVATAR as string,
+        username: "[API] Top GG Vote Notification",
         content: result.headers.content as string
       }, res)
-        .then(() => res.status(200).send("Ok"))
 
+      return result.statusCode
     })
     .catch(err => {
       console.log(res)
-      return res
+      res
         .status(500)
-        .send(err || "Internal Server Error Not Found")
+        .send(err)
+
+      return 500
     })
+
+  if (webhookSended === 200)
+    return res.status(200).send()
+
+  return res.status(webhookSended).send()
 })
