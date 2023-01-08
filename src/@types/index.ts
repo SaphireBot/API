@@ -11,6 +11,11 @@ export interface TopGGWebhookPostResult {
   bot: string
 }
 
+export interface OnlineAlert {
+  authorization: string,
+  host: string
+}
+
 export interface WebhookBodyRequest extends FastifyRequest {
   webhookUrl: string,
   content: string,

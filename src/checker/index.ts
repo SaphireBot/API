@@ -1,12 +1,9 @@
 import axios from "axios";
 import { SaphireApiBotResponse } from "../@types";
 import discloud from "./discloud";
-import doubleCheck from "./double.check";
 import squarecloud from "./squarecloud";
 
 export default async function initCheckerInterval(host: string): Promise<void> {
-
-    doubleCheck()
 
     const url = host === "Discloud"
         ? "https://saphire.discloud.app/"

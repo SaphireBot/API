@@ -31,6 +31,7 @@ declare global {
       COMMIT_AUTHORIZATION: string
       SAPHIRE_ID: string
       SAPHIRE_BOT_ID: string
+      LOGIN_ACCESS: string
       SAPHIRE_API_ID: string
     }
   }
