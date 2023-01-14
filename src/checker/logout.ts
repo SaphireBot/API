@@ -26,7 +26,7 @@ export default async (): Promise<void> => {
             avatarURL: "https://media.discordapp.net/attachments/893361065084198954/1018699630998986752/data-management.png?width=473&height=473",
             username: "[API] Saphire Status | Adjusted"
         })
-
+        
     return sender({
         url: env.WEBHOOK_STATUS,
         content: "📡 | Não foi possível desligar a aplicação na Host Squarecloud.",

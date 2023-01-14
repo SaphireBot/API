@@ -24,7 +24,7 @@ server.post("/sender", async (req, res) => {
   if (content && typeof content !== "string")
     return res
       .status(406) // Not Acceptable
-      .send({ status: "Embeds is not an array" });
+      .send({ status: "Content is not string" });
 
   return sender({ url, username, avatarURL, content, embeds, files }, res)
     .then(() => res.status(200).send("Ok"))

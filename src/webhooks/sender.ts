@@ -22,7 +22,8 @@ export default async (
     res?: FastifyReply
 ) => {
 
-    if (!url) return
+    if (!url)
+        return res?.status(500).send("URL are missing")
 
     const webhook = new WebhookClient({ url })
     if (!webhook || (!content && !embeds))
