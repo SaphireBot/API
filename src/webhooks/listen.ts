@@ -13,7 +13,7 @@ export default async (err: Error | null, address: string): Promise<void> => {
 
     return connect(env.DB_LOGIN,
         async function logger(error: CallbackError | null) {
-            if (error) console.log(error)
+            
             const databaseResponse = error
                 ? `Houve um erro ao me conectar com o banco de dados!\nError: ${error}`
                 : "Conexão efetuada com sucesso!"

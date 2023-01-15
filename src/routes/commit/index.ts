@@ -155,18 +155,15 @@ async function squareCommit(form: FormData): Promise<void> {
             avatarURL: "https://media.discordapp.net/attachments/893361065084198954/1018699630998986752/data-management.png?width=473&height=473",
             username: "[API] Saphire Status | Squarecloud Commit Success"
         }))
-        .catch(error => {
-            console.log(error)
-            sender({
-                url: env.WEBHOOK_STATUS,
-                content: "📡 | Não foi possível realizar o commit na Host Squarecloud.",
-                avatarURL: "https://media.discordapp.net/attachments/893361065084198954/1018699630998986752/data-management.png?width=473&height=473",
-                username: "[API] Saphire Status | Squarecloud Commit Error",
-                embeds: [{
-                    color: 0xFFFFFF,
-                    title: "Relatório de erro",
-                    description: `\`\`\`txt\n${error}\n\`\`\``
-                }]
-            })
-        });
+        .catch(error => sender({
+            url: env.WEBHOOK_STATUS,
+            content: "📡 | Não foi possível realizar o commit na Host Squarecloud.",
+            avatarURL: "https://media.discordapp.net/attachments/893361065084198954/1018699630998986752/data-management.png?width=473&height=473",
+            username: "[API] Saphire Status | Squarecloud Commit Error",
+            embeds: [{
+                color: 0xFFFFFF,
+                title: "Relatório de erro",
+                description: `\`\`\`txt\n${error}\n\`\`\``
+            }]
+        }));
 }
