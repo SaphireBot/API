@@ -12,6 +12,7 @@ server.post("/topgg", async (req, res) => {
       .send("Authorization is not defined correctly.");
 
   const { user } = req.body as TopGGWebhookPostResult
+
   await request(env.ROUTE_SAPHIRE_TOP_GG || "", {
     method: "POST",
     headers: { user, authorization: env.TOP_GG_AUTHORIZATION }

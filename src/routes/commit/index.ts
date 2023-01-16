@@ -12,10 +12,9 @@ server.post("/commit", async (req, res): Promise<number> => {
             .send("Authorization is not defined correctly.");
 
     const discloudFileUrl = req.headers.discloud as string | null
-    const squarecloudFileUrl = req.headers.squarecloud as string | null
     const apiFileUrl = req.headers.api as string | null
 
-    if (!discloudFileUrl && !squarecloudFileUrl && !apiFileUrl)
+    if (!discloudFileUrl && !apiFileUrl)
         return res
             .status(401)
             .send("No file in any hosts.")
@@ -30,18 +29,6 @@ server.post("/commit", async (req, res): Promise<number> => {
         form.append("file", discloudFile, { filename: "file.zip" })
 
         discloudCommit(form)
-    }
-
-    if (squarecloudFileUrl) {
-
-        const squarecloudFile = await axios.get(squarecloudFileUrl, { responseType: "arraybuffer" })
-            .then(data => data.data)
-            .catch(() => null)
-
-        const form = new FormData()
-        form.append("file", squarecloudFile, { filename: "file.zip" })
-
-        squareCommit(form)
     }
 
     if (apiFileUrl) {
@@ -129,41 +116,4 @@ async function discloudCommit(form: FormData): Promise<void> {
             }]
         }));
 
-}
-
-async function squareCommit(form: FormData): Promise<void> {
-
-    sender({
-        url: env.WEBHOOK_STATUS,
-        content: "📡 | Inicializando commit na Host Squarecloud",
-        avatarURL: "https://media.discordapp.net/attachments/893361065084198954/1018699630998986752/data-management.png?width=473&height=473",
-        username: "[API] Saphire Status | Discloud Commit Inicializing..."
-    })
-
-    return axios.postForm(`https://api.squarecloud.app/v1/public/commit/${env.APP_ID}`,
-        form,
-        {
-            headers: {
-                authorization: `${env.SQUARE_API_TOKEN}`,
-                "Content-Type": "multipart/form-data",
-                restart: false
-            }
-        })
-        .then(() => sender({
-            url: env.WEBHOOK_STATUS,
-            content: "📡 | Commit realizado com sucesso na Host Squarecloud. Reinicialização cancelada.",
-            avatarURL: "https://media.discordapp.net/attachments/893361065084198954/1018699630998986752/data-management.png?width=473&height=473",
-            username: "[API] Saphire Status | Squarecloud Commit Success"
-        }))
-        .catch(error => sender({
-            url: env.WEBHOOK_STATUS,
-            content: "📡 | Não foi possível realizar o commit na Host Squarecloud.",
-            avatarURL: "https://media.discordapp.net/attachments/893361065084198954/1018699630998986752/data-management.png?width=473&height=473",
-            username: "[API] Saphire Status | Squarecloud Commit Error",
-            embeds: [{
-                color: 0xFFFFFF,
-                title: "Relatório de erro",
-                description: `\`\`\`txt\n${error}\n\`\`\``
-            }]
-        }));
 }

@@ -11,7 +11,4 @@ server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online
 server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalServer));
 server.get("/ping", (_, res) => res.status(200).send("Saphire's API PING"))
 
-server.listen({
-  port: Number(env.SERVER_PORT),
-  host: "0.0.0.0"
-}, listen);
+server.listen({ port: Number(env.SERVER_PORT), host: "0.0.0.0" }, listen);
