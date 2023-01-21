@@ -38,18 +38,6 @@ _The key called "authorization" in **headers** is required_
 ```
 _The key called "authorization" in **headers** is required_
 
-### **POST - `/topgg`**
->  Receive the Saphire Bot's Votes from [Top.gg](https://top.gg).
-
-> @returns "OK" - String | Status 200 "OK"
-```json
-{
-  "status": 200,
-  "message": "OK"
-}
-```
-_The key called "authorization" in **headers** is required_
-
 ### **POST - `/sender`**
 >  Send a webhook message request to Discord API by URL
 

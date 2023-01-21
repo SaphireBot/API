@@ -4,13 +4,6 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
 
-export interface TopGGWebhookPostResult {
-  user: string
-  type: string
-  query?: string
-  bot: string
-}
-
 export interface WebhookBodyRequest extends FastifyRequest {
   webhookUrl: string,
   content: string,
