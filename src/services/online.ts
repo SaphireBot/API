@@ -10,10 +10,10 @@ server.post("/online", async (req, res) => {
             .status(401)
             .send("Authorization is not defined correctly.");
 
-    res.status(200).send({ continue: "Online" })
+    res.status(200).send()
 
     return await sender({
         url: process.env.WEBHOOK_STATUS,
-        content: `${json.emojis.check} | A apliacação conectou com a API com sucesso.`
+        content: `${json.emojis.check} | A aplicação conectou com a API com sucesso pela máquina \`${req.headers.hostname || "No Machine Defined"}\`.`
     })
 })
