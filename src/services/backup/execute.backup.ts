@@ -1,51 +1,39 @@
-import axios from "axios"
 import databaseBackup from "./database.backup"
-import { WebhookClient, APIMessage } from "discord.js"
+import { WebhookClient, APIMessage, REST, Routes } from "discord.js"
 import { env } from "process"
 import { DiscordWebhook } from "../../@types"
 import { emojis } from "../../json/data.json"
+import { readFileSync } from "fs"
+const avatar = readFileSync("./src/images/webhook_logo.png", { encoding: "base64" })
 let webhook: WebhookClient | undefined;
 let message: APIMessage | undefined;
+const request = new REST().setToken(process.env.BOT_TOKEN_REQUEST)
 
 async function execute(): Promise<void> {
 
-    const webhookFetch: DiscordWebhook[] = await axios.get("https://discord.com/api/v10/channels/1036298713691328614/webhooks", {
-        headers: {
-            authorization: `Bot ${env.BOT_TOKEN_REQUEST}`
-        }
-    })
-        .then(data => data.data)
-        .catch(() => [])
+    const webhookFetch: DiscordWebhook[] | unknown = await request.get(Routes.channelWebhooks(env.CHANNEL_WEBHOOK_STATUS)).catch(() => [])
 
-    let apiWebhook: DiscordWebhook | undefined = webhookFetch.find(wh => wh?.user?.username == "Saphire API")
+    let apiWebhook: DiscordWebhook = Array.isArray(webhookFetch)
+        ? webhookFetch.find(wh => wh?.user?.username == "Saphire API")
+        : undefined
 
     if (!apiWebhook)
-        apiWebhook = await axios({
-            url: "https://discord.com/api/v10/channels/1036298713691328614/webhooks",
-            method: "POST",
-            headers: {
-                authorization: `Bot ${env.BOT_TOKEN_REQUEST}`
+        apiWebhook = <DiscordWebhook>await request.post(Routes.channelWebhooks(env.CHANNEL_WEBHOOK_STATUS), {
+            body: {
+                name: "[API] Database Backup Manager",
+                avatar: `data:image/png;base64,${avatar}`,
             },
-            data: {
-                name: "[API] Database Backup Manager"
-            }
+            headers: { "Content-Type": "image/png" }
         })
-            .then(response => {
-                return response.data as DiscordWebhook
-            })
-            .catch(err => {
-                console.log(err)
-                return undefined
-            })
+            .catch(() => undefined)
 
-    if (apiWebhook && apiWebhook?.token) {
+    if (apiWebhook && apiWebhook.token) {
         env.WEBHOOK_STATUS = `https://discord.com/api/webhooks/${apiWebhook?.id}/${apiWebhook.token}`
         webhook = new WebhookClient({ url: env.WEBHOOK_STATUS as string })
 
         message = await webhook.send({
             content: `${emojis.loading} Inicializando o backup do banco de dados...`,
-            username: "[API] Database Backup Manager",
-            avatarURL: env.WEHBHOOK_SYSTEM_AVATAR
+            username: "[API] Database Backup Manager"
         })
             .catch(() => undefined)
     }

@@ -46,6 +46,7 @@ declare global {
       ROUTE_USERS_FROM_DATABASE: string
       BOT_TOKEN_REQUEST: string
       WEHBHOOK_SYSTEM_AVATAR: string
+      CHANNEL_WEBHOOK_STATUS: string
     }
   }
 }

@@ -30,11 +30,10 @@ export default async (): Promise<void> => {
     const midnight = date.valueOf()
     const timeRemaing = midnight - Date.now()
 
-    if (message) {
+    if (message)
         webhook?.editMessage(message.id, {
             content: `${emojis.check} Backup finalizado.\n📅 Próximo backup em: ${format(date)}`
         }).catch(() => null)
-    }
 
     setTimeout(() => execute(), timeRemaing)
     return
