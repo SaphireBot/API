@@ -1,3 +1,4 @@
+process.env.TZ = "America/Sao_Paulo"
 import "dotenv/config";
 import "./services";
 import "./webhooks";
