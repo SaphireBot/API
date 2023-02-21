@@ -28,9 +28,8 @@ async function save(fileName: string, url: string): Promise<void> {
         })
         .catch(() => false)
 
-    if (Array.isArray(data)) {
+    if (Array.isArray(data))
         writeFileSync(`${fileName}.json`, JSON.stringify(data))
-    }
 
     return
 }
