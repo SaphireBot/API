@@ -2,6 +2,8 @@ import { env } from "process"
 import { save, redefine } from "./save.backup"
 import { emojis } from "../../json/data.json"
 import { execute, webhook, message } from "./execute.backup"
+import Zip from "../../util/zip"
+import { rmSync } from "fs"
 
 export default async (): Promise<void> => {
 
@@ -16,13 +18,18 @@ export default async (): Promise<void> => {
         { name: "indications", url: env.ROUTE_INDICATIONS_FROM_DATABASE },
         { name: "memes", url: env.ROUTE_MEMES_FROM_DATABASE },
         { name: "rathers", url: env.ROUTE_RATHERS_FROM_DATABASE },
-        { name: "reminders", url: env.ROUTE_REMINDERS_FROM_DATABASE },
+        { name: "reminders", url: env.ROUTE_REMINDERS_FROM_DATABASE }
     ]
 
     for await (const document of documentData)
         await save(document.name, document.url)
 
     redefine()
+    const zip = new Zip("./src/services/backup/temp/backup.zip")
+    zip.appendFileList(documentData.map(document => `${document.name}.json`), __dirname)
+    const success: boolean = await zip.finalize().catch(() => false)
+
+    for (const document of documentData) rmSync(`${document.name}.json`)
 
     const date = new Date()
     date.setDate(date.getDate() + 1)
@@ -32,7 +39,7 @@ export default async (): Promise<void> => {
 
     if (message)
         webhook?.editMessage(message.id, {
-            content: `${emojis.check} Backup finalizado.\n📅 Próximo backup em: ${format(date)}`
+            content: `${success ? `${emojis.check} Backup finalizado.` : `${emojis.deny} Falha ao efetuar o backup`}\n${emojis.database} ${documentData.map(document => `**\`${document.name}\`**`).join(", ")}\n📅 Próximo backup em: ${format(date)}`
         }).catch(() => null)
 
     setTimeout(() => execute(), timeRemaing)
