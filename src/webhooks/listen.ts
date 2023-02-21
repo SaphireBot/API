@@ -21,7 +21,7 @@ export default async (err: Error | null, address: string): Promise<void> => {
                 url: env.WEBHOOK_STATUS,
                 username: "[API] Connection Status",
                 content: `${dataJSON.emojis.check} | API conectada com sucesso.\n${dataJSON.emojis.database} | ${databaseResponse}\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`,
-                avatarURL: env.WEHBHOOK_SYSTEM_AVATAR
+                avatarURL: env.WEBHOOK_GSN_AVATAR
             }).catch(() => null);
 
             return console.log(`Saphire's API Connected\n${databaseResponse}`);
