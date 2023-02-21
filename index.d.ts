@@ -44,6 +44,8 @@ declare global {
       ROUTE_RATHERS_FROM_DATABASE: string
       ROUTE_REMINDERS_FROM_DATABASE: string
       ROUTE_USERS_FROM_DATABASE: string
+      BOT_TOKEN_REQUEST: string
+      WEHBHOOK_SYSTEM_AVATAR: string
     }
   }
 }

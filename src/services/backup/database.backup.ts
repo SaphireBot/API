@@ -1,9 +1,9 @@
-import axios from "axios"
 import { env } from "process"
-import saveBackup from "./save.backup"
+import { save, redefine } from "./save.backup"
 import { emojis } from "../../json/data.json"
+import { execute, webhook, message } from "./execute.backup"
 
-export default async () => {
+export default async (): Promise<void> => {
 
     const documentData = [
         { name: "users", url: env.ROUTE_USERS_FROM_DATABASE },
@@ -20,15 +20,31 @@ export default async () => {
     ]
 
     for await (const document of documentData)
-        await saveBackup(document.name, document.url)
+        await save(document.name, document.url)
 
-    await axios({
-        url: env.WEBHOOK_STATUS,
-        method: "POST",
-        data: {
-            content: `${emojis.check} Backup finalizado.`,
-            username: "[API] Database Backup Manager"
-        }
-    })
-        .catch(() => null)
+    redefine()
+
+    const date = new Date()
+    date.setDate(date.getDate() + 1)
+    date.setHours(0, 0, 0, 0)
+    const midnight = date.valueOf()
+    const timeRemaing = midnight - Date.now()
+
+    if (message) {
+        webhook?.editMessage(message.id, {
+            content: `${emojis.check} Backup finalizado.\n📅 Próximo backup em: ${format(date)}`
+        }).catch(() => null)
+    }
+
+    setTimeout(() => execute(), timeRemaing)
+    return
+}
+
+function format(date: Date): string {
+
+    return `${n(date.getDate())}/${n(date.getMonth() + 1)}/${n(date.getFullYear())} ás ${n(date.getHours())}:${n(date.getMinutes())}:${n(date.getSeconds())}`
+
+    function n(num: number): string {
+        return `${num}`.length == 1 ? `0${num}` : `${num}`
+    }
 }

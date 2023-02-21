@@ -96,3 +96,24 @@ export interface DatabaseType {
   saphireResult: string | Error
   cacheResult: string | Error
 }
+
+export interface DiscordWebhook {
+  type: 1,
+  id: string,
+  name: string,
+  avatar: string | null,
+  channel_id: string,
+  guild_id: string,
+  application_id: string,
+  token: string,
+  user: {
+    id: string,
+    username: string,
+    display_name: string | null,
+    avatar: string,
+    avatar_decoration: string | null,
+    discriminator: string,
+    public_flags: number | null,
+    bot: boolean
+  }
+}

@@ -2,7 +2,9 @@
     "emojis": {
         "check": "<:check:889181556646768671>",
         "deny": "<:deny:889181507854426113>",
-        "database": "<:Database:928130726438776883>"
+        "database": "<:Database:928130726438776883>",
+        "info": "<:info:883509103438229534>",
+        "loading": "<a:loading:883148609040838698>"
     },
     "urls": {
         "discordPrincipalServer": "https://discord.gg/2EMVCbJxuC"
