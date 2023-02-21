@@ -47,6 +47,7 @@ declare global {
       BOT_TOKEN_REQUEST: string
       WEHBHOOK_SYSTEM_AVATAR: string
       CHANNEL_WEBHOOK_STATUS: string
+      GET_BACKUP_ZIP: string
     }
   }
 }
