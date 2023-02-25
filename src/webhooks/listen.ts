@@ -3,7 +3,7 @@ import { CallbackError, connect, set } from "mongoose"
 import { env } from "node:process";
 import dataJSON from "../json/data.json";
 
-export default async (err: Error | null, address: string): Promise<void> => {
+export default async (err?: Error | null, address?: string): Promise<void> => {
 
     if (err)
         return errorAtEnableListen(err, address);
@@ -28,7 +28,7 @@ export default async (err: Error | null, address: string): Promise<void> => {
         });
 }
 
-async function errorAtEnableListen(err: Error | null, address: string): Promise<void> {
+async function errorAtEnableListen(err: Error | null, address?: string): Promise<void> {
 
     await sender({
         url: env.WEBHOOK_STATUS,
@@ -39,7 +39,7 @@ async function errorAtEnableListen(err: Error | null, address: string): Promise<
             description: `\`\`\`\n${err}\n\`\`\``.slice(0, 4000),
             fields: [{
                 name: "📨 Rota",
-                value: address
+                value: address || "Nenhum endereço encontrado"
             }]
         }]
     }).catch(() => null);

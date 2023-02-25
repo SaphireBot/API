@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { env } from "process";
-import server from "../../server";
+import { server } from "../../server";
 
 server.get("/backup", async (req, res) => {
 

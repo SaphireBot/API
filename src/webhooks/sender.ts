@@ -1,6 +1,6 @@
 import { Stream } from "node:stream";
 import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, WebhookClient } from "discord.js";
-import { FastifyReply } from "fastify";
+import { Response } from "express"
 
 export default async (
     { url, username, avatarURL, content, embeds, files }:
@@ -19,7 +19,7 @@ export default async (
                 | AttachmentPayload
             )[]
         },
-    res?: FastifyReply
+    res?: Response
 ) => {
 
     if (!url)

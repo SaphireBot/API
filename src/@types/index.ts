@@ -1,10 +1,10 @@
 import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable } from "discord.js";
 import { Stream } from "node:stream";
-import { FastifyRequest, FastifyReply } from "fastify";
 import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
+import { Request } from "express"
 
-export interface WebhookBodyRequest extends FastifyRequest {
+export interface WebhookBodyRequest extends Request {
   webhookUrl: string,
   content: string,
   embeds: APIEmbed[],
@@ -18,16 +18,6 @@ export interface WebhookBodyRequest extends FastifyRequest {
     | AttachmentBuilder
     | AttachmentPayload
   )[]
-}
-
-export interface Response extends FastifyReply {
-  FastifyReply: FastifyReply
-}
-
-export interface Request extends FastifyRequest {
-  query: {
-    code?: string
-  }
 }
 
 export interface CommandsSaphire {

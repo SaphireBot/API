@@ -1,7 +1,7 @@
 import { fetch } from "undici"
 import { env } from "node:process"
 import { CommandsSaphire } from "../../@types/index"
-import server from "../../server"
+import { server } from "../../server"
 
 server.get("/commands", async (req, res) => {
 

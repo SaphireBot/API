@@ -1,4 +1,4 @@
-import server from "../../server";
+import { server } from "../../server";
 import login from "../../database/model/model.js";
 import qs from "qs";
 import os from "os"

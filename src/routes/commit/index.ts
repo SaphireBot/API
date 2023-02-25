@@ -1,10 +1,10 @@
 import axios from "axios";
 import { env } from "node:process";
-import server from "../../server";
+import { server } from "../../server";
 import FormData from "form-data"
 import sender from "../../webhooks/sender";
 
-server.post("/commit", async (req, res): Promise<number> => {
+server.post("/commit", async (req, res) => {
 
     if (req.headers.authorization !== env.COMMIT_AUTHORIZATION)
         return res

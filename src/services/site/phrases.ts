@@ -1,6 +1,6 @@
 import { SiteHomePhrases } from "../../json/data.json"
 import { env } from "node:process"
-import server from "../../server"
+import { server } from "../../server"
 
 server.get("/phrases", async (req, res) => {
 

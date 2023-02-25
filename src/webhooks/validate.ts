@@ -1,10 +1,11 @@
 import { env } from "node:process";
 import { WebhookBodyRequest } from "../@types";
-import server from "../server";
+import { server } from "../server";
 import sender from "./sender";
 
 server.post("/sender", async (req, res) => {
-  const { webhookUrl: url, content, embeds, avatarURL, files, username } = <WebhookBodyRequest>req.body;
+
+  const { webhookUrl: url, content, embeds, avatarURL, files, username } = <WebhookBodyRequest>req.body ?? {};
 
   if (req.headers?.authorization !== env.WEBHOOK_ACCESS)
     return res

@@ -1,0 +1,4 @@
+*.zip
+*.example
+node_modules
+**/*.zip
