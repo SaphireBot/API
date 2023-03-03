@@ -49,7 +49,6 @@ declare global {
       CHANNEL_WEBHOOK_STATUS: string
       GET_BACKUP_ZIP: string
       WEBSOCKET_AUTH: string
-      WEBSOCKET_CONNECTION_AUTHORIZATION: string
     }
   }
 }

@@ -7,7 +7,7 @@ import { server, httpServer } from "./server";
 import dataJSON from "./json/data.json";
 import listen from "./webhooks/listen"
 import { env } from "process";
-import "./websocket/index"
+import "./websocket/index.websocket"
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
 server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalServer));
