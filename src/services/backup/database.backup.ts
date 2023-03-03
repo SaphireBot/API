@@ -18,7 +18,8 @@ export default async (): Promise<void> => {
         { name: "indications", url: env.ROUTE_INDICATIONS_FROM_DATABASE },
         { name: "memes", url: env.ROUTE_MEMES_FROM_DATABASE },
         { name: "rathers", url: env.ROUTE_RATHERS_FROM_DATABASE },
-        { name: "reminders", url: env.ROUTE_REMINDERS_FROM_DATABASE }
+        { name: "reminders", url: env.ROUTE_REMINDERS_FROM_DATABASE },
+        { name: "quiz", url: env.ROUTE_REMINDERS_FROM_DATABASE }
     ]
 
     for await (const document of documentData)
