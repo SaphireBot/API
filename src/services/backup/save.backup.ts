@@ -16,7 +16,7 @@ async function save(fileName: string, url: string): Promise<void> {
             const data = response.data || []
             if (message) {
 
-                const loadArray = ["⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜"]
+                const loadArray = ["⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜", "⬜"]
 
                 for (let i = 0; i <= count; i++)
                     loadArray[i] = data.length > 0 ? loadEmojis["green"] : loadEmojis["gold"]
