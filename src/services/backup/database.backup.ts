@@ -3,7 +3,7 @@ import { save, redefine } from "./save.backup"
 import { emojis } from "../../json/data.json"
 import { execute, webhook, message } from "./execute.backup"
 import Zip from "../../util/zip"
-import { rmSync } from "fs"
+import { rm } from "fs"
 
 export default async (): Promise<void> => {
 
@@ -30,7 +30,7 @@ export default async (): Promise<void> => {
     zip.appendFileList(documentData.map(document => `${document.name}.json`), __dirname)
     const success: boolean = await zip.finalize().catch(() => false)
 
-    for (const document of documentData) rmSync(`${document.name}.json`)
+    for (const document of documentData) rm(`${document.name}.json`, () => { null })
 
     const date = new Date()
     date.setDate(date.getDate() + 1)

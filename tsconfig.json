@@ -49,7 +49,6 @@
     "removeComments": true,
     // "noEmit": true,
     // "importHelpers": true,
-    "importsNotUsedAsValues": "preserve",
     // "downlevelIteration": true,
     "sourceRoot": "./",
     // "mapRoot": "",

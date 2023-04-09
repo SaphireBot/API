@@ -10,22 +10,25 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
 
     set("strictQuery", true)
 
-    return connect(env.DB_LOGIN,
-        async function logger(error: CallbackError | null) {
-            
+    connect(env.DB_LOGIN)
+        .catch((error: CallbackError | null): undefined => {
+
             const databaseResponse = error
                 ? `Houve um erro ao me conectar com o banco de dados!\nError: ${error}`
                 : "Conexão efetuada com sucesso!"
 
-            await sender({
+            sender({
                 url: env.WEBHOOK_STATUS,
                 username: "[API] Connection Status",
                 content: `${dataJSON.emojis.check} | API conectada com sucesso.\n${dataJSON.emojis.database} | ${databaseResponse}\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`,
                 avatarURL: env.WEBHOOK_GSN_AVATAR
             }).catch(() => null);
 
-            return console.log(`Saphire's API Connected\n${databaseResponse}`);
-        });
+            console.log(`Saphire's API Connected\n${databaseResponse}`);
+            return
+        })
+
+    return
 }
 
 async function errorAtEnableListen(err: Error | null, address?: string): Promise<void> {
