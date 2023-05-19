@@ -35,6 +35,10 @@ export default async (webhookUrl: string): Promise<void> => {
                             {
                                 name: "⏱️ Tempo Online",
                                 value: data?.uptime || "0 Segundo"
+                            },
+                            {
+                                name: "🗓️ Última Atualização",
+                                value: getDate()
                             }
                         ]
                     }]
@@ -72,6 +76,10 @@ async function send(webhookUrl: string, data: SaphireApiDataResponse) {
                         {
                             name: "⏱️ Tempo Online",
                             value: data?.uptime || "0 Segundo"
+                        },
+                        {
+                            name: "🗓️ Última Atualização",
+                            value: getDate()
                         }
                     ]
                 }]
@@ -100,4 +108,13 @@ async function getData(): Promise<SaphireApiDataResponse | null> {
         .catch(() => ({ status: false, guilds: 0, users: 0, commands: 0, ping: 0, interactions: 0 }))
 
     return data
+}
+
+function getDate(): string {
+    const date = new Date()
+    return `${format(date.getHours())}:${format(date.getMinutes())} ${format(date.getDate())}/${format(date.getMonth() + 1)}/${format(date.getFullYear())}`
+    function format(num: number) {
+        if (num < 10) return `0${num}`
+        return num
+    }
 }
