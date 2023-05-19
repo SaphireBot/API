@@ -107,3 +107,13 @@ export interface DiscordWebhook {
     bot: boolean
   }
 }
+
+export interface SaphireApiDataResponse {
+  status: boolean,
+  interactions: number,
+  guilds: number,
+  users: number,
+  commands: number,
+  ping: number,
+  uptime: string
+}

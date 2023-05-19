@@ -14,12 +14,12 @@ server.post("/sender", async (req, res) => {
 
   if (!url)
     return res
-      .status(204) // No Content
+      .status(204)
       .send({ status: "Unknown Webhook URL" });
 
   if (!content && (!embeds || !Array.isArray(embeds)))
     return res
-      .status(204) // No Content
+      .status(204)
       .send({ status: "Unknown Content and Embeds" });
 
   if (content && typeof content !== "string")
