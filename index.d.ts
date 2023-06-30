@@ -51,6 +51,7 @@ declare global {
       WEBSOCKET_AUTH: string
       API_BOT_TOKEN: string
       GET_DATA_AUTHORIZATION: string
+      DISCORD_TOKEN: string
     }
   }
 }
