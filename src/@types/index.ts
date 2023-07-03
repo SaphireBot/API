@@ -1,8 +1,8 @@
-import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable } from "discord.js";
+import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, MessageComponent, MessageReference } from "discord.js";
 import { Stream } from "node:stream";
 import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
-import { Request } from "express"
+import { Request, Response } from "express"
 
 export interface WebhookBodyRequest extends Request {
   webhookUrl: string,
@@ -18,6 +18,22 @@ export interface WebhookBodyRequest extends Request {
     | AttachmentBuilder
     | AttachmentPayload
   )[]
+}
+
+export interface MessageSaphireRequest {
+  content: string | null
+  message_reference: MessageReference | null
+  method: string | null
+  channelId: string | null
+  messageId: string | null
+  components: MessageComponent[] | []
+  embeds: APIEmbed[] | []
+  tts: boolean
+}
+
+export interface MessageToSendSaphireData {
+  data: MessageSaphireRequest
+  res: Response
 }
 
 export interface CommandsSaphire {

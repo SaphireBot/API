@@ -52,6 +52,7 @@ declare global {
       API_BOT_TOKEN: string
       GET_DATA_AUTHORIZATION: string
       DISCORD_TOKEN: string
+      POST_MESSAGE: string
     }
   }
 }
