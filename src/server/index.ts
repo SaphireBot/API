@@ -1,11 +1,11 @@
-import express from "express"
-import { WebSocketServer } from "ws"
-import { createServer } from "node:http"
+import express from "express";
+import { Server } from "ws";
+import { createServer } from "node:http";
 
 const server = express()
 server.use(express.json())
 server.disable("x-powered-by");
 const httpServer = createServer(server)
-const wss = new WebSocketServer({ server: httpServer })
+const ws = new Server({ server: httpServer })
 
-export { server, wss, httpServer }
+export { server, httpServer, ws }

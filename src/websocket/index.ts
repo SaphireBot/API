@@ -1,26 +1,40 @@
-import { env } from "process";
-import { wss } from "../server";
+// import { WebSocket } from "ws";
+// import { ws } from "../server";
+// let test = 0
 
-wss.once("listening", () => console.log("Websocket System Started"))
+// ws.on("connection", socket => {
 
-wss.on("connection", (socket, request) => {
+//     socket.send("[WEBSOCKET] Connected.")
+//     checkAndKeepOnline(socket)
 
-    const authorization = request.headers.authorization || null
-    const shardId = Number(request.headers.shardid)
+//     socket.on("message", message => {
+//         if (!message) return
+//         test += parseInt(message?.toString() || "0")
+//         socket.send(test)
+//     })
 
-    if (authorization !== env.WEBSOCKET_CONNECTION_AUTHORIZATION) {
-        socket.send("[WEBSOCKET] Connection failed because authorization key is incorrect.")
-        return socket.close(4004, "[WEBSOCKET] Authentication Failed.")
-    }
 
-    if (isNaN(shardId)) {
-        socket.send("[WEBSOCKET] Shard ID is not defined or it isn't a number")
-        return socket.close(1002, "[WEBSOCKET] Shard ID incorrect.")
-    }
+// })
+//     .on("error", console.log)
 
-    socket.on("error", console.error);
+// function checkAndKeepOnline(socket: WebSocket) {
+//     const enigma = Math.floor(3000 * Math.random())
+//     const interval = setInterval(() => socket.ping(enigma), 5000)
 
-    return socket.send(`[WEBSOCKET] Shard ${shardId} conectada.`)
-});
+//     socket.on("pong", data => {
+//         const number = Number(data.toString())
 
-wss.on("error", error => console.log(error))
+//         if ((enigma + 5) !== number) {
+//             socket.close(undefined, "Who are you?")
+//             clearInterval(interval)
+//             return console.log("died", number)
+//         }
+
+//         return console.log("keepAlive", number)
+//     })
+
+//     return
+// }
+
+
+// console.log("Websocket System Ready")

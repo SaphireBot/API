@@ -48,7 +48,6 @@ declare global {
       WEHBHOOK_SYSTEM_AVATAR: string
       CHANNEL_WEBHOOK_STATUS: string
       GET_BACKUP_ZIP: string
-      WEBSOCKET_AUTH: string
       API_BOT_TOKEN: string
       GET_DATA_AUTHORIZATION: string
       DISCORD_TOKEN: string

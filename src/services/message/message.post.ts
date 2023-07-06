@@ -110,5 +110,4 @@ async function deleteMessage(data: MessageSaphireRequest, res: Response) {
             res.statusCode = 400
             return res.send(err)
         })
-
 }
