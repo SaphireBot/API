@@ -133,3 +133,11 @@ export interface SaphireApiDataResponse {
   ping: number,
   uptime: string
 }
+
+export interface WebsocketMessageRecieveData {
+  type: "registerCommand" | "addInteraction" | "getCommands" | "addMessage" | "getSaphireData" | undefined,
+  message: string | undefined,
+  shardId: number | undefined,
+  commandName: string | undefined,
+  listener: string | undefined
+}

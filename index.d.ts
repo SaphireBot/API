@@ -52,6 +52,7 @@ declare global {
       GET_DATA_AUTHORIZATION: string
       DISCORD_TOKEN: string
       POST_MESSAGE: string
+      WEBSOCKET_SAPHIRE_API_LOGIN_PASSWORD: string
     }
   }
 }

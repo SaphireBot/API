@@ -32,7 +32,7 @@ export default async (
     return webhook.send({ username, avatarURL, content, embeds, files })
         .then(() => res?.status(200).send("Webhook message sended"))
         .catch(error => res
-            ?.status(500)
+            ?.status(403)
             ?.send({ response: "Error to execute the sender", error })
         )
 

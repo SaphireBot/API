@@ -1,11 +1,11 @@
 import express from "express";
-import { Server } from "ws";
-import { createServer } from "node:http";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 const server = express()
 server.use(express.json())
 server.disable("x-powered-by");
 const httpServer = createServer(server)
-const ws = new Server({ server: httpServer })
+const ws = new Server(httpServer)
 
 export { server, httpServer, ws }

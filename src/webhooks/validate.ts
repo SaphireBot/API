@@ -28,10 +28,6 @@ server.post("/sender", async (req, res) => {
       .send({ status: "Content is not string" });
 
   return sender({ url, username, avatarURL, content, embeds, files }, res)
-    .then(() => res.status(200).send("Ok"))
-    .catch(err => res
-      .status(500) // Internal Server Error
-      .send({ response: "An error ocurred", error: err })
-    );
+    .catch(() => null);
 
 });
