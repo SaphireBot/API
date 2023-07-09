@@ -43,7 +43,8 @@ export default (socket: Socket) => {
         return
     })
 
-    socket.on("getSaphireData", (_, callback: CallbackType) => {
+    socket.on("getSaphireData", (data: any, callback: CallbackType) => {
+        if (!data) return
         return callback({
             commands: Object.fromEntries(interactions.commands.entries()),
             count: interactions.count,
