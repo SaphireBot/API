@@ -3,8 +3,9 @@ import { MessageSaphireRequest, MessageToSendSaphireData } from "../../@types"
 import { server } from "../../server"
 import { Response } from "express"
 import { env } from "process"
-const Rest = new REST().setToken(process.env.DISCORD_TOKEN)
-const messagesToSend = <MessageToSendSaphireData[]>[]
+import { Socket } from "socket.io"
+export const Rest = new REST().setToken(process.env.DISCORD_TOKEN)
+export const messagesToSend = <MessageToSendSaphireData[]>[]
 executeMessages()
 
 server.post("/message", async (req, res) => {
@@ -46,18 +47,18 @@ async function executeMessages(): Promise<any> {
     if (messagesToSend.length) {
         const toSendData = messagesToSend.slice(0, 40)
 
-        for (const { data, res } of toSendData) {
+        for (const { data, res, socket } of toSendData) {
 
             if (!data.method) {
-                res.send({ message: "No method field provided", data })
+                report(res, socket, { message: "No method field provided", data })
                 continue
             }
 
             switch (data.method) {
-                case "post": postMessage(data, res); break;
-                case "patch": patchMessage(data, res); break;
-                case "delete": deleteMessage(data, res); break;
-                default: res.send({ message: "No method field provided", data }); break;
+                case "post": postMessage(data, res, socket); break;
+                case "patch": patchMessage(data, res, socket); break;
+                case "delete": deleteMessage(data, res, socket); break;
+                default: report(res, socket, { message: "No method field provided", data }); break;
             }
             continue;
         }
@@ -68,46 +69,71 @@ async function executeMessages(): Promise<any> {
     return setTimeout(() => executeMessages(), 1000 * 2)
 }
 
-async function postMessage(data: MessageSaphireRequest, res: Response) {
-    if (!data.channelId) return res.send({ message: "channelId Missing", data })
+async function postMessage(data: MessageSaphireRequest, res: Response | undefined, socket: Socket | undefined) {
+    if (!data.channelId) return report(res, socket, { message: "channelId Missing", data })
 
     return await Rest.post(
         Routes.channelMessages(data.channelId),
         { body: data }
     )
-        .then(() => res.sendStatus(200))
+        .then(() => {
+            if (res) res.end()
+            return
+        })
         .catch(err => {
-            res.statusCode = 400
-            return res.send(err)
+            if (socket) return socket.emit("errorInPostingMessage", { data, err })
+            if (res) {
+                res.statusCode = 400
+                return res.send(err)
+            }
         })
 }
 
-async function patchMessage(data: MessageSaphireRequest, res: Response) {
-    if (!data.messageId) return res.send({ message: "messageID missing", data })
-    if (!data.channelId) return res.send({ message: "channelId missing", data })
+async function patchMessage(data: MessageSaphireRequest, res: Response | undefined, socket: Socket | undefined) {
+    if (!data.messageId) return report(res, socket, { message: "messageID missing", data })
+    if (!data.channelId) return report(res, socket, { message: "channelId missing", data })
 
     return await Rest.patch(
         Routes.channelMessage(data.channelId, data.messageId),
         { body: data }
     )
-        .then(() => res.sendStatus(200))
+        .then(() => {
+            if (res) res.end()
+            return
+        })
         .catch(err => {
-            res.statusCode = 400
-            return res.send(err)
+            if (socket) return socket.emit("errorInPostingMessage", { data, err })
+            if (res) {
+                res.statusCode = 400
+                return res.send(err)
+            }
         })
 }
 
-async function deleteMessage(data: MessageSaphireRequest, res: Response) {
-    if (!data.messageId) return res.send({ message: "messageId missing", data })
-    if (!data.channelId) return res.send({ message: "channelId missing", data })
+async function deleteMessage(data: MessageSaphireRequest, res: Response | undefined, socket: Socket | undefined) {
+    if (!data.messageId) return report(res, socket, { message: "messageId missing", data })
+    if (!data.channelId) return report(res, socket, { message: "channelId missing", data })
 
     return await Rest.delete(
         Routes.channelMessage(data.channelId, data.messageId),
         { body: data }
     )
-        .then(() => res.sendStatus(200))
-        .catch(err => {
-            res.statusCode = 400
-            return res.send(err)
+        .then(() => {
+            if (res) res.end()
+            return
         })
+        .catch(err => {
+            if (socket) return socket.emit("errorInPostingMessage", { data, err })
+            if (res) {
+                res.statusCode = 400
+                return res.send(err)
+            }
+        })
+
+}
+
+function report(res: Response | undefined, socket: Socket | undefined, data: any) {
+    if (socket) socket.emit("errorInPostingMessage", { data, err: data.message })
+    if (res) res.send(data)
+    return
 }

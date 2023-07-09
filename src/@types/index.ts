@@ -3,13 +3,14 @@ import { Stream } from "node:stream";
 import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
 import { Request, Response } from "express"
+import { Socket } from "socket.io";
 
 export interface WebhookBodyRequest extends Request {
-  webhookUrl: string,
-  content: string,
-  embeds: APIEmbed[],
-  avatarURL: string,
-  username: string,
+  webhookUrl: string
+  content: string
+  embeds: APIEmbed[]
+  avatarURL: string
+  username: string
   files: (
     | Stream
     | BufferResolvable
@@ -31,15 +32,26 @@ export interface MessageSaphireRequest {
   tts: boolean
 }
 
+export interface MessageToSendThroughWebsocket {
+  method: "post" | "patch" | "delete" | undefined
+  type: string | undefined
+  channelId: string | undefined
+  body: MessageSaphireRequest
+  authorization: string
+  isWebsocket: boolean
+  isTwitchNotification: boolean | undefined
+  LogType: string | undefined
+}
 export interface MessageToSendSaphireData {
   data: MessageSaphireRequest
-  res: Response
+  res?: Response
+  socket?: Socket
 }
 
 export interface CommandsSaphire {
-  name: string,
-  id: string,
-  category: string,
+  name: string
+  id: string
+  category: string
   description: string
 }
 
@@ -48,13 +60,13 @@ export interface ResponseGetIp extends UndiciResponse {
 }
 
 export interface ModelType extends DocumentSetOptions {
-  ip: string,
-  id: string,
-  username: string,
-  avatar: string,
-  discriminator: string,
-  email: string,
-  guildsOwner: object[],
+  ip: string
+  id: string
+  username: string
+  avatar: string
+  discriminator: string
+  email: string
+  guildsOwner: object[]
   loginDate: number
 }
 
@@ -68,10 +80,10 @@ export interface DiscloudAppStatus {
   apps: {
     id: string
     name: string
-    online: boolean,
-    ramKilled: boolean,
-    exitCode: number,
-    ram: number,
+    online: boolean
+    ramKilled: boolean
+    exitCode: number
+    ram: number
     mainFile: string
     lang: string
     mods: [string]
@@ -81,20 +93,20 @@ export interface DiscloudAppStatus {
 }
 
 export interface UserData {
-  id: string,
-  username: string,
-  avatar: string | null,
-  avatar_decoration: string | null,
-  discriminator: string,
-  public_flags: number,
-  flags: number,
-  banner: string,
-  banner_color: string,
-  accent_color: number,
-  locale: string,
-  mfa_enabled: boolean,
-  premium_type: number,
-  email: string,
+  id: string
+  username: string
+  avatar: string | null
+  avatar_decoration: string | null
+  discriminator: string
+  public_flags: number
+  flags: number
+  banner: string
+  banner_color: string
+  accent_color: number
+  locale: string
+  mfa_enabled: boolean
+  premium_type: number
+  email: string
   verified: boolean
 }
 
@@ -104,40 +116,44 @@ export interface DatabaseType {
 }
 
 export interface DiscordWebhook {
-  type: 1,
-  id: string,
-  name: string,
-  avatar: string | null,
-  channel_id: string,
-  guild_id: string,
-  application_id: string,
-  token: string,
+  type: 1
+  id: string
+  name: string
+  avatar: string | null
+  channel_id: string
+  guild_id: string
+  application_id: string
+  token: string
   user: {
-    id: string,
-    username: string,
-    display_name: string | null,
-    avatar: string,
-    avatar_decoration: string | null,
-    discriminator: string,
-    public_flags: number | null,
+    id: string
+    username: string
+    display_name: string | null
+    avatar: string
+    avatar_decoration: string | null
+    discriminator: string
+    public_flags: number | null
     bot: boolean
   }
 }
 
 export interface SaphireApiDataResponse {
-  status: boolean,
-  interactions: number,
-  guilds: number,
-  users: number,
-  commands: number,
-  ping: number,
+  status: boolean
+  interactions: number
+  guilds: number
+  users: number
+  commands: number
+  ping: number
   uptime: string
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "getCommands" | "addMessage" | "getSaphireData" | undefined,
-  message: string | undefined,
-  shardId: number | undefined,
-  commandName: string | undefined,
+  type: "registerCommand" | "addInteraction" | "getCommands" | "addMessage" | "getSaphireData" | undefined
+  message: string | undefined
+  shardId: number | undefined
+  commandName: string | undefined
   listener: string | undefined
+}
+
+export interface CallbackType {
+  (data: any): void
 }

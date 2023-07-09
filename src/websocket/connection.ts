@@ -1,7 +1,8 @@
 import { Socket } from "socket.io";
 import { Collection } from "discord.js";
 import { env } from "process";
-import { WebsocketMessageRecieveData } from "../@types";
+import { CallbackType, WebsocketMessageRecieveData } from "../@types";
+import postmessage from "./functions/postmessage";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -42,7 +43,7 @@ export default (socket: Socket) => {
         return
     })
 
-    socket.on("getSaphireData", (_, callback) => {
+    socket.on("getSaphireData", (_, callback: CallbackType) => {
         return callback({
             commands: Object.fromEntries(interactions.commands.entries()),
             count: interactions.count,
@@ -51,6 +52,8 @@ export default (socket: Socket) => {
     })
 
     socket.on("ping", (_, callback) => callback("pong"))
+
+    socket.on("postMessage", data => postmessage(data, socket))
 }
 
 function registerNewCommand(commandName: string | undefined): void {
