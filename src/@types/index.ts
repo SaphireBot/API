@@ -167,3 +167,8 @@ export interface ShardsStatus {
   clusterName: string
   socketId?: string
 }
+
+export interface GuildsThroughShards {
+  name: string
+  id: string
+}

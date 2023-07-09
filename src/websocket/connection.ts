@@ -1,4 +1,4 @@
-import { CallbackType, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
+import { CallbackType, GuildsThroughShards, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { env } from "process";
@@ -61,14 +61,37 @@ export default (socket: Socket) => {
         return callback(Object.fromEntries(shards.entries()))
     })
 
-    socket.on("ping", (_, callback) => callback("pong"))
+    socket.on("ping", (_: any, callback: CallbackType) => callback("pong"))
     socket.on("postMessage", data => postmessage(data, socket))
+    socket.on("getAllGuilds", async (_: any, callback: CallbackType) => GetAndSendAllGuildsData(callback))
     socket.on("shardStatus", (data: ShardsStatus) => {
         if (!data || isNaN(Number(data.shardId))) return
         shards.set(data.shardId, data)
         return
     })
 
+}
+
+async function GetAndSendAllGuildsData(callback: CallbackType) {
+
+    const guilds: GuildsThroughShards[] = []
+    let i = 0
+
+    shardsAndSockets
+        .forEach((socket: Socket, shardId: number) => {
+            socket
+                .timeout(5000)
+                .emitWithAck("getGuilds", "get")
+                .then((data: GuildsThroughShards[]) => {
+                    i++
+                    guilds.push(...data)
+
+                    if (i == shardsAndSockets.size)
+                        return callback(guilds.filter(i => i))
+                })
+                .catch(() => setOfflineShard(shardId))
+            return
+        })
 }
 
 function registerNewCommand(commandName: string | undefined): void {
