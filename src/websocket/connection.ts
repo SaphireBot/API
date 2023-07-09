@@ -37,16 +37,20 @@ export default (socket: Socket) => {
             case "addInteraction": interactions.count++; break;
             case "addMessage": interactions.message++; break;
             case "registerCommand": registerNewCommand(data?.commandName); break;
-            case "getCommands": socket.emit("responseCommand", interactions.commands.map((count, name) => ({ [name]: count }))); break;
-            case "getSaphireData": socket.emit(data.listener || "fumou?", {
-                commands: Object.fromEntries(interactions.commands.entries()),
-                count: interactions.count,
-                messages: interactions.message
-            }); break;
             default: console.log(data); break;
         }
-
+        return
     })
+
+    socket.on("getSaphireData", (_, callback) => {
+        return callback({
+            commands: Object.fromEntries(interactions.commands.entries()),
+            count: interactions.count,
+            messages: interactions.message
+        })
+    })
+
+    socket.on("ping", (_, callback) => callback("pong"))
 }
 
 function registerNewCommand(commandName: string | undefined): void {
