@@ -1,14 +1,14 @@
 import { Socket } from "socket.io";
 import { Collection } from "discord.js";
 import { env } from "process";
-import { CallbackType, WebsocketMessageRecieveData } from "../@types";
+import { CallbackType, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
 import postmessage from "./functions/postmessage";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
     message: 0
 }
-const shards = new Collection()
+export const shards = new Collection<string, ShardsStatus>()
 
 export default (socket: Socket) => {
 
@@ -23,7 +23,6 @@ export default (socket: Socket) => {
     }
 
     const shardId = socket.handshake.auth.shardId as number
-    shards.set(shardId, socket.id)
 
     socket.send({
         type: "console",
@@ -53,8 +52,12 @@ export default (socket: Socket) => {
     })
 
     socket.on("ping", (_, callback) => callback("pong"))
-
     socket.on("postMessage", data => postmessage(data, socket))
+    socket.on("shardStatus", (data: ShardsStatus) => {
+        if (!data || isNaN(Number(data.shardId))) return
+        shards.set(data.shardId, data)
+        return
+    })
 }
 
 function registerNewCommand(commandName: string | undefined): void {

@@ -157,3 +157,9 @@ export interface WebsocketMessageRecieveData {
 export interface CallbackType {
   (data: any): void
 }
+
+export interface ShardsStatus {
+  shardId: string
+  ready: boolean
+  ms: number
+}

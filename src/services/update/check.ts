@@ -1,8 +1,9 @@
 import { SaphireApiDataResponse } from "../../@types"
 import { env } from "process"
+import { interactions, shards } from "../../websocket/connection"
 let messageId: string | undefined
 
-export default async (webhookUrl: string): Promise<void> => {
+export default (webhookUrl: string): void => {
 
     if (!webhookUrl) return
 
@@ -13,8 +14,7 @@ export default async (webhookUrl: string): Promise<void> => {
 
         const data = await getData()
         if (!data) return clearTimeout(interval)
-
-        if (!messageId) return send(webhookUrl, data)
+        if (!messageId) return send(webhookUrl)
         await fetch(
             `${webhookUrl}/messages/${messageId}`,
             {
@@ -23,14 +23,18 @@ export default async (webhookUrl: string): Promise<void> => {
                 body: JSON.stringify({
                     avatar_url: "https://media.discordapp.net/attachments/893361065084198954/1076924109440700547/image.png",
                     username: "API - Saphire Status Verification",
+                    content: null,
                     embeds: [{
                         color: data.status ? 0x57F287 : 0xED4245,
                         title: "🛰️ Resources Status",
-                        description: data.status ? "🟢 Online" : "🔴 Offline",
                         fields: [
                             {
                                 name: "📊 Contagem",
-                                value: `${data.guilds} Servidores\n${data.users} Usuários\n${data.commands} Comandos\n${data.ping}ms ping\n${data.interactions} Interações Recebidas`
+                                value: `${data.commands} Comandos\n${interactions.count} Interações Recebidas\n${interactions.message} Mensagens Recebidas`
+                            },
+                            {
+                                name: "🧩 Shards",
+                                value: `${shards.size ? shards.map((status, shardId) => `${status.ready ? "🟢" : "🔴"} Shard ${shardId} | ${status.ms}ms`).join("\n") : "Nenhum dado obtido"}`
                             },
                             {
                                 name: "⏱️ Tempo Online",
@@ -47,14 +51,14 @@ export default async (webhookUrl: string): Promise<void> => {
         )
             .catch(err => {
                 console.log(err)
-                send(webhookUrl, data)
+                send(webhookUrl)
             })
         return;
     }
 
 }
 
-async function send(webhookUrl: string, data: SaphireApiDataResponse) {
+async function send(webhookUrl: string) {
 
     await fetch(
         `${webhookUrl}?wait=true`,
@@ -64,25 +68,8 @@ async function send(webhookUrl: string, data: SaphireApiDataResponse) {
             body: JSON.stringify({
                 avatar_url: "https://media.discordapp.net/attachments/893361065084198954/1076924109440700547/image.png",
                 username: "API - Saphire Status Verification",
-                embeds: [{
-                    color: data.status ? 0x57F287 : 0xED4245,
-                    title: "🛰️ Resources Status",
-                    description: data.status ? "🟢 Online" : "🔴 Offline",
-                    fields: [
-                        {
-                            name: "📊 Contagem",
-                            value: `${data.guilds} Servidores\n${data.users} Usuários\n${data.commands} Comandos\n${data.ping}ms ping\n${data.interactions} Interações Recebidas`
-                        },
-                        {
-                            name: "⏱️ Tempo Online",
-                            value: data?.uptime || "0 Segundo"
-                        },
-                        {
-                            name: "🗓️ Última Atualização",
-                            value: getDate()
-                        }
-                    ]
-                }]
+                embeds: [],
+                content: "Aguardando recebimento de dados..."
             })
         }
     )
