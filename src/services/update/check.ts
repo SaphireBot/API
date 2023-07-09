@@ -34,7 +34,7 @@ export default (webhookUrl: string): void => {
                             },
                             {
                                 name: "🧩 Shards",
-                                value: `${shards.size ? shards.map((status, shardId) => `${status.ready ? "🟢" : "🔴"} Shard ${shardId} | ${status.ms}ms`).join("\n") : "Nenhum dado obtido"}`
+                                value: `${shards.size ? shards.map((status, shardId) => `${status.ready ? "🟢" : "🔴"} Shard ${shardId} | ${status.ms}ms [${status.clusterName}]`).join("\n") : "Nenhum dado obtido"}`
                             },
                             {
                                 name: "⏱️ Tempo Online",

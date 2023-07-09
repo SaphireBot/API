@@ -159,7 +159,11 @@ export interface CallbackType {
 }
 
 export interface ShardsStatus {
-  shardId: string
+  shardId: number
   ready: boolean
   ms: number
+  guilds: number
+  users: number
+  clusterName: string
+  socketId?: string
 }
