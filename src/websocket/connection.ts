@@ -1,4 +1,4 @@
-import { CallbackType, GuildsThroughShards, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
+import { CallbackType, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { env } from "process";
@@ -25,6 +25,7 @@ export default (socket: Socket) => {
     }
 
     const shardId = socket.handshake.auth.shardId as number
+    socket.data.shardId = shardId
     shardsAndSockets.set(shardId, socket)
 
     socket.on("disconnect", () => setOfflineShard(shardId))
@@ -56,42 +57,18 @@ export default (socket: Socket) => {
         })
     })
 
-    socket.on("getShardsData", (data: any, callback: CallbackType) => {
-        if (!data) return
-        return callback(Object.fromEntries(shards.entries()))
-    })
+    socket.on("getShardsData", (_: any, callback: CallbackType) => callback(Object.fromEntries(shards.entries())))
 
     socket.on("ping", (_: any, callback: CallbackType) => callback("pong"))
     socket.on("postMessage", data => postmessage(data, socket))
-    socket.on("getAllGuilds", async (_: any, callback: CallbackType) => GetAndSendAllGuildsData(callback))
+    socket.on("getAllGuilds", async (_: any, callback: CallbackType) => callback(shards.map(data => data.guilds || []).flat()))
     socket.on("shardStatus", (data: ShardsStatus) => {
         if (!data || isNaN(Number(data.shardId))) return
+        data.socketId = socket.id
         shards.set(data.shardId, data)
         return
     })
 
-}
-
-async function GetAndSendAllGuildsData(callback: CallbackType) {
-
-    const guilds: GuildsThroughShards[] = []
-    let i = 0
-
-    shardsAndSockets
-        .forEach((socket: Socket, shardId: number) => {
-            socket
-                .timeout(5000)
-                .emitWithAck("getGuilds", "get")
-                .then((data: GuildsThroughShards[]) => {
-                    i++
-                    guilds.push(...data)
-
-                    if (i == shardsAndSockets.size)
-                        return callback(guilds.filter(i => i))
-                })
-                .catch(() => setOfflineShard(shardId))
-            return
-        })
 }
 
 function registerNewCommand(commandName: string | undefined): void {
@@ -103,7 +80,7 @@ function registerNewCommand(commandName: string | undefined): void {
     return
 }
 
-function checkIfTheShardIsAlive() {
+async function checkIfTheShardIsAlive() {
     if (!shardsAndSockets.size) return
 
     shardsAndSockets
@@ -113,6 +90,7 @@ function checkIfTheShardIsAlive() {
                 .emitWithAck("isAlive", "ping")
                 .then((data: ShardsStatus) => {
                     if (!data || isNaN(Number(data.shardId))) return
+                    data.socketId = socket.id
                     shards.set(data.shardId, data)
                     return
                 })
@@ -127,8 +105,9 @@ function setOfflineShard(shardId: number) {
     const data = shards.get(shardId)
     if (!data) return
     data.ready = false
-    data.users = 0
-    data.guilds = 0
+    data.usersCount = 0
+    data.guildsCount = 0
+    data.guilds = []
     data.ms = 0
     delete data.socketId
     return shards.set(shardId, data)

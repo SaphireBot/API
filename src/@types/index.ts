@@ -162,8 +162,11 @@ export interface ShardsStatus {
   shardId: number
   ready: boolean
   ms: number
-  guilds: number
-  users: number
+  guilds: GuildsThroughShards[]
+  guildsCount: number
+  emojisCount: number
+  channelsCount: number
+  usersCount: number
   clusterName: string
   socketId?: string
 }
