@@ -1,8 +1,13 @@
-import { CallbackType, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
+import { CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, RefreshCache, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { env } from "process";
 import postmessage from "./functions/postmessage";
+import getCache from "./cache/get.cache";
+import getMultipleCache from "./cache/multiple.cache";
+import refreshCache from "./cache/update.cache";
+import deleteCache from "./cache/delete.cache";
+import twitchCache from "./cache/twitch.cache";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -61,7 +66,15 @@ export default (socket: Socket) => {
 
     socket.on("ping", (_: any, callback: CallbackType) => callback("pong"))
     socket.on("postMessage", data => postmessage(data, socket))
-    socket.on("getAllGuilds", async (_: any, callback: CallbackType) => callback(shards.map(data => data.guilds || []).flat()))
+    socket.on("getAllGuilds", (_: any, callback: CallbackType) => callback(shards.map(data => data.guilds || []).flat()))
+
+    // Cache
+    socket.on("getCache", (data: GetAndDeleteCacheType, callback: CallbackType) => getCache(data?.id, data?.type, callback))
+    socket.on("getMultipleCache", (data: GetMultiplecacheDataType, callback: CallbackType) => getMultipleCache(data?.ids, data?.type, callback))
+    socket.on("updateCache", (data: RefreshCache) => refreshCache(data?.id, data?.type, data?.data))
+    socket.on("deleteCache", (data: GetAndDeleteCacheType) => deleteCache(data?.id, data?.type))
+    socket.on("removeChannelFromTwitchManager", (channelId: string | undefined) => twitchCache(channelId))
+    
     socket.on("shardStatus", (data: ShardsStatus) => {
         if (!data || isNaN(Number(data.shardId))) return
         data.socketId = socket.id

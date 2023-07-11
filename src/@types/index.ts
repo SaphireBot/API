@@ -176,3 +176,192 @@ export interface GuildsThroughShards {
   name: string
   id: string
 }
+
+export interface GetAndDeleteCacheType {
+  id: string | undefined
+  type: "user" | "guild" | undefined
+}
+
+export interface GetMultiplecacheDataType {
+  ids: string[] | undefined
+  type: "user" | "guild" | undefined
+}
+
+export interface RefreshCache {
+  id: string | undefined
+  type: "user" | "guild" | undefined
+  data: UserDatabase | GuildDatabase
+}
+
+export interface UserDatabase {
+  id: string,
+  Likes: number,
+  // {
+  //     access_token: string,
+  //     refresh_token: tokens.refresh_token,
+  //     expires_at: Date.now() + tokens.expires_in * 1000,
+  // }
+  Tokens: Record<string, any>,
+  Xp: number,
+  Level: number,
+  Transactions: Record<string, any>[],
+  Balance: number,
+  AfkSystem: string,
+  DailyCount: number,
+  MixCount: number,
+  QuizCount: number,
+  TicTacToeCount: number,
+  CompetitiveMemoryCount: number,
+  ForcaCount: number,
+  GamingCount: {
+    FlagCount: number,
+    AnimeThemeCount: number,
+    QuizAnime: number,
+    Logomarca: number,
+    QuizQuestions: number
+  },
+  Timeouts: {
+    Bug: number,
+    Daily: number,
+    ImagesCooldown: number,
+    Loteria: number,
+    Cantada: number,
+    Bitcoin: number,
+    Porquinho: number,
+    TopGGVote: number,
+    Rep: number
+  },
+  Cache: { ComprovanteOpen: boolean },
+  Color: {
+    Perm: boolean,
+    Set: string
+  },
+  Perfil: {
+    Titulo: string,
+    Status: string,
+    Sexo: string,
+    Signo: string,
+    Aniversario: string,
+    Trabalho: string,
+    BalanceOcult: boolean,
+    Marry: {
+      Conjugate: string,
+      StartAt: number
+    },
+    Bits: number,
+    Bitcoins: number,
+    Estrela: {
+      Um: boolean,
+      Dois: boolean,
+      Tres: boolean,
+      Quatro: boolean,
+      Cinco: boolean,
+      Seis: boolean,
+    }
+  },
+  Vip: {
+    DateNow: number,
+    TimeRemaing: number,
+    Permanent: boolean
+  },
+  Walls: {
+    Bg: string[],
+    Set: string
+  },
+  Jokempo: {
+    Wins: number,
+    Loses: number
+  }
+}
+
+export interface GuildDatabase {
+  id: string
+  Giveaways: Record<string, any>[]
+  TempCall: {
+    enable: boolean
+    muteTime: boolean
+    members: any
+    membersMuted: any
+  },
+  Spam: {
+    enabled: boolean,
+    ignoreChannels: string[]
+    ignoreRoles: string[]
+    filters: {
+      capsLock: {
+        enabled: boolean,
+        percent: number
+      },
+      messagesTimer: {
+        enabled: boolean
+        amount: number
+        seconds: number
+      },
+      repeat: {
+        enabled: boolean
+      }
+    }
+  },
+  Chest: boolean
+  Polls: Record<string, any>[]
+  Moeda: string
+  FirstSystem: boolean
+  Autorole: any[],
+  CommandBlocks: any[]
+  TwitchNotifications: Record<string, any>[]
+  MinDay: {
+    days: number
+    punishment: string
+  },
+  announce: {
+    channel: string
+    allowedRole: string
+    notificationRole: string
+    crosspost: boolean
+  },
+  LogSystem: {
+    channel: string
+    webhookUrl: string
+    ban: {
+      active: boolean
+    },
+    unban: {
+      active: boolean
+    },
+    kick: {
+      active: boolean
+    },
+    mute: {
+      active: boolean
+    },
+    channels: {
+      active: boolean
+    },
+    messages: {
+      active: boolean
+    },
+    botAdd: {
+      active: boolean
+    },
+    roles: {
+      active: boolean
+    }
+  },
+  XpSystem: {
+    Canal: string
+    Mensagem: string
+  },
+  LeaveChannel: {
+    channelId: string
+    body: Record<string, any>[]
+  },
+  WelcomeChannel: {
+    channelId: string
+    body: Record<string, any>[]
+  },
+  Stars: {
+    limit: number
+    channel: string
+    sended: Record<string, any>[]
+  }
+}
