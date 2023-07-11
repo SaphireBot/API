@@ -115,8 +115,7 @@ async function deleteMessage(data: MessageSaphireRequest, res: Response | undefi
     if (!data.channelId) return report(res, socket, { message: "channelId missing", data })
 
     return await Rest.delete(
-        Routes.channelMessage(data.channelId, data.messageId),
-        { body: data }
+        Routes.channelMessage(data.channelId, data.messageId)
     )
         .then(() => {
             if (res) res.end()

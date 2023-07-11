@@ -26,7 +26,7 @@ export interface MessageSaphireRequest {
   message_reference: MessageReference | null
   method: string | null
   channelId: string | null
-  messageId: string | null
+  messageId?: string | null
   components: MessageComponent[] | []
   embeds: APIEmbed[] | []
   tts: boolean
@@ -36,7 +36,8 @@ export interface MessageToSendThroughWebsocket {
   method: "post" | "patch" | "delete" | undefined
   type: string | undefined
   channelId: string | undefined
-  body: MessageSaphireRequest
+  messageId?: string | undefined
+  body?: MessageSaphireRequest
   authorization: string
   isWebsocket: boolean
   isTwitchNotification: boolean | undefined
