@@ -365,3 +365,9 @@ export interface GuildDatabase {
     sended: Record<string, any>[]
   }
 }
+
+export interface AfkGlobalData {
+  userId: string | undefined
+  message: string | undefined
+  method: "save" | "delete" | undefined
+}

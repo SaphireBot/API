@@ -1,4 +1,4 @@
-import { CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, RefreshCache, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
+import { AfkGlobalData, CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, RefreshCache, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { env } from "process";
@@ -8,6 +8,7 @@ import getMultipleCache from "./cache/multiple.cache";
 import refreshCache from "./cache/update.cache";
 import deleteCache from "./cache/delete.cache";
 import twitchCache from "./cache/twitch.cache";
+import postAfk from "./functions/postafk";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -74,7 +75,8 @@ export default (socket: Socket) => {
     socket.on("updateCache", (data: RefreshCache) => refreshCache(data?.id, data?.type, data?.data))
     socket.on("deleteCache", (data: GetAndDeleteCacheType) => deleteCache(data?.id, data?.type))
     socket.on("removeChannelFromTwitchManager", (channelId: string | undefined) => twitchCache(channelId))
-    
+    socket.on("AfkGlobalSystem", (data: AfkGlobalData) => postAfk(data, socket))
+
     socket.on("shardStatus", (data: ShardsStatus) => {
         if (!data || isNaN(Number(data.shardId))) return
         data.socketId = socket.id
