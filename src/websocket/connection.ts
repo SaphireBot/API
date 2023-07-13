@@ -1,4 +1,4 @@
-import { AfkGlobalData, CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, RefreshCache, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
+import { AfkGlobalData, CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, MessageToSendThroughWebsocket, RefreshCache, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { env } from "process";
@@ -9,6 +9,7 @@ import refreshCache from "./cache/update.cache";
 import deleteCache from "./cache/delete.cache";
 import twitchCache from "./cache/twitch.cache";
 import postAfk from "./functions/postafk";
+import postmessagewithreply from "./functions/postmessagewithreply";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -66,7 +67,8 @@ export default (socket: Socket) => {
     socket.on("getShardsData", (_: any, callback: CallbackType) => callback(Object.fromEntries(shards.entries())))
 
     socket.on("ping", (_: any, callback: CallbackType) => callback("pong"))
-    socket.on("postMessage", data => postmessage(data, socket))
+    socket.on("postMessage", (data: MessageToSendThroughWebsocket) => postmessage(data, socket))
+    socket.on("postMessageWithReply", (data: MessageSaphireRequest, callback: CallbackType) => postmessagewithreply(data, callback))
     socket.on("getAllGuilds", (_: any, callback: CallbackType) => callback(shards.map(data => data.guilds || []).flat()))
 
     // Cache
