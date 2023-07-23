@@ -371,3 +371,16 @@ export interface AfkGlobalData {
   message: string | undefined
   method: "save" | "delete" | undefined
 }
+
+export interface SiteStaffs {
+  id: string
+  username: string
+  avatarUrl: string | null
+  tags: string[]
+  social: {
+    instagram: string | null
+    github: string | null
+    discord: string
+  }
+  description: string | null
+}

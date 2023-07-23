@@ -1,6 +1,7 @@
-import { AfkGlobalData, CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, MessageToSendThroughWebsocket, RefreshCache, ShardsStatus, WebsocketMessageRecieveData } from "../@types";
+import { AfkGlobalData, CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, MessageToSendThroughWebsocket, RefreshCache, ShardsStatus, SiteStaffs, WebsocketMessageRecieveData } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
+import { staffs } from "../site";
 import { env } from "process";
 import postmessage from "./functions/postmessage";
 import getCache from "./cache/get.cache";
@@ -64,8 +65,6 @@ export default (socket: Socket) => {
         })
     })
 
-    socket.on("getShardsData", (_: any, callback: CallbackType) => callback(Object.fromEntries(shards.entries())))
-
     socket.on("ping", (_: any, callback: CallbackType) => callback("pong"))
     socket.on("postMessage", (data: MessageToSendThroughWebsocket) => postmessage(data, socket))
     socket.on("postMessageWithReply", (data: MessageSaphireRequest, callback: CallbackType) => postmessagewithreply(data, callback))
@@ -79,6 +78,14 @@ export default (socket: Socket) => {
     socket.on("removeChannelFromTwitchManager", (channelId: string | undefined) => twitchCache(channelId))
     socket.on("AfkGlobalSystem", (data: AfkGlobalData) => postAfk(data, socket))
 
+    // Site
+    socket.on("siteStaffData", (data: SiteStaffs) => {
+        if (data?.id) staffs.set(data?.id, data)
+        return
+    })
+
+    // Shards
+    socket.on("getShardsData", (_: any, callback: CallbackType) => callback(Object.fromEntries(shards.entries())))
     socket.on("shardStatus", (data: ShardsStatus) => {
         if (!data || isNaN(Number(data.shardId))) return
         data.socketId = socket.id
