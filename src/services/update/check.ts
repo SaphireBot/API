@@ -83,7 +83,7 @@ async function send(webhookUrl: string) {
 async function getData(): Promise<SaphireApiDataResponse | null> {
 
     const data: SaphireApiDataResponse | null = await fetch(
-        "https://saphire.one/data",
+        "https://saphire.discloud.app/data",
         {
             method: "GET",
             headers: {
