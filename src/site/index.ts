@@ -5,8 +5,6 @@ export const staffs = new Collection<string, SiteStaffs>();
 
 server.get("/staffs", async (_, res) => {
 
-    console.log(staffs)
-
     const developers = [] as SiteStaffs[]
     const admins = [] as SiteStaffs[]
     const boards = [] as SiteStaffs[]
@@ -76,22 +74,22 @@ function getDescription(userId: string) {
 
     const data = {
         // Rody
-        "451619591320371213": "Um texto qualquer",
+        "451619591320371213": "Criador e fundador da Saphire Moon",
 
         // Lucas
-        "435601052755296256": "Um texto qualquer",
+        "435601052755296256": "Artista principal do Front-End",
 
         // André
-        "648389538703736833": "Um texto qualquer",
+        "648389538703736833": "Diretor geral do Front-End ao Back-End",
 
         // Geovanne (Space)
-        "920496244281970759": "Um texto qualquer",
+        "920496244281970759": "Desenvolvedor Back-End Good-Vibes",
 
         // Gorniaky
-        "395669252121821227": "Um texto qualquer",
+        "395669252121821227": "Desenvolvedor e suporte a Typescript & Conexões",
 
         // MakolPedro
-        "351903530161799178": "Um texto qualquer"
+        "351903530161799178": "Investidor de mais de 2 anos de servidor."
     }[userId] || null
 
     return data
