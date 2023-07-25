@@ -9,7 +9,7 @@ import dataJSON from "./json/data.json";
 import listen from "./webhooks/listen"
 import { env } from "process";
 import update from "./services/update/index";
-import { interactions } from "./websocket/connection";
+import { apiCommandsData, interactions } from "./websocket/connection";
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
 server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalServer));
@@ -27,6 +27,7 @@ server.get("/commandscount", (req, res) => {
     })
 
 });
+server.get("/commandsdata", (_, res) => res.send(apiCommandsData.toJSON()));
 
 httpServer.listen(
     env.SERVER_PORT,

@@ -1,4 +1,4 @@
-import { AfkGlobalData, CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, MessageToSendThroughWebsocket, RefreshCache, ShardsStatus, SiteStaffs, WebsocketMessageRecieveData } from "../@types";
+import { AfkGlobalData, CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, MessageToSendThroughWebsocket, RefreshCache, ShardsStatus, SiteStaffs, WebsocketMessageRecieveData, commandApi } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { staffs } from "../site";
@@ -16,6 +16,7 @@ export const interactions = {
     count: 0,
     message: 0
 }
+export const apiCommandsData = new Collection<string, commandApi>()
 export const shards = new Collection<number, ShardsStatus>()
 const shardsAndSockets = new Collection<number, Socket>()
 setInterval(() => checkIfTheShardIsAlive(), 1000 * 15)
@@ -51,6 +52,7 @@ export default (socket: Socket) => {
             case "addInteraction": interactions.count++; break;
             case "addMessage": interactions.message++; break;
             case "registerCommand": registerNewCommand(data?.commandName); break;
+            case "apiCommandsData": registerCommandsApi(data?.commandsApi); break;
             default: console.log(data); break;
         }
         return
@@ -135,4 +137,10 @@ function setOfflineShard(shardId: number) {
     data.ms = 0
     delete data.socketId
     return shards.set(shardId, data)
+}
+
+function registerCommandsApi(data: commandApi[]) {
+    if (!data?.length) return
+    for (const cmd of data) apiCommandsData.set(cmd?.name, cmd)
+    return
 }

@@ -148,11 +148,12 @@ export interface SaphireApiDataResponse {
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "getCommands" | "addMessage" | "getSaphireData" | undefined
+  type: "registerCommand" | "addInteraction" | "getCommands" | "addMessage" | "getSaphireData" | "apiCommandsData" | undefined
   message: string | undefined
   shardId: number | undefined
   commandName: string | undefined
   listener: string | undefined
+  commandsApi: commandApi[]
 }
 
 export interface CallbackType {
@@ -383,4 +384,15 @@ export interface SiteStaffs {
     discord: string
   }
   description: string | null
+}
+
+export interface commandApi {
+  name: string,
+  description: string,
+  category: string,
+  synonyms: string[],
+  perms: {
+    user: string[]
+    bot: string[]
+  }
 }
