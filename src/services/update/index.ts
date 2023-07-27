@@ -18,7 +18,7 @@ export default async (): Promise<void> => {
         .then(data => data.json())
         .catch(() => [])
 
-    webhookUrl = webhooks.find(webhook => webhook?.user?.id == "1035037311907405834")?.url
+    webhookUrl = webhooks?.find(webhook => webhook?.user?.id == "1035037311907405834")?.url
 
     if (!webhookUrl)
         webhookUrl = await createWebhook()

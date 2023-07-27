@@ -18,7 +18,7 @@ export const interactions = {
 }
 export const apiCommandsData = new Collection<string, commandApi>()
 export const shards = new Collection<number, ShardsStatus>()
-const shardsAndSockets = new Collection<number, Socket>()
+export const shardsAndSockets = new Collection<number, Socket>()
 setInterval(() => checkIfTheShardIsAlive(), 1000 * 15)
 
 export default (socket: Socket) => {

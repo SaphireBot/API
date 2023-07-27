@@ -53,6 +53,7 @@ declare global {
       DISCORD_TOKEN: string
       POST_MESSAGE: string
       WEBSOCKET_SAPHIRE_API_LOGIN_PASSWORD: string
+      BOT_USERS_TOKEN_REQUEST: string
     }
   }
 }

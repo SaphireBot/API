@@ -9,7 +9,7 @@ import dataJSON from "./json/data.json";
 import listen from "./webhooks/listen"
 import { env } from "process";
 import update from "./services/update/index";
-import { apiCommandsData, interactions } from "./websocket/connection";
+import { apiCommandsData, interactions, shardsAndSockets } from "./websocket/connection";
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
 server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalServer));
@@ -28,6 +28,63 @@ server.get("/commandscount", (req, res) => {
 
 });
 server.get("/commandsdata", (_, res) => res.send(apiCommandsData.toJSON()));
+
+server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
+
+    const { CreatedBy, Sponsor } = req.params
+
+    const data = {
+        CreatedBy: {},
+        Sponsor: {}
+    }
+
+    await fetch(`https://discord.com/api/users/${CreatedBy}`, {
+        method: "GET",
+        headers: {
+            authorization: `Bot ${env.DISCORD_TOKEN}`,
+        }
+    })
+        .then(data => data.json())
+        .then(user => data.CreatedBy = user)
+        .catch(() => ({ username: null }))
+
+    await fetch(`https://discord.com/api/users/${Sponsor}`, {
+        method: "GET",
+        headers: {
+            authorization: `Bot ${env.DISCORD_TOKEN}`,
+        }
+    })
+        .then(data => data.json())
+        .then(user => data.Sponsor = user)
+        .catch(() => ({ username: null }))
+
+    return res.send(data)
+})
+
+server.get("/giveaway/:guildId/:giveawayId", async (req, res) => {
+
+    const { guildId, giveawayId } = req.params
+
+    if (!guildId || !giveawayId) return res.status(400).send({})
+    const timeout = setTimeout(() => res.sendStatus(404), 1000 * 15)
+
+    for (const socket of shardsAndSockets.values())
+        socket
+            .timeout(7000)
+            .emitWithAck("getGuildAndGiveaway", { guildId, giveawayId })
+            .then(sendResponse)
+            .catch(() => null)
+
+    return
+    function sendResponse(stringifiedData: string) {
+        if (!stringifiedData) return
+
+        clearTimeout(timeout)
+        const data = JSON.parse(stringifiedData)
+        return res.status(200).send(data)
+    }
+
+})
 
 httpServer.listen(
     env.SERVER_PORT,
