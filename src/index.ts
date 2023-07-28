@@ -9,7 +9,7 @@ import dataJSON from "./json/data.json";
 import listen from "./webhooks/listen"
 import { env } from "process";
 import update from "./services/update/index";
-import { apiCommandsData, interactions, shardsAndSockets } from "./websocket/connection";
+import { apiCommandsData, baseData, interactions, shardsAndSockets } from "./websocket/connection";
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
 server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalServer));
@@ -26,6 +26,13 @@ server.get("/commandscount", (req, res) => {
         messages: interactions.message
     })
 
+});
+server.get("/home", (_, res) => {
+    return res.send({
+        guilds: Object.values(baseData.guilds).reduce((pre, cur) => pre += cur, 0),
+        commands: baseData.commands(),
+        interactions: interactions.count
+    })
 });
 server.get("/commandsdata", (_, res) => res.send(apiCommandsData.toJSON()));
 

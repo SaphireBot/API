@@ -19,6 +19,11 @@ export const interactions = {
 export const apiCommandsData = new Collection<string, commandApi>()
 export const shards = new Collection<number, ShardsStatus>()
 export const shardsAndSockets = new Collection<number, Socket>()
+export const baseData = {
+    guilds: <Record<number, number>>{},
+    commands: () => apiCommandsData.size
+}
+let siteSocket: Socket;
 setInterval(() => checkIfTheShardIsAlive(), 1000 * 15)
 
 export default (socket: Socket) => {
@@ -26,6 +31,13 @@ export default (socket: Socket) => {
     if (socket.handshake.auth?.token as string !== env.WEBSOCKET_SAPHIRE_API_LOGIN_PASSWORD) {
         socket.send({ type: "console", message: "Where is the token bro?" })
         return socket.disconnect(true)
+    }
+
+    if (socket.handshake.auth?.shardId == "site") {
+        // messageAdded
+        siteSocket = socket
+        socket.emit("message", "Websocket Connected")
+        return
     }
 
     if (isNaN(socket.handshake.auth?.shardId)) {
@@ -49,10 +61,13 @@ export default (socket: Socket) => {
         if (!data || !data.type) return
 
         switch (data.type) {
-            case "addInteraction": interactions.count++; break;
+            case "addInteraction":
+                interactions.count++
+                if (siteSocket) siteSocket.emit("addInteraction", interactions.count)
+                break;
             case "addMessage": interactions.message++; break;
             case "registerCommand": registerNewCommand(data?.commandName); break;
-            case "apiCommandsData": registerCommandsApi(data?.commandsApi); break;
+            case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[], guilds: data.guilds, shardId: data.shardId }); break;
             default: console.log(data); break;
         }
         return
@@ -139,8 +154,18 @@ function setOfflineShard(shardId: number) {
     return shards.set(shardId, data)
 }
 
-function registerCommandsApi(data: commandApi[]) {
-    if (!data?.length) return
-    for (const cmd of data) apiCommandsData.set(cmd?.name, cmd)
+function registerCommandsApi({ commandApi, guilds, shardId }: { commandApi: commandApi[], guilds: number | undefined, shardId: number | undefined }) {
+
+    if (commandApi?.length)
+        for (const cmd of commandApi) apiCommandsData.set(cmd?.name, cmd)
+
+    if (
+        guilds !== undefined
+        && shardId !== undefined
+        && guilds >= 0
+        && shardId >= 0
+    )
+        baseData.guilds[shardId] = guilds
+
     return
 }
