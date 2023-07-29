@@ -73,7 +73,7 @@ server.get("/giveaway/:guildId/:giveawayId", async (req, res) => {
     const { guildId, giveawayId } = req.params
 
     if (!guildId || !giveawayId) return res.status(400).send({})
-    const timeout = setTimeout(() => res.sendStatus(404), 1000 * 15)
+    const timeout = setTimeout(() => res.status(404).send({}), 1000 * 10)
 
     for (const socket of shardsAndSockets.values())
         socket
