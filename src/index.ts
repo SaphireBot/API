@@ -72,8 +72,10 @@ server.get("/giveaway/:guildId/:giveawayId", async (req, res) => {
 
     const { guildId, giveawayId } = req.params
 
-    if (!guildId || !giveawayId) return res.status(400).send({})
-    const timeout = setTimeout(() => res.status(404).send({}), 1000 * 10)
+    if (!guildId || !giveawayId) return res.status(400).send({ message: "O ID do servidor ou do Sorteio não foram definidos corretamente." })
+    const timeout = setTimeout(() => res.status(404).send({ message: "O Discord demorou demais para entregar os participantes do sorteio." }), 1000 * 10)
+    const size = shardsAndSockets.size
+    let responses = 0
 
     for (const socket of shardsAndSockets.values())
         socket
@@ -84,7 +86,14 @@ server.get("/giveaway/:guildId/:giveawayId", async (req, res) => {
 
     return
     function sendResponse(stringifiedData: string) {
-        if (!stringifiedData) return
+        if (!stringifiedData) {
+            responses++
+            if (responses == size) {
+                clearTimeout(timeout)
+                res.status(404).send({ message: "Este sorteio não existe ou foi deletado." })
+            }
+            return
+        }
 
         clearTimeout(timeout)
         const data = JSON.parse(stringifiedData)
