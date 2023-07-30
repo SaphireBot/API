@@ -70,7 +70,7 @@ server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
     return res.send(data)
 })
 
-server.get("/user/:userId/:field", async (req, res) => {
+server.get("/user/:userId/:field", (req, res) => {
 
     const { field, userId } = req.params
 
@@ -98,7 +98,7 @@ server.get("/user/:userId/:field", async (req, res) => {
         .catch(err => res.status(404).send({ message: "Erro ao obter os dados solicitados.", err: err?.message }))
 })
 
-server.get("/user/:userId", async (req, res) => {
+server.get("/user/:userId", (req, res) => {
 
     const { userId } = req.params
 
