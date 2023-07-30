@@ -25,7 +25,7 @@ export const baseData = {
     guildsId: <string[]>[]
 }
 let siteSocket: Socket;
-setInterval(() => checkIfTheShardIsAlive(), 1000 * 15)
+// setInterval(() => checkIfTheShardIsAlive(), 1000 * 15)
 
 export default (socket: Socket) => {
 
@@ -50,7 +50,7 @@ export default (socket: Socket) => {
     socket.data.shardId = shardId
     shardsAndSockets.set(shardId, socket)
 
-    socket.on("disconnect", () => setOfflineShard(shardId))
+    socket.on("disconnect", () => shardsAndSockets.delete(shardId))
 
     socket.send({
         type: "console",
@@ -69,6 +69,7 @@ export default (socket: Socket) => {
             case "addMessage": interactions.message++; break;
             case "registerCommand": registerNewCommand(data?.commandName); break;
             case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[], guilds: data.guilds, shardId: data.shardId, guildsId: data.guildsId }); break;
+            case "newGuild": newGuild(data.guildId, shardId); break;
             default: console.log(data); break;
         }
         return
@@ -122,38 +123,38 @@ function registerNewCommand(commandName: string | undefined): void {
     return
 }
 
-async function checkIfTheShardIsAlive() {
-    if (!shardsAndSockets.size) return
+// async function checkIfTheShardIsAlive() {
+//     if (!shardsAndSockets.size) return
 
-    shardsAndSockets
-        .forEach((socket: Socket, shardId: number) => {
-            socket
-                .timeout(5000)
-                .emitWithAck("isAlive", "ping")
-                .then((data: ShardsStatus) => {
-                    if (!data || isNaN(Number(data.shardId))) return
-                    data.socketId = socket.id
-                    shards.set(data.shardId, data)
-                    return
-                })
-                .catch(() => setOfflineShard(shardId))
-            return
-        })
-    return
-}
+//     shardsAndSockets
+//         .forEach((socket: Socket, shardId: number) => {
+//             socket
+//                 .timeout(5000)
+//                 .emitWithAck("isAlive", "ping")
+//                 .then((data: ShardsStatus) => {
+//                     if (!data || isNaN(Number(data.shardId))) return
+//                     data.socketId = socket.id
+//                     shards.set(data.shardId, data)
+//                     return
+//                 })
+//                 .catch(() => setOfflineShard(shardId))
+//             return
+//         })
+//     return
+// }
 
-function setOfflineShard(shardId: number) {
-    shardsAndSockets.delete(shardId)
-    const data = shards.get(shardId)
-    if (!data) return
-    data.ready = false
-    data.usersCount = 0
-    data.guildsCount = 0
-    data.guilds = []
-    data.ms = 0
-    delete data.socketId
-    return shards.set(shardId, data)
-}
+// function setOfflineShard(shardId: number) {
+//     shardsAndSockets.delete(shardId)
+//     const data = shards.get(shardId)
+//     if (!data) return
+//     data.ready = false
+//     data.usersCount = 0
+//     data.guildsCount = 0
+//     data.guilds = []
+//     data.ms = 0
+//     delete data.socketId
+//     return shards.set(shardId, data)
+// }
 
 function registerCommandsApi({ commandApi, guilds, shardId, guildsId }: { commandApi: commandApi[], guilds: number | undefined, shardId: number | undefined, guildsId: string[] | undefined }) {
 
@@ -172,4 +173,9 @@ function registerCommandsApi({ commandApi, guilds, shardId, guildsId }: { comman
         baseData.guilds[shardId] = guilds
 
     return
+}
+
+function newGuild(guildId: string, shardId: number) {
+    if (!baseData.guildsId.includes(guildId)) baseData.guildsId.push(guildId)
+    if (baseData.guilds[shardId]) baseData.guilds[shardId]++
 }

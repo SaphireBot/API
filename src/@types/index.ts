@@ -148,13 +148,14 @@ export interface SaphireApiDataResponse {
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "getCommands" | "addMessage" | "getSaphireData" | "apiCommandsData" | "logged" | undefined
+  type: "registerCommand" | "addInteraction" | "getCommands" | "addMessage" | "getSaphireData" | "apiCommandsData" | "logged" | "newGuild" | undefined
   message: string | undefined
   shardId: number | undefined
   commandName: string | undefined
   listener: string | undefined
   guilds: number | undefined
   guildsId: string[] | undefined
+  guildId: string
   commandsApi: commandApi[]
 }
 
