@@ -36,6 +36,7 @@ server.get("/home", (_, res) => {
     })
 });
 server.get("/commandsdata", (_, res) => res.send(apiCommandsData.toJSON()));
+server.get("/servers", (_, res) => res.send(baseData.guildsId))
 
 server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
 

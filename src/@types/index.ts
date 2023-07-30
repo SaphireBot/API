@@ -154,6 +154,7 @@ export interface WebsocketMessageRecieveData {
   commandName: string | undefined
   listener: string | undefined
   guilds: number | undefined
+  guildsId: string[] | undefined
   commandsApi: commandApi[]
 }
 

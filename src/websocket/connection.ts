@@ -21,7 +21,8 @@ export const shards = new Collection<number, ShardsStatus>()
 export const shardsAndSockets = new Collection<number, Socket>()
 export const baseData = {
     guilds: <Record<number, number>>{},
-    commands: () => apiCommandsData.size
+    commands: () => apiCommandsData.size,
+    guildsId: <string[]>[]
 }
 let siteSocket: Socket;
 setInterval(() => checkIfTheShardIsAlive(), 1000 * 15)
@@ -67,7 +68,7 @@ export default (socket: Socket) => {
                 break;
             case "addMessage": interactions.message++; break;
             case "registerCommand": registerNewCommand(data?.commandName); break;
-            case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[], guilds: data.guilds, shardId: data.shardId }); break;
+            case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[], guilds: data.guilds, shardId: data.shardId, guildsId: data.guildsId }); break;
             default: console.log(data); break;
         }
         return
@@ -154,10 +155,13 @@ function setOfflineShard(shardId: number) {
     return shards.set(shardId, data)
 }
 
-function registerCommandsApi({ commandApi, guilds, shardId }: { commandApi: commandApi[], guilds: number | undefined, shardId: number | undefined }) {
+function registerCommandsApi({ commandApi, guilds, shardId, guildsId }: { commandApi: commandApi[], guilds: number | undefined, shardId: number | undefined, guildsId: string[] | undefined }) {
 
     if (commandApi?.length)
         for (const cmd of commandApi) apiCommandsData.set(cmd?.name, cmd)
+
+    if (guildsId?.length)
+        baseData.guildsId = Array.from(new Set([...baseData.guildsId, ...guildsId]))
 
     if (
         guilds !== undefined
