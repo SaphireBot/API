@@ -70,6 +70,64 @@ server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
     return res.send(data)
 })
 
+server.get("/user/:userId/:field", async (req, res) => {
+
+    const { field, userId } = req.params
+
+    if (!userId || !field)
+        return res.status(400).send({ message: "Campo do banco de dados não informado. Exemplo: .../user/transactions" })
+
+    if (!shardsAndSockets.size)
+        return res.status(500).send({ message: "Nenhum socket está conectado com a Saphire BOT." })
+
+    return shardsAndSockets
+        .random()
+        ?.timeout(5000)
+        .emitWithAck("getDatabaseInfo", { field, userId })
+        .then(data => {
+
+            if (!data)
+                return res
+                    .status(404)
+                    .send({ message: "Nenhuma informação foi encontrada." })
+
+            if (data.message) return res.send(data)
+
+            return res.send(data)
+        })
+        .catch(err => res.status(404).send({ message: "Erro ao obter os dados solicitados.", err: err?.message }))
+})
+
+server.get("/user/:userId", async (req, res) => {
+
+    const { userId } = req.params
+
+    if (!userId)
+        return res.status(400).send({ message: "Campo do banco de dados não informado. Exemplo: .../user/transactions" })
+
+    if (!shardsAndSockets.size)
+        return res.status(500).send({ message: "Nenhum socket está conectado com a Saphire BOT." })
+
+    return shardsAndSockets
+        .random()
+        ?.timeout(5000)
+        .emitWithAck("getDatabaseInfo", { userId })
+        .then(data => {
+
+            if (!data)
+                return res
+                    .status(404)
+                    .send({ message: "Nenhuma informação foi encontrada." })
+
+
+            if (data.message)
+                return res.send(data)
+
+            return res.send(data)
+        })
+        .catch(err => res.status(404).send({ message: "Erro ao obter os dados solicitados.", err: err?.message }))
+})
+
 server.get("/giveaway/:guildId/:giveawayId", async (req, res) => {
 
     const { giveawayId, guildId } = req.params
