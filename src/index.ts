@@ -10,6 +10,7 @@ import listen from "./webhooks/listen"
 import { env } from "process";
 import update from "./services/update/index";
 import { apiCommandsData, baseData, interactions, shardsAndSockets } from "./websocket/connection";
+import { GiveawayResponseData } from "./@types";
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
 server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalServer));
@@ -70,9 +71,9 @@ server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
 
 server.get("/giveaway/:guildId/:giveawayId", async (req, res) => {
 
-    const { guildId, giveawayId } = req.params
+    const { giveawayId, guildId } = req.params
 
-    if (!guildId || !giveawayId) return res.status(400).send({ message: "O ID do servidor ou do Sorteio não foram definidos corretamente." })
+    if (!giveawayId || !guildId) return res.status(400).send({ message: "O ID do servidor ou do Sorteio não foram definidos corretamente." })
     const timeout = setTimeout(() => res.status(404).send({ message: "O Discord demorou demais para entregar os participantes do sorteio." }), 1000 * 10)
     const size = shardsAndSockets.size
     let responses = 0
@@ -81,24 +82,54 @@ server.get("/giveaway/:guildId/:giveawayId", async (req, res) => {
         socket
             .timeout(7000)
             .emitWithAck("getGuildAndGiveaway", { guildId, giveawayId })
-            .then(sendResponse)
+            .then((data: GiveawayResponseData) => {
+                responses++
+
+                if (!data) {
+                    if (size == responses) {
+                        clearTimeout(timeout)
+                        console.log(data)
+                        return res.status(404).send({ message: "Infelizmente, o sorteio não foi encontrado.", data })
+                    }
+                    return
+                }
+
+                const { giveaway, guild } = data
+
+                if (!giveaway || !guild) {
+                    clearTimeout(timeout)
+                    return res.status(404).send({ message: "Os dados deste sorteio foram entregues, porém, incompletos.", data })
+                }
+
+                if (giveaway && guild) {
+                    clearTimeout(timeout)
+                    return res.send(data)
+                }
+            })
             .catch(() => null)
 
-    return
-    function sendResponse(stringifiedData: string) {
-        if (!stringifiedData) {
-            responses++
-            if (responses == size) {
-                clearTimeout(timeout)
-                res.status(404).send({ message: "Este sorteio não existe ou foi deletado." })
-            }
-            return
-        }
+    // for (const socket of shardsAndSockets.values())
+    //     socket
+    //         .timeout(7000)
+    //         .emitWithAck("getGuildAndGiveaway", { giveawayId })
+    //         .then(sendResponse)
+    //         .catch(() => null)
 
-        clearTimeout(timeout)
-        const data = JSON.parse(stringifiedData)
-        return res.status(200).send(data)
-    }
+    // return
+    // function sendResponse(stringifiedData: string) {
+    //     if (!stringifiedData) {
+    //         responses++
+    //         if (responses == size) {
+    //             clearTimeout(timeout)
+    //             res.status(404).send({ message: "Este sorteio não existe ou foi deletado." })
+    //         }
+    //         return
+    //     }
+
+    //     clearTimeout(timeout)
+    //     const data = JSON.parse(stringifiedData)
+    //     return res.status(200).send(data)
+    // }
 
 })
 

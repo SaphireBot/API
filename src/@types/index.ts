@@ -1,4 +1,4 @@
-import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, MessageComponent, MessageReference } from "discord.js";
+import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, MessageComponent, MessageReference, APIRole } from "discord.js";
 import { Stream } from "node:stream";
 import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
@@ -396,4 +396,38 @@ export interface commandApi {
     user: string[]
     bot: string[]
   }
+}
+
+export interface GiveawayResponseData {
+	guild: {
+		id: string
+		name: string
+		roles: APIRole[]
+		members:  { username: string, id: string }[]
+	},
+	giveaway: {
+		MessageID: string
+		GuildId: string
+		Prize: string
+		Winners: number
+		WinnersGiveaway: string[]
+		Participants: string[]
+		Emoji: string
+		TimeMs: number
+		DateNow: number
+		ChannelId: string
+		Actived: boolean
+		MessageLink: string
+		CreatedBy: string
+		Sponsor: string | null
+		AllowedRoles: string[]
+		LockedRoles: string[]
+		AllowedMembers: string[]
+		LockedMembers: string[]
+		RequiredAllRoles: boolean
+		AddRoles: string[]
+		MinAccountDays: number
+		MinInServerDays: number
+		DischargeDate: number
+	}
 }
