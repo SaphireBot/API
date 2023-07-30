@@ -108,29 +108,6 @@ server.get("/giveaway/:guildId/:giveawayId", async (req, res) => {
             })
             .catch(() => null)
 
-    // for (const socket of shardsAndSockets.values())
-    //     socket
-    //         .timeout(7000)
-    //         .emitWithAck("getGuildAndGiveaway", { giveawayId })
-    //         .then(sendResponse)
-    //         .catch(() => null)
-
-    // return
-    // function sendResponse(stringifiedData: string) {
-    //     if (!stringifiedData) {
-    //         responses++
-    //         if (responses == size) {
-    //             clearTimeout(timeout)
-    //             res.status(404).send({ message: "Este sorteio não existe ou foi deletado." })
-    //         }
-    //         return
-    //     }
-
-    //     clearTimeout(timeout)
-    //     const data = JSON.parse(stringifiedData)
-    //     return res.status(200).send(data)
-    // }
-
 })
 
 httpServer.listen(
