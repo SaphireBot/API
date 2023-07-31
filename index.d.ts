@@ -54,6 +54,7 @@ declare global {
       POST_MESSAGE: string
       WEBSOCKET_SAPHIRE_API_LOGIN_PASSWORD: string
       BOT_USERS_TOKEN_REQUEST: string
+      LINKED_ROLES_AUTHORIZATION: string
     }
   }
 }

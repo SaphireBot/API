@@ -169,6 +169,37 @@ server.get("/giveaway/:guildId/:giveawayId", async (req, res) => {
 
 })
 
+server.post("/discordtokens", async (req, res) => {
+
+    if (req.headers?.authorization !== env.LINKED_ROLES_AUTHORIZATION)
+        return res.send({ message: "Nenhuma autorização foi definida." })
+
+    const { tokens, userId, notResponse } = JSON.parse(req.headers.data as string)
+
+    if (!tokens || !userId)
+        return res.send({ message: "userId ou tokens não definidos." })
+
+    return shardsAndSockets
+        .random()
+        ?.timeout(7000)
+        .emitWithAck("setTokens", { userId, tokens })
+        .then(data => {
+
+            if (notResponse) return res.sendStatus(200)
+
+            if (!data)
+                return res
+                    .send({ message: "Nenhuma resposta foi encontrada." })
+
+            if (data.message)
+                return res.send(data)
+
+            return res.send(data)
+        })
+        .catch(err => res.status(500).send({ message: "Erro ao salvar os dados solicitados.", err: err?.message }))
+
+})
+
 httpServer.listen(
     env.SERVER_PORT,
     "0.0.0.0",

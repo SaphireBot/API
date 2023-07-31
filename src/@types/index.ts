@@ -433,3 +433,12 @@ export interface GiveawayResponseData {
 		DischargeDate: number
 	}
 }
+
+export interface DiscordTokensBody {
+  userId: string
+  tokens: {
+    access_token: string
+    refresh_token: string
+    expires_at: number
+  }
+}
