@@ -8,7 +8,6 @@ import { server, httpServer } from "./server";
 import dataJSON from "./json/data.json";
 import listen from "./webhooks/listen"
 import { env } from "process";
-import update from "./services/update/index";
 import { apiCommandsData, baseData, interactions, shardsAndSockets } from "./websocket/connection";
 import { GiveawayResponseData } from "./@types";
 
@@ -200,12 +199,22 @@ server.post("/discordtokens", async (req, res) => {
 
 })
 
-httpServer.listen(
-    env.SERVER_PORT,
-    "0.0.0.0",
-    (): void => {
-        listen();
-        update();
-        return console.log("API Connected")
-    }
-)
+server.post("/topgg", async (req, res) => {
+
+    if (
+        req.headers.authorization !== env.TOP_GG_AUTHORIZATION
+        || !req.body.user
+    )
+        return res.sendStatus(200)
+
+    console.log({ type: "topgg", message: req.body?.user })
+    // return res.sendStatus(200)
+    // return
+    shardsAndSockets
+        .random()
+        ?.send({ type: "topgg", message: req.body?.user })
+
+    return res.sendStatus(200)
+})
+
+httpServer.listen(env.SERVER_PORT, "0.0.0.0", listen)

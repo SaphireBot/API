@@ -8,6 +8,7 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
     if (err)
         return errorAtEnableListen(err, address);
 
+    console.log("API Connected")
     set("strictQuery", true)
 
     connect(env.DB_LOGIN)
