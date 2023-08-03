@@ -16,6 +16,7 @@ export const interactions = {
     count: 0,
     message: 0
 }
+export const allGuilds = new Collection<string, string>()
 export const apiCommandsData = new Collection<string, commandApi>()
 export const shards = new Collection<number, ShardsStatus>()
 export const shardsAndSockets = new Collection<number, Socket>()
@@ -69,7 +70,8 @@ export default (socket: Socket) => {
             case "addMessage": interactions.message++; break;
             case "registerCommand": registerNewCommand(data?.commandName); break;
             case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[], guilds: data.guilds, shardId: data.shardId, guildsId: data.guildsId }); break;
-            case "newGuild": newGuild(data.guildId, shardId); break;
+            case "guildCreate": newGuild(data.guildId, data.guildName, shardId); break;
+            case "guildDelete": allGuilds.delete(data.guildId); break;
             default: console.log(data); break;
         }
         return
@@ -87,7 +89,7 @@ export default (socket: Socket) => {
     socket.on("ping", (_: any, callback: CallbackType) => callback("pong"))
     socket.on("postMessage", (data: MessageToSendThroughWebsocket) => postmessage(data, socket))
     socket.on("postMessageWithReply", (data: MessageSaphireRequest, callback: CallbackType) => postmessagewithreply(data, callback))
-    socket.on("getAllGuilds", (_: any, callback: CallbackType) => callback(shards.map(data => data.guilds || []).flat()))
+    socket.on("getAllGuilds", (_: any, callback: CallbackType) => callback(allGuilds.map((name, id) => ({ name, id }))))
 
     // Cache
     socket.on("getCache", (data: GetAndDeleteCacheType, callback: CallbackType) => getCache(data?.id, data?.type, callback))
@@ -107,6 +109,7 @@ export default (socket: Socket) => {
     socket.on("getShardsData", (_: any, callback: CallbackType) => callback(Object.fromEntries(shards.entries())))
     socket.on("shardStatus", (data: ShardsStatus) => {
         if (!data || isNaN(Number(data.shardId))) return
+        for (const guild of data.guilds) allGuilds.set(guild.id, guild.name)
         data.socketId = socket.id
         shards.set(data.shardId, data)
         return
@@ -122,39 +125,6 @@ function registerNewCommand(commandName: string | undefined): void {
     )
     return
 }
-
-// async function checkIfTheShardIsAlive() {
-//     if (!shardsAndSockets.size) return
-
-//     shardsAndSockets
-//         .forEach((socket: Socket, shardId: number) => {
-//             socket
-//                 .timeout(5000)
-//                 .emitWithAck("isAlive", "ping")
-//                 .then((data: ShardsStatus) => {
-//                     if (!data || isNaN(Number(data.shardId))) return
-//                     data.socketId = socket.id
-//                     shards.set(data.shardId, data)
-//                     return
-//                 })
-//                 .catch(() => setOfflineShard(shardId))
-//             return
-//         })
-//     return
-// }
-
-// function setOfflineShard(shardId: number) {
-//     shardsAndSockets.delete(shardId)
-//     const data = shards.get(shardId)
-//     if (!data) return
-//     data.ready = false
-//     data.usersCount = 0
-//     data.guildsCount = 0
-//     data.guilds = []
-//     data.ms = 0
-//     delete data.socketId
-//     return shards.set(shardId, data)
-// }
 
 function registerCommandsApi({ commandApi, guilds, shardId, guildsId }: { commandApi: commandApi[], guilds: number | undefined, shardId: number | undefined, guildsId: string[] | undefined }) {
 
@@ -175,7 +145,9 @@ function registerCommandsApi({ commandApi, guilds, shardId, guildsId }: { comman
     return
 }
 
-function newGuild(guildId: string, shardId: number) {
+function newGuild(guildId: string, guildName: string, shardId: number) {
+    if (!guildId || !guildName || !shardId) return
+    allGuilds.set(guildId, guildName)
     if (!baseData.guildsId.includes(guildId)) baseData.guildsId.push(guildId)
     if (baseData.guilds[shardId]) baseData.guilds[shardId]++
 }
