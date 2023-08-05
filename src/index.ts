@@ -4,9 +4,9 @@ import "./services";
 import "./webhooks";
 import "./routes";
 import "./websocket";
-import { server, httpServer } from "./server";
 import dataJSON from "./json/data.json";
 import listen from "./webhooks/listen"
+import { server, httpServer } from "./server";
 import { env } from "process";
 import { apiCommandsData, baseData, interactions, shardsAndSockets } from "./websocket/connection";
 import { GiveawayResponseData } from "./@types";

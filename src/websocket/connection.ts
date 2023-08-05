@@ -26,7 +26,7 @@ export const baseData = {
     guildsId: <string[]>[]
 }
 let siteSocket: Socket;
-// setInterval(() => checkIfTheShardIsAlive(), 1000 * 15)
+setInterval(() => refresh(), 1000 * 5)
 
 export default (socket: Socket) => {
 
@@ -51,7 +51,15 @@ export default (socket: Socket) => {
     socket.data.shardId = shardId
     shardsAndSockets.set(shardId, socket)
 
-    socket.on("disconnect", () => shardsAndSockets.delete(shardId))
+    socket.on("reconnect", () => {
+        console.log(`${socket.id} reconnect`)
+        shardsAndSockets.set(shardId, socket)
+    })
+
+    socket.on("disconnect", () => {
+        shards.delete(shardId)
+        shardsAndSockets.delete(shardId)
+    })
 
     socket.send({
         type: "console",
@@ -150,4 +158,23 @@ function newGuild(guildId: string, guildName: string, shardId: number) {
     allGuilds.set(guildId, guildName)
     if (!baseData.guildsId.includes(guildId)) baseData.guildsId.push(guildId)
     if (baseData.guilds[shardId]) baseData.guilds[shardId]++
+}
+
+async function refresh() {
+    return shardsAndSockets
+        .forEach((socket, shardId) => {
+
+            if (!socket.connected)
+                shardsAndSockets.delete(shardId)
+
+            socket
+                .timeout(1500)
+                .emitWithAck("refresh", "get")
+                .then((data: ShardsStatus) => {
+                    for (const guild of data.guilds) allGuilds.set(guild.id, guild.name)
+                    data.socketId = socket.id
+                    shards.set(data.shardId, data)
+                })
+                .catch(() => { })
+        })
 }
