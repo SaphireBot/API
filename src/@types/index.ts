@@ -148,16 +148,23 @@ export interface SaphireApiDataResponse {
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "getCommands" | "addMessage" | "getSaphireData" | "apiCommandsData" | "logged" | "guildCreate" | "guildDelete" | undefined
+  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | undefined
   message: string | undefined
   shardId: number | undefined
   commandName: string | undefined
   listener: string | undefined
   guilds: number | undefined
-  guildsId: string[] | undefined
   guildId: string
   guildName: string
   commandsApi: commandApi[]
+  shardData: ShardsStatus
+  id: string
+  to: "guild" | "user" | undefined
+  data: GuildDatabase | UserDatabase | undefined
+  messageData: MessageToSendThroughWebsocket
+  userId: string
+  method: "save" | "delete"
+  staffData: SiteStaffs
 }
 
 export interface CallbackType {
@@ -378,7 +385,7 @@ export interface AfkGlobalData {
 }
 
 export interface SiteStaffs {
-  id: string
+  id: string | undefined
   username: string
   avatarUrl: string | null
   tags: string[]
@@ -402,37 +409,37 @@ export interface commandApi {
 }
 
 export interface GiveawayResponseData {
-	guild: {
-		id: string
-		name: string
-		roles: APIRole[]
-		members:  { username: string, id: string }[]
-	},
-	giveaway: {
-		MessageID: string
-		GuildId: string
-		Prize: string
-		Winners: number
-		WinnersGiveaway: string[]
-		Participants: string[]
-		Emoji: string
-		TimeMs: number
-		DateNow: number
-		ChannelId: string
-		Actived: boolean
-		MessageLink: string
-		CreatedBy: string
-		Sponsor: string | null
-		AllowedRoles: string[]
-		LockedRoles: string[]
-		AllowedMembers: string[]
-		LockedMembers: string[]
-		RequiredAllRoles: boolean
-		AddRoles: string[]
-		MinAccountDays: number
-		MinInServerDays: number
-		DischargeDate: number
-	}
+  guild: {
+    id: string
+    name: string
+    roles: APIRole[]
+    members: { username: string, id: string }[]
+  },
+  giveaway: {
+    MessageID: string
+    GuildId: string
+    Prize: string
+    Winners: number
+    WinnersGiveaway: string[]
+    Participants: string[]
+    Emoji: string
+    TimeMs: number
+    DateNow: number
+    ChannelId: string
+    Actived: boolean
+    MessageLink: string
+    CreatedBy: string
+    Sponsor: string | null
+    AllowedRoles: string[]
+    LockedRoles: string[]
+    AllowedMembers: string[]
+    LockedMembers: string[]
+    RequiredAllRoles: boolean
+    AddRoles: string[]
+    MinAccountDays: number
+    MinInServerDays: number
+    DischargeDate: number
+  }
 }
 
 export interface DiscordTokensBody {

@@ -1,4 +1,4 @@
-import { AfkGlobalData, CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, MessageToSendThroughWebsocket, RefreshCache, ShardsStatus, SiteStaffs, WebsocketMessageRecieveData, commandApi } from "../@types";
+import { CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, ShardsStatus, WebsocketMessageRecieveData, commandApi } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { staffs } from "../site";
@@ -20,13 +20,7 @@ export const allGuilds = new Collection<string, string>()
 export const apiCommandsData = new Collection<string, commandApi>()
 export const shards = new Collection<number, ShardsStatus>()
 export const shardsAndSockets = new Collection<number, Socket>()
-export const baseData = {
-    guilds: <Record<number, number>>{},
-    commands: () => apiCommandsData.size,
-    guildsId: <string[]>[]
-}
 let siteSocket: Socket;
-setInterval(() => refresh(), 1000 * 5)
 
 export default (socket: Socket) => {
 
@@ -48,13 +42,7 @@ export default (socket: Socket) => {
     }
 
     const shardId = socket.handshake.auth.shardId as number
-    socket.data.shardId = shardId
     shardsAndSockets.set(shardId, socket)
-
-    socket.on("reconnect", () => {
-        console.log(`${socket.id} reconnect`)
-        shardsAndSockets.set(shardId, socket)
-    })
 
     socket.on("disconnect", () => {
         shards.delete(shardId)
@@ -77,9 +65,17 @@ export default (socket: Socket) => {
                 break;
             case "addMessage": interactions.message++; break;
             case "registerCommand": registerNewCommand(data?.commandName); break;
-            case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[], guilds: data.guilds, shardId: data.shardId, guildsId: data.guildsId }); break;
-            case "guildCreate": newGuild(data.guildId, data.guildName, shardId); break;
+            case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[] }); break;
+            case "guildCreate": newGuild(data.guildId, data.guildName); break;
             case "guildDelete": allGuilds.delete(data.guildId); break;
+            case "updateCache": refreshCache(data?.id, data?.to, data?.data); break;
+            case "deleteCache": deleteCache(data.id, data.to); break;
+            case "postMessage": postmessage(data.messageData, socket); break;
+            case "removeChannelFromTwitchManager": twitchCache(data.id); break;
+            // case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }, socket); break;
+            case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }); break;
+            case "siteStaffData": data.staffData?.id ? staffs.set(data.staffData.id, data.staffData) : null; break;
+            case "shardStatus": setShardStatus(data.shardData, socket); break;
             default: console.log(data); break;
         }
         return
@@ -94,35 +90,24 @@ export default (socket: Socket) => {
         })
     })
 
-    socket.on("ping", (_: any, callback: CallbackType) => callback("pong"))
-    socket.on("postMessage", (data: MessageToSendThroughWebsocket) => postmessage(data, socket))
     socket.on("postMessageWithReply", (data: MessageSaphireRequest, callback: CallbackType) => postmessagewithreply(data, callback))
     socket.on("getAllGuilds", (_: any, callback: CallbackType) => callback(allGuilds.map((name, id) => ({ name, id }))))
 
     // Cache
     socket.on("getCache", (data: GetAndDeleteCacheType, callback: CallbackType) => getCache(data?.id, data?.type, callback))
     socket.on("getMultipleCache", (data: GetMultiplecacheDataType, callback: CallbackType) => getMultipleCache(data?.ids, data?.type, callback))
-    socket.on("updateCache", (data: RefreshCache) => refreshCache(data?.id, data?.type, data?.data))
-    socket.on("deleteCache", (data: GetAndDeleteCacheType) => deleteCache(data?.id, data?.type))
-    socket.on("removeChannelFromTwitchManager", (channelId: string | undefined) => twitchCache(channelId))
-    socket.on("AfkGlobalSystem", (data: AfkGlobalData) => postAfk(data, socket))
-
-    // Site
-    socket.on("siteStaffData", (data: SiteStaffs) => {
-        if (data?.id) staffs.set(data?.id, data)
-        return
-    })
 
     // Shards
     socket.on("getShardsData", (_: any, callback: CallbackType) => callback(Object.fromEntries(shards.entries())))
-    socket.on("shardStatus", (data: ShardsStatus) => {
-        if (!data || isNaN(Number(data.shardId))) return
-        for (const guild of data.guilds) allGuilds.set(guild.id, guild.name)
-        data.socketId = socket.id
-        shards.set(data.shardId, data)
-        return
-    })
 
+}
+
+function setShardStatus(data: ShardsStatus, socket: Socket) {
+    if (!data || isNaN(Number(data.shardId))) return
+    for (const guild of data.guilds) allGuilds.set(guild.id, guild.name)
+    data.socketId = socket.id
+    shards.set(data.shardId, data)
+    return
 }
 
 function registerNewCommand(commandName: string | undefined): void {
@@ -134,47 +119,15 @@ function registerNewCommand(commandName: string | undefined): void {
     return
 }
 
-function registerCommandsApi({ commandApi, guilds, shardId, guildsId }: { commandApi: commandApi[], guilds: number | undefined, shardId: number | undefined, guildsId: string[] | undefined }) {
+function registerCommandsApi({ commandApi }: { commandApi: commandApi[] }) {
 
     if (commandApi?.length)
         for (const cmd of commandApi) apiCommandsData.set(cmd?.name, cmd)
 
-    if (guildsId?.length)
-        baseData.guildsId = Array.from(new Set([...baseData.guildsId, ...guildsId]))
-
-    if (
-        guilds !== undefined
-        && shardId !== undefined
-        && guilds >= 0
-        && shardId >= 0
-    )
-        baseData.guilds[shardId] = guilds
-
     return
 }
 
-function newGuild(guildId: string, guildName: string, shardId: number) {
-    if (!guildId || !guildName || !shardId) return
+function newGuild(guildId: string, guildName: string) {
+    if (!guildId || !guildName) return
     allGuilds.set(guildId, guildName)
-    if (!baseData.guildsId.includes(guildId)) baseData.guildsId.push(guildId)
-    if (baseData.guilds[shardId]) baseData.guilds[shardId]++
-}
-
-async function refresh() {
-    return shardsAndSockets
-        .forEach((socket, shardId) => {
-
-            if (!socket.connected)
-                shardsAndSockets.delete(shardId)
-
-            socket
-                .timeout(1500)
-                .emitWithAck("refresh", "get")
-                .then((data: ShardsStatus) => {
-                    for (const guild of data.guilds) allGuilds.set(guild.id, guild.name)
-                    data.socketId = socket.id
-                    shards.set(data.shardId, data)
-                })
-                .catch(() => { })
-        })
 }

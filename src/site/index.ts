@@ -16,8 +16,10 @@ server.get("/staffs", async (_, res) => {
 
             if (!data.avatarUrl) data.avatarUrl = "https://media.discordapp.net/attachments/893361065084198954/1132515877124841522/No-photo-m.png"
 
-            data.social = getSocial(data.id)
-            data.description = getDescription(data.id)
+            if (data.id) {
+                data.social = getSocial(data.id)
+                data.description = getDescription(data.id)
+            }
 
             if (data.tags.includes("developer")) return developers.push(data)
             if (data.tags.includes("adminstrator")) return admins.push(data)

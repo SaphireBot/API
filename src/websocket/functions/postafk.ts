@@ -1,7 +1,9 @@
-import { Socket } from "socket.io";
+// import { Socket } from "socket.io";
 import { AfkGlobalData } from "../../@types";
+import { ws } from "../../server";
 
-export default (data: AfkGlobalData, socket: Socket) => {
+export default (data: AfkGlobalData) => {
+// export default (data: AfkGlobalData, socket: Socket) => {
 
     if (
         !data
@@ -9,6 +11,10 @@ export default (data: AfkGlobalData, socket: Socket) => {
         || !data.method
     ) return
 
-    socket.broadcast.emit("globalAfk", { userId: data?.userId, message: data?.message || "No Message", method: data.method })
+    // socket.broadcast.emit("globalAfk", { userId: data?.userId, message: data?.message || "No Message", method: data.method })
+    ws.sockets.send({
+        type: "globalAfk",
+        data: { userId: data?.userId, message: data?.message || "No Message", method: data.method }
+    })
     return
 }

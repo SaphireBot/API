@@ -8,7 +8,7 @@ import dataJSON from "./json/data.json";
 import listen from "./webhooks/listen"
 import { server, httpServer } from "./server";
 import { env } from "process";
-import { apiCommandsData, baseData, interactions, shardsAndSockets } from "./websocket/connection";
+import { allGuilds, apiCommandsData, interactions, shardsAndSockets } from "./websocket/connection";
 import { GiveawayResponseData } from "./@types";
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
@@ -29,13 +29,13 @@ server.get("/commandscount", (req, res) => {
 });
 server.get("/home", (_, res) => {
     return res.send({
-        guilds: Object.values(baseData.guilds).reduce((pre, cur) => pre += cur, 0),
-        commands: baseData.commands(),
+        guilds: allGuilds.size,
+        commands: apiCommandsData.size,
         interactions: interactions.count
     })
 });
 server.get("/commandsdata", (_, res) => res.send(apiCommandsData.toJSON()));
-server.get("/servers", (_, res) => res.send(baseData.guildsId))
+server.get("/servers", (_, res) => res.send(...allGuilds.keys()))
 
 server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
 
@@ -207,9 +207,6 @@ server.post("/topgg", async (req, res) => {
     )
         return res.sendStatus(200)
 
-    console.log({ type: "topgg", message: req.body?.user })
-    // return res.sendStatus(200)
-    // return
     shardsAndSockets
         .random()
         ?.send({ type: "topgg", message: req.body?.user })

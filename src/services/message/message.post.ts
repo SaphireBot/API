@@ -81,7 +81,7 @@ async function postMessage(data: MessageSaphireRequest, res: Response | undefine
             return
         })
         .catch(err => {
-            if (socket) return socket.emit("errorInPostingMessage", { data, err })
+            if (socket) return socket.send({ type: "errorInPostingMessage", data, err })
             if (res) {
                 res.statusCode = 400
                 return res.send(err)
