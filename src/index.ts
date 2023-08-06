@@ -207,9 +207,10 @@ server.post("/topgg", async (req, res) => {
     )
         return res.sendStatus(200)
 
-    shardsAndSockets
-        .random()
-        ?.send({ type: "topgg", message: req.body?.user })
+    const socket = shardsAndSockets.random()
+
+    if (socket)
+        socket.send({ type: "topgg", message: req.body?.user })
 
     return res.sendStatus(200)
 })

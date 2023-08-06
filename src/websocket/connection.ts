@@ -44,6 +44,7 @@ export default (socket: Socket) => {
     const shardId = socket.handshake.auth.shardId as number
     shardsAndSockets.set(shardId, socket)
 
+    socket.on("connect", () => shardsAndSockets.set(shardId, socket))
     socket.on("disconnect", () => {
         shards.delete(shardId)
         shardsAndSockets.delete(shardId)
@@ -72,7 +73,6 @@ export default (socket: Socket) => {
             case "deleteCache": deleteCache(data.id, data.to); break;
             case "postMessage": postmessage(data.messageData, socket); break;
             case "removeChannelFromTwitchManager": twitchCache(data.id); break;
-            // case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }, socket); break;
             case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }); break;
             case "siteStaffData": data.staffData?.id ? staffs.set(data.staffData.id, data.staffData) : null; break;
             case "shardStatus": setShardStatus(data.shardData, socket); break;
@@ -106,6 +106,7 @@ function setShardStatus(data: ShardsStatus, socket: Socket) {
     if (!data || isNaN(Number(data.shardId))) return
     for (const guild of data.guilds) allGuilds.set(guild.id, guild.name)
     data.socketId = socket.id
+    shardsAndSockets.set(data.shardId, socket)
     shards.set(data.shardId, data)
     return
 }
