@@ -20,6 +20,7 @@ export const allGuilds = new Collection<string, string>()
 export const apiCommandsData = new Collection<string, commandApi>()
 export const shards = new Collection<number, ShardsStatus>()
 export const shardsAndSockets = new Collection<number, Socket>()
+setInterval(() => shardsAndSockets.random()?.send({ type: "refreshRanking" }), 1000 * 60 * 15)
 let siteSocket: Socket;
 
 export default (socket: Socket) => {
