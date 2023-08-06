@@ -21,6 +21,19 @@ export const apiCommandsData = new Collection<string, commandApi>()
 export const shards = new Collection<number, ShardsStatus>()
 export const shardsAndSockets = new Collection<number, Socket>()
 setInterval(() => shardsAndSockets.random()?.send({ type: "refreshRanking" }), 1000 * 60 * 15)
+setInterval(() => {
+    if (!apiCommandsData.size)
+        shardsAndSockets
+            .random()
+            ?.timeout(1000)
+            .emitWithAck("commands", "get")
+            .then((res: commandApi[]) => {
+                if (!res?.length) return
+                for (const cmd of res)
+                    apiCommandsData.set(cmd.name, cmd)
+            })
+            .catch(() => { })
+}, 1000 * 60)
 let siteSocket: Socket;
 
 export default (socket: Socket) => {
@@ -91,6 +104,24 @@ export default (socket: Socket) => {
         })
     })
 
+    socket.on("getGuild", (guildId: string, callback: CallbackType) => {
+
+        return callback(null)
+        // if (!guildId) return callback(null)
+
+        shardsAndSockets
+            .forEach(socket => {
+                socket
+                    .timeout(10000)
+                    .emitWithAck("getGuild", guildId)
+                    .then(data => {
+                        if (data) callback(data)
+                    })
+                    .catch(() => callback(null))
+            })
+        return
+    })
+
     socket.on("postMessageWithReply", (data: MessageSaphireRequest, callback: CallbackType) => postmessagewithreply(data, callback))
     socket.on("getAllGuilds", (_: any, callback: CallbackType) => callback(allGuilds.map((name, id) => ({ name, id }))))
 
@@ -114,10 +145,7 @@ function setShardStatus(data: ShardsStatus, socket: Socket) {
 
 function registerNewCommand(commandName: string | undefined): void {
     if (!commandName) return
-    interactions.commands.set(
-        commandName,
-        (interactions.commands.get(commandName) || 0) + 1
-    )
+    interactions.commands.set(commandName, (interactions.commands.get(commandName) || 0) + 1)
     return
 }
 

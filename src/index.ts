@@ -48,9 +48,7 @@ server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
 
     await fetch(`https://discord.com/api/users/${CreatedBy}`, {
         method: "GET",
-        headers: {
-            authorization: `Bot ${env.DISCORD_TOKEN}`,
-        }
+        headers: { authorization: `Bot ${env.DISCORD_TOKEN}` }
     })
         .then(data => data.json())
         .then(user => data.CreatedBy = user)
@@ -59,7 +57,7 @@ server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
     await fetch(`https://discord.com/api/users/${Sponsor}`, {
         method: "GET",
         headers: {
-            authorization: `Bot ${env.DISCORD_TOKEN}`,
+            authorization: `Bot ${env.DISCORD_TOKEN}`
         }
     })
         .then(data => data.json())
@@ -97,9 +95,24 @@ server.get("/user/:userId/:field", (req, res) => {
         .catch(err => res.status(404).send({ message: "Erro ao obter os dados solicitados.", err: err?.message }))
 })
 
-server.get("/user/:userId", (req, res) => {
+server.get("/user/:userId", async (req, res) => {
 
     const { userId } = req.params
+    const { name } = req.query
+
+    if (name == "true") {
+        await fetch(
+            `https://discord.com/api/v10/users/${userId}`,
+            {
+                headers: { authorization: `Bot ${env.BOT_TOKEN_REQUEST}` },
+                method: "GET"
+            }
+        )
+            .then(res => res.json())
+            .then(data => res.send(data.username))
+            .catch(() => res.send("No Name"))
+        return
+    }
 
     if (!userId)
         return res.status(400).send({ message: "Campo do banco de dados não informado. Exemplo: .../user/transactions" })
@@ -118,10 +131,7 @@ server.get("/user/:userId", (req, res) => {
                     .status(404)
                     .send({ message: "Nenhuma informação foi encontrada." })
 
-
-            if (data.message)
-                return res.send(data)
-
+            delete data.Tokens
             return res.send(data)
         })
         .catch(err => res.status(404).send({ message: "Erro ao obter os dados solicitados.", err: err?.message }))
