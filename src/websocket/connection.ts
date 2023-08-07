@@ -95,6 +95,7 @@ export default (socket: Socket) => {
         return
     })
 
+    socket.on("ping", (_, callback: CallbackType) => callback("pong"))
     socket.on("getSaphireData", (data: any, callback: CallbackType) => {
         if (!data) return
         return callback({

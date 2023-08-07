@@ -9,7 +9,8 @@ import listen from "./webhooks/listen"
 import { server, httpServer } from "./server";
 import { env } from "process";
 import { allGuilds, apiCommandsData, interactions, shardsAndSockets } from "./websocket/connection";
-import { GiveawayResponseData } from "./@types";
+import { GiveawayResponseData, commandApi } from "./@types";
+import mongoose from "mongoose";
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
 server.get("/connections", (_, res) => res.send(dataJSON.urls.discordPrincipalServer));
@@ -34,8 +35,27 @@ server.get("/home", (_, res) => {
         interactions: interactions.count
     })
 });
-server.get("/commandsdata", (_, res) => res.send(apiCommandsData.toJSON()));
-server.get("/servers", (_, res) => res.send(...allGuilds.keys()))
+server.get("/commandsdata", async (_, res) => {
+
+    if (!apiCommandsData.size) {
+        shardsAndSockets
+            .random()
+            ?.timeout(1000)
+            .emitWithAck("commands", "get")
+            .then((cmds: commandApi[]) => {
+                if (!cmds?.length) return
+                for (const cmd of cmds)
+                    apiCommandsData.set(cmd.name, cmd)
+
+                return res.send(apiCommandsData.toJSON())
+            })
+            .catch(() => { })
+        return
+    }
+
+    return res.send(apiCommandsData.toJSON())
+});
+server.get("/servers", (_, res) => res.send(Array.from(new Set(allGuilds.keys()))))
 
 server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
 
@@ -98,9 +118,12 @@ server.get("/user/:userId/:field", (req, res) => {
 server.get("/user/:userId", async (req, res) => {
 
     const { userId } = req.params
-    const { name } = req.query
+    const { name, data } = req.query
 
-    if (name == "true") {
+    if (!userId)
+        return res.status(400).send({ message: "Campo do banco de dados não informado. Exemplo: .../user/transactions" })
+
+    if (name == "true" || data == "true") {
         await fetch(
             `https://discord.com/api/v10/users/${userId}`,
             {
@@ -109,13 +132,13 @@ server.get("/user/:userId", async (req, res) => {
             }
         )
             .then(res => res.json())
-            .then(data => res.send(data.username))
+            .then(data => {
+                if (name) return res.send(data.username)
+                if (data) return res.send(data)
+            })
             .catch(() => res.send("No Name"))
         return
     }
-
-    if (!userId)
-        return res.status(400).send({ message: "Campo do banco de dados não informado. Exemplo: .../user/transactions" })
 
     if (!shardsAndSockets.size)
         return res.status(500).send({ message: "Nenhum socket está conectado com a Saphire BOT." })
@@ -223,6 +246,41 @@ server.post("/topgg", async (req, res) => {
         socket.send({ type: "topgg", message: req.body?.user })
 
     return res.sendStatus(200)
+})
+
+server.get("/clientdata", async (_, res) => {
+
+    const timeout = setTimeout(() => res.send(null), 5000)
+
+    shardsAndSockets
+        .random()
+        ?.timeout(2000)
+        .emitWithAck("clientData", "get")
+        .then(data => {
+            clearTimeout(timeout)
+            delete data.SpotifyAccessToken
+            delete data.TwitchAccessToken
+            return res.send(data)
+        })
+        .catch(() => { })
+
+})
+
+server.get("/status", async (_, res) => {
+
+    const now = Date.now()
+    const calculate = () => Date.now() - now
+    const ms: any = []
+
+    await Promise.all([
+        fetch("https://api.discloud.app/v2/user", { headers: { accept: "*/*", "api-token": process.env.DISCLOUD_TOKEN } }).then(() => ms.push({ name: "discloud", ms: calculate() })).catch(() => ms.push({ name: "discloud", ms: 0 })),
+        fetch("https://discord.com/api/v10/users/@me", { method: "GET", headers: { authorization: process.env.DISCORD_TOKEN } }).then(() => ms.push({ name: "discord", ms: calculate() })).catch(() => ms.push({ name: "discord", ms: 0 })),
+        fetch("https://top.gg/api/bots/912509487984812043", { headers: { authorization: process.env.TOP_GG_TOKEN }, method: "GET" }).then(() => ms.push({ name: "topgg", ms: calculate() })).catch(() => ms.push({ name: "topgg", ms: 0 })),
+        mongoose.connection.db.admin().ping().then(() => ms.push({ name: "database", ms: calculate() })).catch(() => ms.push({ name: "database", ms: 0 })),
+        shardsAndSockets?.random()?.timeout(7000).emitWithAck("shardsping", "get").then(data => ms.push({ name: "shards", data: data })).catch(() => ms.push({ name: "shards", data: [] }))
+    ])
+
+    return res.send(ms)
 })
 
 httpServer.listen(env.SERVER_PORT, "0.0.0.0", listen)
