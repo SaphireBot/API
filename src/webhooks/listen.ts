@@ -2,6 +2,7 @@ import sender from "./sender";
 import { CallbackError, connect, set } from "mongoose"
 import { env } from "node:process";
 import dataJSON from "../json/data.json";
+import TwitchManager from "../twitch/manager.twitch"
 
 export default async (err?: Error | null, address?: string): Promise<void> => {
 
@@ -11,7 +12,11 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
     console.log("API Connected")
     set("strictQuery", true)
 
-    connect(env.DB_LOGIN)
+    connect(env.DATABASE_LINK_CONNECTION)
+        .then(() => {
+            console.log("Database Connected")
+            TwitchManager.getToken()
+        })
         .catch((error: CallbackError | null): undefined => {
 
             const databaseResponse = error

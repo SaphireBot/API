@@ -4,6 +4,7 @@ import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
 import { Request, Response } from "express"
 import { Socket } from "socket.io";
+import { RemoveChannelParams, UpdateManyStreamerParams, UpdateStreamerParams } from "./twitch";
 
 export interface WebhookBodyRequest extends Request {
   webhookUrl: string
@@ -23,13 +24,15 @@ export interface WebhookBodyRequest extends Request {
 
 export interface MessageSaphireRequest {
   content: string | null
-  message_reference: MessageReference | null
+  message_reference?: MessageReference | null
   method: string | null
   channelId: string | null
   messageId?: string | null
+  isTwitchNotification?: boolean | undefined
+  body?: any
   components: MessageComponent[] | []
-  embeds: APIEmbed[] | []
-  tts: boolean
+  embeds: APIEmbed[]
+  tts?: boolean
 }
 
 export interface MessageToSendThroughWebsocket {
@@ -148,7 +151,7 @@ export interface SaphireApiDataResponse {
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | undefined
+  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateStreamer" | "updateManyStreamers" | "removeChannel" | undefined
   message: string | undefined
   shardId: number | undefined
   commandName: string | undefined
@@ -165,6 +168,9 @@ export interface WebsocketMessageRecieveData {
   userId: string
   method: "save" | "delete"
   staffData: SiteStaffs
+  updateTwitchStreamer: UpdateStreamerParams
+  updateManyTwitchStreamer: UpdateManyStreamerParams
+  channelData: RemoveChannelParams
 }
 
 export interface CallbackType {

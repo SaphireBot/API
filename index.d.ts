@@ -55,6 +55,10 @@ declare global {
       WEBSOCKET_SAPHIRE_API_LOGIN_PASSWORD: string
       BOT_USERS_TOKEN_REQUEST: string
       LINKED_ROLES_AUTHORIZATION: string
+      SAPHIRE_BOT_ID: string
+      DATABASE_LINK_CONNECTION: string
+      TWITCH_CLIENT_ID: string
+      TWITCH_CLIENT_SECRET: string
     }
   }
 }

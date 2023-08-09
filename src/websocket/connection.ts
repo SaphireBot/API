@@ -11,6 +11,8 @@ import deleteCache from "./cache/delete.cache";
 import twitchCache from "./cache/twitch.cache";
 import postAfk from "./functions/postafk";
 import postmessagewithreply from "./functions/postmessagewithreply";
+import ManagerTwitch from "../twitch/manager.twitch";
+import { UpdateStreamerParams } from "../@types/twitch";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -86,14 +88,24 @@ export default (socket: Socket) => {
             case "updateCache": refreshCache(data?.id, data?.to, data?.data); break;
             case "deleteCache": deleteCache(data.id, data.to); break;
             case "postMessage": postmessage(data.messageData, socket); break;
-            case "removeChannelFromTwitchManager": twitchCache(data.id); break;
             case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }); break;
             case "siteStaffData": data.staffData?.id ? staffs.set(data.staffData.id, data.staffData) : null; break;
             case "shardStatus": setShardStatus(data.shardData, socket); break;
+
+            // Twitch Section
+            // case "updateStreamer": ManagerTwitch.updateStreamer(data.updateTwitchStreamer); break;
+            case "updateManyStreamers": ManagerTwitch.updateManyStreamer(data.updateManyTwitchStreamer); break;
+            case "removeChannel": ManagerTwitch.removeChannel(data.channelData); break;
+            case "removeChannelFromTwitchManager": twitchCache(data.id); break;
+            // --------------
             default: console.log(data); break;
         }
         return
     })
+
+    // Twitch Section
+    socket.on("updateStreamer", (data: UpdateStreamerParams, callback: CallbackType) => ManagerTwitch.updateStreamer(data, callback))
+    socket.on("getStreamersOnline", async (url: string, callback: CallbackType) => callback(await ManagerTwitch.fetcher(url)))
 
     socket.on("ping", (_, callback: CallbackType) => callback("pong"))
     socket.on("getSaphireData", (data: any, callback: CallbackType) => {

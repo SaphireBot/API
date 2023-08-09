@@ -4,6 +4,7 @@ import { server } from "../../server"
 import { Response } from "express"
 import { env } from "process"
 import { Socket } from "socket.io"
+import { shardsAndSockets } from "../../websocket/connection"
 export const Rest = new REST().setToken(process.env.DISCORD_TOKEN)
 export const messagesToSend = <MessageToSendSaphireData[]>[]
 executeMessages()
@@ -49,7 +50,7 @@ async function executeMessages(): Promise<any> {
 
         for (const { data, res, socket } of toSendData) {
 
-            if (!data.method) {
+            if (!data?.method) {
                 report(res, socket, { message: "No method field provided", data })
                 continue
             }
@@ -81,11 +82,20 @@ async function postMessage(data: MessageSaphireRequest, res: Response | undefine
             return
         })
         .catch(err => {
+            console.log(err)
             if (socket) return socket.send({ type: "errorInPostingMessage", data, err })
             if (res) {
                 res.statusCode = 400
                 return res.send(err)
             }
+
+            return shardsAndSockets
+                .random()
+                ?.send({
+                    type: "errorInPostingMessage",
+                    data,
+                    err
+                })
         })
 }
 
