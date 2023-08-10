@@ -1,10 +1,12 @@
-import { REST, Routes, APIEmbed, MessageReference, MessageComponent } from "discord.js"
-import { MessageSaphireRequest, MessageToSendSaphireData } from "../../@types"
+import { REST, Routes, APIEmbed, MessageReference, MessageComponent, DiscordAPIError } from "discord.js"
+import { GuildDatabase, MessageSaphireRequest, MessageToSendSaphireData, MessageToSendThroughWebsocket } from "../../@types"
 import { server } from "../../server"
 import { Response } from "express"
 import { env } from "process"
 import { Socket } from "socket.io"
 import { shardsAndSockets } from "../../websocket/connection"
+import Database from "../../database"
+import { guilds } from "../../websocket/cache/get.cache"
 export const Rest = new REST().setToken(process.env.DISCORD_TOKEN)
 export const messagesToSend = <MessageToSendSaphireData[]>[]
 executeMessages()
@@ -70,7 +72,7 @@ async function executeMessages(): Promise<any> {
     return setTimeout(() => executeMessages(), 1000 * 2)
 }
 
-async function postMessage(data: MessageSaphireRequest, res: Response | undefined, socket: Socket | undefined) {
+async function postMessage(data: MessageSaphireRequest | MessageToSendThroughWebsocket, res: Response | undefined, socket: Socket | undefined) {
     if (!data.channelId) return report(res, socket, { message: "channelId Missing", data })
 
     return await Rest.post(
@@ -81,13 +83,25 @@ async function postMessage(data: MessageSaphireRequest, res: Response | undefine
             if (res) res.end()
             return
         })
-        .catch(err => {
+        .catch(async (err: DiscordAPIError) => {
             console.log(err)
             if (socket) return socket.send({ type: "errorInPostingMessage", data, err })
             if (res) {
                 res.statusCode = 400
                 return res.send(err)
             }
+
+            if (
+                "guildId" in data
+                && "LogType" in data
+                && [50001, 10003, "50001", "10003"].includes(err.code)
+            )
+                return await Database.Guilds.findOneAndUpdate(
+                    { id: data.guildId },
+                    { $unset: { [`LogSystem.${data.LogType}`]: true } },
+                    { new: true, upsert: true }
+                )
+                    .then(doc => guilds.set(doc?.id, doc as GuildDatabase))
 
             return shardsAndSockets
                 .random()

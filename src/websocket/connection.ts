@@ -105,7 +105,8 @@ export default (socket: Socket) => {
 
     // Twitch Section
     socket.on("updateStreamer", (data: UpdateStreamerParams, callback: CallbackType) => ManagerTwitch.updateStreamer(data, callback))
-    socket.on("getStreamersOnline", async (url: string, callback: CallbackType) => callback(await ManagerTwitch.fetcher(url)))
+    socket.on("twitchFetcher", async (url: string, callback: CallbackType) => callback(await ManagerTwitch.fetcher(url)))
+    // --------------
 
     socket.on("ping", (_, callback: CallbackType) => callback("pong"))
     socket.on("getSaphireData", (data: any, callback: CallbackType) => {

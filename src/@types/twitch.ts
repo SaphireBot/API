@@ -86,3 +86,18 @@ export interface RemoveChannelParams {
     streamer: string
     channelId: string
 }
+
+export interface ChannelFollower {
+    user_id: string
+    user_name: string
+    user_login: string
+    followed_at: string
+}
+
+export interface GetChannelFollowers {
+    total: number
+    data: ChannelFollower[]
+    pagination: {
+        cursor: string
+    }
+}

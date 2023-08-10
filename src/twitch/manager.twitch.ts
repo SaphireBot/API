@@ -132,13 +132,6 @@ export default new class Twitch {
         const guildsDocuments = await Database.Guilds.find({ TwitchNotifications: { $exists: true } }, "id TwitchNotifications").then(doc => doc.filter(d => d.TwitchNotifications.length && d.id)) || []
         this.allGuildsID = guildsDocuments.length
 
-        // await shardsAndSockets
-        //     .random()
-        //     ?.timeout(5000)
-        //     .emitWithAck("getChannels", "get")
-        //     .then((ch: string[]) => channels.push(...ch))
-        //     .catch(() => { })
-
         for (const { TwitchNotifications } of guildsDocuments)
             for (const { streamer, channelId, roleId, message } of TwitchNotifications) { // [..., { channelId: '123', streamer: 'alanzoka', roleId: '123' }, ...]
                 if (!streamer || !channelId) continue
@@ -311,6 +304,7 @@ export default new class Twitch {
                         return resolve([])
                     }
 
+                    if (url.includes("/followers")) return resolve(res.total)
                     return resolve(res.data || [])
                 })
                 .catch(err => {

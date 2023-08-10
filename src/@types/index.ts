@@ -39,8 +39,9 @@ export interface MessageToSendThroughWebsocket {
   method: "post" | "patch" | "delete" | undefined
   type: string | undefined
   channelId: string | undefined
-  messageId?: string | undefined
+  messageId?: string
   body?: MessageSaphireRequest
+  guildId?: string
   authorization: string
   isWebsocket: boolean
   isTwitchNotification: boolean | undefined
