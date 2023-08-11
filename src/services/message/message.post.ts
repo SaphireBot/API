@@ -1,4 +1,4 @@
-import { REST, Routes, APIEmbed, MessageReference, MessageComponent, DiscordAPIError } from "discord.js"
+import { REST, Routes, APIEmbed, MessageReference, DiscordAPIError, APIMessageComponent } from "discord.js"
 import { GuildDatabase, MessageSaphireRequest, MessageToSendSaphireData, MessageToSendThroughWebsocket } from "../../@types"
 import { server } from "../../server"
 import { Response } from "express"
@@ -38,7 +38,7 @@ server.post("/message", async (req, res) => {
         content: <string | null>req.body.content || null,
         embeds: <APIEmbed[] | []>req.body.embeds || [],
         message_reference: <MessageReference>req.body.message_reference || null,
-        components: <MessageComponent[] | []>req.body.components || [],
+        components: <APIMessageComponent[] | []>req.body.components || [],
         tts: false
     }
 
@@ -84,7 +84,7 @@ async function postMessage(data: MessageSaphireRequest | MessageToSendThroughWeb
             return
         })
         .catch(async (err: DiscordAPIError) => {
-            console.log(err)
+
             if (socket) return socket.send({ type: "errorInPostingMessage", data, err })
             if (res) {
                 res.statusCode = 400
@@ -94,15 +94,16 @@ async function postMessage(data: MessageSaphireRequest | MessageToSendThroughWeb
             if (
                 "guildId" in data
                 && "LogType" in data
-                && [50001, 10003, "50001", "10003"].includes(err.code)
+                && [50001, 10003].includes(err.code as number)
             )
-                return await Database.Guilds.findOneAndUpdate(
+                return await Database.Guild.findOneAndUpdate(
                     { id: data.guildId },
                     { $unset: { [`LogSystem.${data.LogType}`]: true } },
                     { new: true, upsert: true }
                 )
                     .then(doc => guilds.set(doc?.id, doc as GuildDatabase))
 
+            console.log(err, data)
             return shardsAndSockets
                 .random()
                 ?.send({

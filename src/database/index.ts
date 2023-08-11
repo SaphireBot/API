@@ -1,15 +1,18 @@
 import cache from "./model/cache";
 import client from "./model/client";
-import guilds from "./model/guilds";
+import guild from "./model/guilds";
+import user from "./model/user";
 
 export default new class Database {
     Client: typeof client
     Cache: typeof cache
-    Guilds: typeof guilds
+    Guild: typeof guild
+    User: typeof user
 
     constructor() {
         this.Client = client
         this.Cache = cache
-        this.Guilds = guilds
+        this.Guild = guild
+        this.User = user
     }
 }

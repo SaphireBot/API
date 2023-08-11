@@ -59,6 +59,7 @@ declare global {
       DATABASE_LINK_CONNECTION: string
       TWITCH_CLIENT_ID: string
       TWITCH_CLIENT_SECRET: string
+      SERVER_BUG_REPORT: string
     }
   }
 }

@@ -10,7 +10,7 @@ export default async (channelId: string | undefined) => {
         ManagerTwitch.channelsNotified[streamer] = await Database.Cache.Twitch.pull(`channelsNotified.${streamer}`, cId => [channelId, null].includes(cId))
     }
 
-    await Database.Guilds.updateMany(
+    await Database.Guild.updateMany(
         {},
         { $pull: { TwitchNotifications: { channelId } } }
     )

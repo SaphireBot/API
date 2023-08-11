@@ -129,7 +129,7 @@ export default new class Twitch {
             )
         ).flat().length
 
-        const guildsDocuments = await Database.Guilds.find({ TwitchNotifications: { $exists: true } }, "id TwitchNotifications").then(doc => doc.filter(d => d.TwitchNotifications.length && d.id)) || []
+        const guildsDocuments = await Database.Guild.find({ TwitchNotifications: { $exists: true } }, "id TwitchNotifications").then(doc => doc.filter(d => d.TwitchNotifications.length && d.id)) || []
         this.allGuildsID = guildsDocuments.length
 
         for (const { TwitchNotifications } of guildsDocuments)
@@ -682,7 +682,7 @@ export default new class Twitch {
     async updateStreamer({ streamer, channelId, guildId }: UpdateStreamerParams, callback: CallbackType) {
 
         if (!streamer || !guildId || !channelId) return
-        const dataFromDatabase = await Database.Guilds.findOne({ id: guildId })
+        const dataFromDatabase = await Database.Guild.findOne({ id: guildId })
         const notifications = dataFromDatabase?.TwitchNotifications || []
         const has = dataFromDatabase?.TwitchNotifications?.some(d => d?.streamer == streamer && d?.channelId == channelId)
         if (has) return callback("already")
@@ -693,7 +693,7 @@ export default new class Twitch {
 
         data.push({ streamer, channelId })
 
-        await Database.Guilds.findOneAndUpdate(
+        await Database.Guild.findOneAndUpdate(
             { id: guildId },
             { $set: { TwitchNotifications: data } },
             { new: true, upsert: true }
