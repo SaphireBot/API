@@ -1,10 +1,9 @@
 import { env } from "process"
-import clientModel from "../database/model/client"
 import Database from "../database"
 // import { shardsAndSockets } from "../websocket/connection"
 import { messagesToSend } from "../services/message/message.post"
 import { ButtonStyle, parseEmoji, time } from "discord.js"
-import parsems from "parse-ms"
+// import parsems from "parse-ms"
 import { TwitchLanguages } from "../json/data.json"
 import { FetchError, OauthToken, OauthValidade, OfflineStreamersToNotifier, RemoveChannelParams, StreamData, UpdateManyStreamerParams, UpdateStreamerParams, UserData } from "../@types/twitch"
 import { CallbackType, GuildDatabase } from "../@types"
@@ -106,7 +105,7 @@ export default new class Twitch {
                 if ("status" in data)
                     return console.log("Fail to validate the token")
 
-                return await clientModel.updateOne(
+                return await Database.Client.updateOne(
                     { id: env.SAPHIRE_BOT_ID },
                     { $set: { TwitchAccessToken: data.access_token } }
                 )
@@ -603,30 +602,22 @@ export default new class Twitch {
 
         if (!ms || isNaN(ms) || ms <= 0) return "0 segundo"
 
-        const date: Record<string, number> = { millennia: 0, century: 0, years: 0, months: 0, ...parsems(ms) }
-
-        if (date.days >= 365)
-            while (date.days >= 365) {
-                date.years++
-                date.days -= 365
-            }
+        const totalYears = ms / (365.25 * 24 * 60 * 60 * 1000)
+        const date: Record<string, number> = {
+            millennia: Math.trunc(totalYears / 1000),
+            century: Math.trunc((totalYears % 1000) / 100),
+            years: Math.trunc(totalYears % 100),
+            months: 0,
+            days: Math.trunc(ms / 86400000),
+            hours: Math.trunc(ms / 3600000) % 24,
+            minutes: Math.trunc(ms / 60000) % 60,
+            seconds: Math.trunc(ms / 1000) % 60
+        }
 
         if (date.days >= 30)
             while (date.days >= 30) {
                 date.months++
                 date.days -= 30
-            }
-
-        if (date.years >= 1000)
-            while (date.years >= 1000) {
-                date.millennia++
-                date.years -= 1000
-            }
-
-        if (date.years >= 100)
-            while (date.years >= 365) {
-                date.century++
-                date.years -= 100
             }
 
         const timeSequency = ["millennia", "century", "years", "months", "days", "hours", "minutes", "seconds"]

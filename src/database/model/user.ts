@@ -37,7 +37,8 @@ export default model("User", new Schema({
         Bitcoin: Number,
         Porquinho: Number,
         TopGGVote: Number,
-        Rep: Number
+        Rep: Number,
+        Reputation: Number
     },
     Cache: { ComprovanteOpen: Boolean },
     Color: {
@@ -45,9 +46,8 @@ export default model("User", new Schema({
         Set: String
     },
     Perfil: {
-        // Reputation: [{
-            
-        // }],
+        Reputation: Array,
+        Avatar: String,
         Titulo: String,
         Status: String,
         Sexo: String,

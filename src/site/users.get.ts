@@ -12,7 +12,7 @@ export default async (req: Request, res: Response) => {
 
     await fetch(`https://discord.com/api/users/${CreatedBy}`, {
         method: "GET",
-        headers: { authorization: `Bot ${env.DISCORD_TOKEN}` }
+        headers: { authorization: `Bot ${env.BOT_TOKEN_REQUEST}` }
     })
         .then(data => data.json())
         .then(user => data.CreatedBy = user)
@@ -21,7 +21,7 @@ export default async (req: Request, res: Response) => {
     await fetch(`https://discord.com/api/users/${Sponsor}`, {
         method: "GET",
         headers: {
-            authorization: `Bot ${env.DISCORD_TOKEN}`
+            authorization: `Bot ${env.BOT_TOKEN_REQUEST}`
         }
     })
         .then(data => data.json())

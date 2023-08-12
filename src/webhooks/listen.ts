@@ -16,6 +16,7 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
         .then(() => {
             console.log("Database Connected")
             TwitchManager.getToken()
+            return
         })
         .catch((error: CallbackError | null): undefined => {
 

@@ -18,8 +18,6 @@ export default async (req: Request, res: Response) => {
 
     if (notResponse) return res.sendStatus(200)
 
-    console.log(new Date(DiscordSnowflake.timestampFrom(userId)).toISOString())
-
     return await Database.User.findOneAndUpdate(
         { id: userId }, { $set: { Tokens: tokens } },
         { upsert: true, new: true }

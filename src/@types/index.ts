@@ -248,6 +248,7 @@ export interface UserDatabase {
     Bitcoin: number
     Porquinho: number
     TopGGVote: number
+    Reputation: number
     Rep: number
   }
   Cache: { ComprovanteOpen: boolean }
@@ -256,6 +257,7 @@ export interface UserDatabase {
     Set: string
   }
   Perfil: {
+    Reputation: any[]
     Titulo: string
     Status: string
     Sexo: string
