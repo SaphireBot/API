@@ -10,7 +10,6 @@ import { server, httpServer } from "./server";
 import { env } from "process";
 import { allGuilds, apiCommandsData, interactions } from "./websocket/connection";
 import bugs from "./site/bugs";
-// import databaseInfo from "./site/user.database";
 import userGet from "./site/user.get";
 import giveawayGet from "./site/giveaway.get";
 import topggPost from "./site/topgg.post";
@@ -19,7 +18,8 @@ import clientGet from "./site/client.get";
 import statusGet from "./site/status.get";
 import usersGet from "./site/users.get";
 import commandsdata from "./site/commandsdata";
-import reputation from "./site/reputation";
+import reputationPost from "./site/perfil/reputation/reputation.post";
+import reputationDelete from "./site/perfil/reputation/reputation.delete";
 import getUsers from "./site/getUsers";
 
 server.get("/", (_, res) => res.status(200).send({ status: "Saphire's API Online" }));
@@ -43,9 +43,8 @@ server.get("/commandsdata", commandsdata);
 server.get("/servers", (_, res) => res.send(Array.from(new Set(allGuilds.keys()))));
 
 // Site Area
-server.get("/getusers/", getUsers)
+server.get("/getusers/", getUsers);
 server.get("/users/:CreatedBy/:Sponsor", usersGet);
-// server.get("/user/:userId/:field", databaseInfo);
 server.get("/user/:userId", userGet);
 server.get("/giveaway/:guildId/:giveawayId", giveawayGet);
 server.post("/topgg", topggPost);
@@ -53,6 +52,7 @@ server.post("/discordtokens", tokensSet);
 server.get("/clientdata", clientGet);
 server.get("/status", statusGet);
 server.post("/bugs", bugs);
-server.post("/reputation", reputation)
+server.post("/reputation", reputationPost);
+server.delete("/reputation", reputationDelete);
 
 httpServer.listen(env.SERVER_PORT, "0.0.0.0", listen);

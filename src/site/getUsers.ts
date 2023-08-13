@@ -32,7 +32,6 @@ export default async (req: Request, res: Response) => {
     async function fetcher() {
 
         const ids = Array.from(new Set(id.slice(0, 10)))
-        console.log(ids)
         let gets = 0
         const usersData: APIUser[] = []
 

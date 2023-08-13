@@ -21,7 +21,6 @@ export default (req: Request, res: Response) => {
                 if (!data) {
                     if (size == responses) {
                         clearTimeout(timeout)
-                        console.log(data)
                         return res.status(404).send({ message: "Infelizmente, o sorteio não foi encontrado.", data })
                     }
                     return

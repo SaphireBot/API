@@ -93,7 +93,6 @@ export default (socket: Socket) => {
             case "shardStatus": setShardStatus(data.shardData, socket); break;
 
             // Twitch Section
-            // case "updateStreamer": ManagerTwitch.updateStreamer(data.updateTwitchStreamer); break;
             case "updateManyStreamers": ManagerTwitch.updateManyStreamer(data.updateManyTwitchStreamer); break;
             case "removeChannel": ManagerTwitch.removeChannel(data.channelData); break;
             case "removeChannelFromTwitchManager": twitchCache(data.id); break;
@@ -106,6 +105,13 @@ export default (socket: Socket) => {
     // Twitch Section
     socket.on("updateStreamer", (data: UpdateStreamerParams, callback: CallbackType) => ManagerTwitch.updateStreamer(data, callback))
     socket.on("twitchFetcher", async (url: string, callback: CallbackType) => callback(await ManagerTwitch.fetcher(url)))
+    socket.on("twitchdata", (_, callback: CallbackType) => callback({
+        notifications: ManagerTwitch.notifications,
+        streamersOffline: ManagerTwitch.streamersOffline,
+        streamersOnline: ManagerTwitch.streamersOnline,
+        allGuildsID: ManagerTwitch.allGuildsID,
+        awaitingRequests: ManagerTwitch.awaitingRequests
+    }))
     // --------------
 
     socket.on("ping", (_, callback: CallbackType) => callback("pong"))

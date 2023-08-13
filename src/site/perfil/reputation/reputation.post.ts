@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import Database from "../database";
-import { users } from "../websocket/cache/get.cache";
-import { UserDatabase } from "../@types";
-import managerTwitch from "../twitch/manager.twitch";
+import Database from "../../../database";
+import { users } from "../../../websocket/cache/get.cache";
+import { UserDatabase } from "../../../@types";
+import managerTwitch from "../../../twitch/manager.twitch";
 
 export default async (req: Request<{ from: string | undefined, text: string | undefined, to: string | undefined, username: string | undefined, date: number | undefined }>, res: Response) => {
 

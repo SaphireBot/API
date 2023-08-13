@@ -6,7 +6,7 @@ import cors from "cors";
 const server = express()
 server.use(express.json())
 server.disable("x-powered-by");
-server.use(cors({ methods: "GET,POST" }))
+server.use(cors({ methods: "GET,POST,DELETE" }))
 
 const httpServer = createServer(server)
 const ws = new Server(httpServer)
