@@ -5,19 +5,15 @@ import dataJSON from "../json/data.json";
 import TwitchManager from "../twitch/manager.twitch"
 
 export default async (err?: Error | null, address?: string): Promise<void> => {
+    console.log("Connected")
 
     if (err)
         return errorAtEnableListen(err, address);
 
-    console.log("API Connected")
     set("strictQuery", true)
 
     connect(env.DATABASE_LINK_CONNECTION)
-        .then(() => {
-            console.log("Database Connected")
-            TwitchManager.getToken()
-            return
-        })
+        .then(() => TwitchManager.getToken())
         .catch((error: CallbackError | null): undefined => {
 
             const databaseResponse = error
@@ -31,7 +27,7 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
                 avatarURL: env.WEBHOOK_GSN_AVATAR
             }).catch(() => null);
 
-            console.log(`Saphire's API Connected\n${databaseResponse}`);
+            console.log(`Saphire's API\n${databaseResponse}`);
             return
         })
 

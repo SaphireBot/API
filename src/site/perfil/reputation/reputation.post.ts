@@ -3,6 +3,7 @@ import Database from "../../../database";
 import { users } from "../../../websocket/cache/get.cache";
 import { UserDatabase } from "../../../@types";
 import managerTwitch from "../../../twitch/manager.twitch";
+import { siteSocket } from "../../../websocket/connection";
 
 export default async (req: Request<{ from: string | undefined, text: string | undefined, to: string | undefined, username: string | undefined, date: number | undefined }>, res: Response) => {
 
@@ -54,5 +55,13 @@ export default async (req: Request<{ from: string | undefined, text: string | un
         .catch(() => saved.return = true)
 
     if (saved.return) return res.status(500).send({ status: 200, type: "partial", message: "Os dados foram salvos particialmente." })
-    return res.status(200).send({ status: 200, type: "success", message: `Muito bem! Você pode enviar outra reputação em ${managerTwitch.stringDate(1000 * 60 * 60 * 2)}`, })
+
+    siteSocket?.emit("reputation", { userId: to, reputations: users?.get(to)?.Perfil?.Reputation || [] })
+    siteSocket?.emit("notification", { userId: to, message: `Você recebeu uma <a href='https://saphire.one/perfil'>reputação</a> de ${username}` })
+    return res.status(200).send({
+        status: 200,
+        type: "success",
+        message: `Muito bem! Você pode enviar outra reputação em ${managerTwitch.stringDate(1000 * 60 * 60 * 2)}`,
+        reputations: users?.get(to)?.Perfil?.Reputation || []
+    })
 }

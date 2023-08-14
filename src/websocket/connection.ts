@@ -36,7 +36,7 @@ setInterval(() => {
             })
             .catch(() => { })
 }, 1000 * 60)
-let siteSocket: Socket;
+export let siteSocket: Socket | undefined;
 
 export default (socket: Socket) => {
 
@@ -91,6 +91,7 @@ export default (socket: Socket) => {
             case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }); break;
             case "siteStaffData": data.staffData?.id ? staffs.set(data.staffData.id, data.staffData) : null; break;
             case "shardStatus": setShardStatus(data.shardData, socket); break;
+            case "transactions": siteSocket?.emit("transactions", data.transactionsData); break;
 
             // Twitch Section
             case "updateManyStreamers": ManagerTwitch.updateManyStreamer(data.updateManyTwitchStreamer); break;

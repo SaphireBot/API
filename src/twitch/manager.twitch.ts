@@ -1,9 +1,7 @@
 import { env } from "process"
 import Database from "../database"
-// import { shardsAndSockets } from "../websocket/connection"
 import { messagesToSend } from "../services/message/message.post"
 import { ButtonStyle, parseEmoji, time } from "discord.js"
-// import parsems from "parse-ms"
 import { TwitchLanguages } from "../json/data.json"
 import { FetchError, OauthToken, OauthValidade, OfflineStreamersToNotifier, RemoveChannelParams, StreamData, UpdateManyStreamerParams, UpdateStreamerParams, UserData } from "../@types/twitch"
 import { CallbackType, GuildDatabase } from "../@types"
@@ -158,8 +156,6 @@ export default new class Twitch {
         this.checkStreamersStatus()
         this.saveChannelsNotified()
         this.setCounter()
-
-        console.log("Twitch Manager Loaded")
         return
     }
 

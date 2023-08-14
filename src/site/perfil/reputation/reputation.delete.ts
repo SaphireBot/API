@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Database from "../../../database";
 import { users } from "../../../websocket/cache/get.cache";
 import { UserDatabase } from "../../../@types";
+import { siteSocket } from "../../../websocket/connection";
 
 export default async (req: Request, res: Response) => {
 
@@ -9,23 +10,22 @@ export default async (req: Request, res: Response) => {
     const from = req.query.from as string | undefined
 
     // When the reputation was sended and the Rep's ID
-    const date = req.query.date as number | undefined
+    const date = Number(req.query.date || 0)
 
     // The profile owner's ID
     const userId = req.query.userId as string | undefined
 
     // Who is requesting the delete
     const requesting = req.query.requesting as string | undefined
-    console.log(from, date, userId, requesting)
 
     if (!from || !date || !userId || !requesting)
-        return res.status(400).send({ message: "Date, From, UserId, Requesting field is missing" })
+        return res.status(400).send({ type: "error", message: "Date, From, UserId, Requesting field is missing" })
 
     const userdata = users.get(userId) || await Database.User.findOne({ id: userId })
     if (!userdata) return res.send({ type: "notfound", message: "Nenhum usuário foi encontrado." })
 
     const reputation = userdata?.Perfil?.Reputation?.find(rep => rep?.date == date)
-    if (!reputation) return res.send({ type: "notfound", message: "Esta reputação não foi encontrada." })
+    if (!reputation) return res.send({ type: "notfound", message: "Esta reputação não foi encontrada.", reputations: userdata?.Perfil?.Reputation || [] })
 
     /**
      * Can delete any reputation in own profile
@@ -38,14 +38,21 @@ export default async (req: Request, res: Response) => {
     async function deleteReputation() {
         return await Database.User.findOneAndUpdate(
             { id: userId },
-            { $pull: { "Perfil.Reputation": { date: `${date}` } } },
+            { $pull: { "Perfil.Reputation": { date: date } } },
             { upsert: true, new: true }
         )
             .then(doc => {
                 users.set(doc?.id, doc as UserDatabase)
-                return res.send({ type: "success", message: "Reputação deletada com succeso." })
+
+                siteSocket?.emit("reputation", { userId, reputations: doc?.Perfil?.Reputation || [] })
+                siteSocket?.emit("notification", { userId, message: "Você perdeu uma <a href='https://saphire.one/perfil'>reputação</a>" })
+                return res.send({
+                    type: "success",
+                    message: "Reputação deletada com succeso.",
+                    reputations: doc?.Perfil?.Reputation || []
+                })
             })
-            .catch(err => res.send({ type: "error", message: err }))
+            .catch(err => res.send({ type: "error", message: err?.message }))
     }
 
 }
