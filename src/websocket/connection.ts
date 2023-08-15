@@ -92,6 +92,7 @@ export default (socket: Socket) => {
             case "siteStaffData": data.staffData?.id ? staffs.set(data.staffData.id, data.staffData) : null; break;
             case "shardStatus": setShardStatus(data.shardData, socket); break;
             case "transactions": siteSocket?.emit("transactions", data.transactionsData); break;
+            case "notification": siteSocket?.emit("notification", data.notifyData); break;
 
             // Twitch Section
             case "updateManyStreamers": ManagerTwitch.updateManyStreamer(data.updateManyTwitchStreamer); break;

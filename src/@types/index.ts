@@ -152,7 +152,7 @@ export interface SaphireApiDataResponse {
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateStreamer" | "updateManyStreamers" | "removeChannel" | "transactions" | undefined
+  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateStreamer" | "updateManyStreamers" | "removeChannel" | "transactions" | "notification" | undefined
   message: string | undefined
   shardId: number | undefined
   commandName: string | undefined
@@ -173,6 +173,13 @@ export interface WebsocketMessageRecieveData {
   updateManyTwitchStreamer: UpdateManyStreamerParams
   channelData: RemoveChannelParams
   transactionsData: TransactionsNotificationSite
+  notifyData: notifyData
+}
+
+export interface notifyData {
+  userId: string
+  message: string
+  title: string | undefined
 }
 
 export interface TransactionsNotificationSite {
