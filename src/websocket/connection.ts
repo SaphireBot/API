@@ -1,4 +1,4 @@
-import { CallbackType, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, ShardsStatus, WebsocketMessageRecieveData, commandApi } from "../@types";
+import { CallbackType, ChatMessage, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, ShardsStatus, WebsocketMessageRecieveData, commandApi } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { staffs } from "../site";
@@ -37,6 +37,25 @@ setInterval(() => {
             .catch(() => { })
 }, 1000 * 60)
 export let siteSocket: Socket | undefined;
+const chatMessages = new Collection<number, ChatMessage>()
+
+chatMessages.set(Date.now(), {
+    avatar: "https://cdn.discordapp.com/avatars/140926143783108610/77b077b82dffc71f575cc6fc09569b79.webp",
+    date: Date.now(),
+    id: "541033481199812628",
+    message: "Hello World.",
+    name: "Ryuuji"
+})
+
+setTimeout(() => {
+    chatMessages.set(Date.now(), {
+        avatar: "https://cdn.discordapp.com/avatars/854494598533742622/a69a4f99469391885462df7cc3d0fa87.webp",
+        date: Date.now(),
+        id: "854494598533742622",
+        message: "Hello World 2.",
+        name: "Akemy"
+    })
+}, 500)
 
 export default (socket: Socket) => {
 
@@ -48,6 +67,7 @@ export default (socket: Socket) => {
     if (socket.handshake.auth?.shardId == "site") {
         // messageAdded
         siteSocket = socket
+        socket.on("getChatMessages", (_, callback: CallbackType) => callback(chatMessages.sort((a, b) => a.date - b.date).toJSON()))
         socket.emit("message", "Websocket Connected")
         return
     }
@@ -93,6 +113,7 @@ export default (socket: Socket) => {
             case "shardStatus": setShardStatus(data.shardData, socket); break;
             case "transactions": siteSocket?.emit("transactions", data.transactionsData); break;
             case "notification": siteSocket?.emit("notification", data.notifyData); break;
+            case "chatMessage": chatMessages.set(data?.chatMessage.date, data.chatMessage); break;
 
             // Twitch Section
             case "updateManyStreamers": ManagerTwitch.updateManyStreamer(data.updateManyTwitchStreamer); break;
