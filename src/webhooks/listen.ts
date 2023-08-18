@@ -3,6 +3,7 @@ import { CallbackError, connect, set } from "mongoose"
 import { env } from "node:process";
 import dataJSON from "../json/data.json";
 import TwitchManager from "../twitch/manager.twitch"
+import loadCache from "../database/functions/load.cache";
 
 export default async (err?: Error | null, address?: string): Promise<void> => {
     console.log("Connected")
@@ -12,8 +13,18 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
 
     set("strictQuery", true)
 
+    console.log("ok")
     connect(env.DATABASE_LINK_CONNECTION)
-        .then(() => TwitchManager.getToken())
+        .then(() => {
+            TwitchManager.getToken()
+            loadCache()
+            sender({
+                url: env.WEBHOOK_STATUS,
+                username: "[API] Connection Status",
+                content: `${dataJSON.emojis.check} | API conectada com sucesso.\n${dataJSON.emojis.database} | "Conexão efetuada com sucesso!"\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`,
+                avatarURL: env.WEBHOOK_GSN_AVATAR
+            }).catch(() => null);
+        })
         .catch((error: CallbackError | null): undefined => {
 
             const databaseResponse = error
