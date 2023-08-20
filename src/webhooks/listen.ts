@@ -1,8 +1,7 @@
 import sender from "./sender";
-import { CallbackError, connect, set } from "mongoose"
+import { CallbackError, connect, set } from "mongoose";
 import { env } from "node:process";
 import dataJSON from "../json/data.json";
-import TwitchManager from "../twitch/manager.twitch"
 import loadCache from "../database/functions/load.cache";
 
 export default async (err?: Error | null, address?: string): Promise<void> => {
@@ -13,10 +12,8 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
 
     set("strictQuery", true)
 
-    console.log("ok")
     connect(env.DATABASE_LINK_CONNECTION)
         .then(() => {
-            TwitchManager.getToken()
             loadCache()
             sender({
                 url: env.WEBHOOK_STATUS,

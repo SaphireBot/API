@@ -1,3 +1,4 @@
+import "discord.js"
 import { Dispatcher } from "undici"
 
 declare global {
@@ -63,6 +64,7 @@ declare global {
       REQUESTER1: string
     }
   }
+
 }
 
 declare namespace Dispatcher {
@@ -70,4 +72,10 @@ declare namespace Dispatcher {
     content?: string
   }
 
+}
+
+declare module "discord.js" {
+  interface Collection<K, V> {
+    getMany: (keys: K[]) => Collection<K, V>
+  }
 }

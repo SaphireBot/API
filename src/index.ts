@@ -1,11 +1,12 @@
 process.env.TZ = "America/Sao_Paulo";
+import "./prototypes/Collection";
 import "dotenv/config";
 import "./services";
 import "./webhooks";
 import "./routes";
 import "./websocket";
 import dataJSON from "./json/data.json";
-import listen from "./webhooks/listen"
+import listen from "./webhooks/listen";
 import { server, httpServer } from "./server";
 import { env } from "process";
 import { allGuilds, apiCommandsData, interactions } from "./websocket/connection";

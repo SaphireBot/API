@@ -105,7 +105,7 @@ export default (socket: Socket) => {
             case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[] }); break;
             case "guildCreate": newGuild(data.guildId, data.guildName); break;
             case "guildDelete": allGuilds.delete(data.guildId); break;
-            case "updateCache": refreshCache(data?.id, data?.to, data?.data); break;
+            case "updateCache": refreshCache(data?.to, data?.data); break;
             case "deleteCache": deleteCache(data.id, data.to); break;
             case "postMessage": postmessage(data.messageData, socket); break;
             case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }); break;

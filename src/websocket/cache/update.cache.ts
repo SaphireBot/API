@@ -1,11 +1,12 @@
+import { Collection } from "discord.js"
 import { GuildDatabase, UserDatabase } from "../../@types"
 import { users, guilds } from "./get.cache"
 
-export default (id: string | undefined, to: "user" | "guild" | undefined, data: UserDatabase | GuildDatabase | undefined) => {
+export default (to: "user" | "guild" | undefined, cacheData: UserDatabase[] | GuildDatabase[] | undefined) => {
 
-    if (!id || !to || !data) return
+    if (!to || !cacheData?.length || !["user", "guild"].includes(to)) return
 
-    if (to == "guild") guilds.set(id, data as GuildDatabase)
-    if (to == "user") users.set(id, data as UserDatabase)
+    const cache = (to == "user" ? users : guilds) as Collection<string, GuildDatabase | UserDatabase>
+    for (const d of cacheData) cache.set(d?.id, d)
     return
 }

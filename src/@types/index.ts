@@ -164,7 +164,7 @@ export interface WebsocketMessageRecieveData {
   shardData: ShardsStatus
   id: string
   to: "guild" | "user" | undefined
-  data: GuildDatabase | UserDatabase | undefined
+  data: GuildDatabase[] | UserDatabase[] | undefined
   messageData: MessageToSendThroughWebsocket
   userId: string
   method: "save" | "delete"
