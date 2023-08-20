@@ -1,4 +1,4 @@
-import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, MessageReference, APIRole, APIMessageComponent } from "discord.js";
+import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, MessageReference, APIRole, APIMessageComponent, APIUser } from "discord.js";
 import { Stream } from "node:stream";
 import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
@@ -168,13 +168,24 @@ export interface WebsocketMessageRecieveData {
   messageData: MessageToSendThroughWebsocket
   userId: string
   method: "save" | "delete"
-  staffData: SiteStaffs
+  staffData: staffData[]
   updateTwitchStreamer: UpdateStreamerParams
   updateManyTwitchStreamer: UpdateManyStreamerParams
   channelData: RemoveChannelParams
   transactionsData: TransactionsNotificationSite
   notifyData: notifyData
   chatMessage: ChatMessage
+}
+
+export interface staffData extends APIUser {
+  avatarUrl: string | null
+  tags: string[]
+  social: {
+    github: string | null
+    instagram: string | null
+    discord: string
+  }
+  description: string | null
 }
 
 export interface notifyData {
@@ -410,20 +421,6 @@ export interface AfkGlobalData {
   message: string | undefined
   method: "save" | "delete" | undefined
 }
-
-export interface SiteStaffs {
-  id: string | undefined
-  username: string
-  avatarUrl: string | null
-  tags: string[]
-  social: {
-    instagram: string | null
-    github: string | null
-    discord: string
-  }
-  description: string | null
-}
-
 export interface commandApi {
   name: string,
   description: string

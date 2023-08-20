@@ -3,6 +3,7 @@ import { CallbackError, connect, set } from "mongoose";
 import { env } from "node:process";
 import dataJSON from "../json/data.json";
 import loadCache from "../database/functions/load.cache";
+import { shardsAndSockets } from "../websocket/connection";
 
 export default async (err?: Error | null, address?: string): Promise<void> => {
     console.log("Connected")
@@ -15,6 +16,7 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
     connect(env.DATABASE_LINK_CONNECTION)
         .then(() => {
             loadCache()
+            shardsAndSockets.random()?.send("sendStaffData", "post")
             sender({
                 url: env.WEBHOOK_STATUS,
                 username: "[API] Connection Status",

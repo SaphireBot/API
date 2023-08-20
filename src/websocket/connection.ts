@@ -1,4 +1,4 @@
-import { CallbackType, ChatMessage, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, ShardsStatus, WebsocketMessageRecieveData, commandApi } from "../@types";
+import { CallbackType, ChatMessage, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, ShardsStatus, WebsocketMessageRecieveData, commandApi, staffData } from "../@types";
 import { Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { staffs } from "../site";
@@ -109,7 +109,7 @@ export default (socket: Socket) => {
             case "deleteCache": deleteCache(data.id, data.to); break;
             case "postMessage": postmessage(data.messageData, socket); break;
             case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }); break;
-            case "siteStaffData": data.staffData?.id ? staffs.set(data.staffData.id, data.staffData) : null; break;
+            case "siteStaffData": siteStaffData(data.staffData); break;
             case "shardStatus": setShardStatus(data.shardData, socket); break;
             case "transactions": siteSocket?.emit("transactions", data.transactionsData); break;
             case "notification": siteSocket?.emit("notification", data.notifyData); break;
@@ -203,4 +203,9 @@ function registerCommandsApi({ commandApi }: { commandApi: commandApi[] }) {
 function newGuild(guildId: string, guildName: string) {
     if (!guildId || !guildName) return
     allGuilds.set(guildId, guildName)
+}
+
+function siteStaffData(staffData: staffData[]) {
+    if (!Array.isArray(staffData) || !staffData?.length) return
+    for (const staff of staffData) staffs.set(staff.id, staff)
 }

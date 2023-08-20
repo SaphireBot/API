@@ -1,15 +1,14 @@
 import { Collection } from "discord.js";
-import { SiteStaffs } from "../@types";
+import { staffData } from "../@types";
 import { server } from "../server";
-export const staffs = new Collection<string, SiteStaffs>();
+export const staffs = new Collection<string, staffData>();
 
 server.get("/staffs", async (_, res) => {
 
-    const developers = [] as SiteStaffs[]
-    const admins = [] as SiteStaffs[]
-    const boards = [] as SiteStaffs[]
-    const staff = [] as SiteStaffs[]
-
+    const developers = [] as staffData[]
+    const admins = [] as staffData[]
+    const boards = [] as staffData[]
+    const staff = [] as staffData[]
 
     staffs
         .forEach(data => {
@@ -73,8 +72,7 @@ function getSocial(userId: string) {
 }
 
 function getDescription(userId: string) {
-
-    const data = {
+    return {
         // Rody
         "451619591320371213": "Criador e fundador da Saphire Moon",
 
@@ -93,6 +91,4 @@ function getDescription(userId: string) {
         // MakolPedro
         "351903530161799178": "Investidor de mais de 2 anos de servidor."
     }[userId] || null
-
-    return data
 }
