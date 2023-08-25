@@ -1,10 +1,11 @@
-import { APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, MessageReference, APIRole, APIMessageComponent, APIUser } from "discord.js";
+import { APIApplicationCommand, APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, MessageReference, APIRole, APIMessageComponent, APIUser } from "discord.js";
 import { Stream } from "node:stream";
 import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
 import { Request, Response } from "express"
 import { Socket } from "socket.io";
 import { RemoveChannelParams, UpdateManyStreamerParams, UpdateStreamerParams } from "./twitch";
+import { ReminderType } from "./reminder";
 
 export interface WebhookBodyRequest extends Request {
   webhookUrl: string
@@ -30,6 +31,7 @@ export interface MessageSaphireRequest {
   messageId?: string | null
   isTwitchNotification?: boolean | undefined
   body?: any
+  isReminder?: boolean
   components: APIMessageComponent[] | []
   embeds: APIEmbed[]
   tts?: boolean
@@ -44,6 +46,7 @@ export interface MessageToSendThroughWebsocket {
   guildId?: string
   authorization: string
   isWebsocket: boolean
+  isReminder?: boolean
   isTwitchNotification: boolean | undefined
   LogType: string | undefined
 }
@@ -152,7 +155,7 @@ export interface SaphireApiDataResponse {
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateManyStreamers" | "removeChannel" | "transactions" | "notification" | "chatMessage" | undefined
+  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateManyStreamers" | "removeChannel" | "transactions" | "notification" | "chatMessage" | "ApplicationCommandData" | "postReminder" | "removeReminder" | "updateReminder" | undefined
   message: string | undefined
   shardId: number | undefined
   commandName: string | undefined
@@ -175,6 +178,8 @@ export interface WebsocketMessageRecieveData {
   transactionsData: TransactionsNotificationSite
   notifyData: notifyData
   chatMessage: ChatMessage
+  applicationCommandData: APIApplicationCommand[]
+  reminderData: ReminderType
 }
 
 export interface staffData extends APIUser {

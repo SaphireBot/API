@@ -16,7 +16,7 @@ export default (_: Request, res: Response) => {
 
                 return res.send(apiCommandsData.toJSON())
             })
-            .catch(() => { })
+            .catch(() => res.send([]))
         return
     }
 

@@ -4,6 +4,8 @@ import { env } from "node:process";
 import dataJSON from "../json/data.json";
 import loadCache from "../database/functions/load.cache";
 import { shardsAndSockets } from "../websocket/connection";
+import applicationCommands from "../websocket/functions/application.commands";
+import ManagerReminder from "../reminder/manager.reminder";
 
 export default async (err?: Error | null, address?: string): Promise<void> => {
     console.log("Connected")
@@ -15,12 +17,14 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
 
     connect(env.DATABASE_LINK_CONNECTION)
         .then(() => {
-            loadCache()
-            shardsAndSockets.random()?.send("sendStaffData", "post")
+            loadCache();
+            shardsAndSockets.random()?.send({ type: "sendStaffData" });
+            applicationCommands();
+            ManagerReminder.load();
             sender({
                 url: env.WEBHOOK_STATUS,
                 username: "[API] Connection Status",
-                content: `${dataJSON.emojis.check} | API conectada com sucesso.\n${dataJSON.emojis.database} | "Conexão efetuada com sucesso!"\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`,
+                content: `${dataJSON.emojis.check} | API conectada com sucesso.\n${dataJSON.emojis.database} | Conexão efetuada com sucesso!\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`,
                 avatarURL: env.WEBHOOK_GSN_AVATAR
             }).catch(() => null);
         })

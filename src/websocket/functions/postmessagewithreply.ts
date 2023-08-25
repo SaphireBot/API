@@ -1,6 +1,6 @@
+import { Rest } from "../../index";
 import { CallbackType, MessageSaphireRequest } from "../../@types";
 import { Routes } from "discord.js";
-import { Rest } from "../../services/message/message.post";
 
 export default (data: MessageSaphireRequest, callback: CallbackType) => {
 

@@ -1,5 +1,5 @@
 import { CallbackType, ChatMessage, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, ShardsStatus, WebsocketMessageRecieveData, commandApi, staffData } from "../@types";
-import { Collection } from "discord.js";
+import { APIApplicationCommand, Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { staffs } from "../site";
 import { env } from "process";
@@ -13,6 +13,8 @@ import postAfk from "./functions/postafk";
 import postmessagewithreply from "./functions/postmessagewithreply";
 import ManagerTwitch from "../twitch/manager.twitch";
 import { UpdateStreamerParams } from "../@types/twitch";
+import ManagerReminder from "../reminder/manager.reminder";
+import { ReminderType } from "../@types/reminder";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -38,6 +40,7 @@ setInterval(() => {
 }, 1000 * 60)
 export let siteSocket: Socket | undefined;
 const chatMessages = new Collection<number, ChatMessage>()
+export const applicationCommands = new Collection<string, APIApplicationCommand>()
 
 chatMessages.set(Date.now(), {
     avatar: "https://cdn.discordapp.com/avatars/140926143783108610/77b077b82dffc71f575cc6fc09569b79.webp",
@@ -56,6 +59,8 @@ setTimeout(() => {
         name: "Akemy"
     })
 }, 500)
+
+setTimeout(() => shardsAndSockets.random()?.send({ type: "sendStaffData" }), 1000 * 5)
 
 export default (socket: Socket) => {
 
@@ -114,6 +119,13 @@ export default (socket: Socket) => {
             case "transactions": siteSocket?.emit("transactions", data.transactionsData); break;
             case "notification": siteSocket?.emit("notification", data.notifyData); break;
             case "chatMessage": chatMessages.set(data?.chatMessage.date, data.chatMessage); break;
+            case "ApplicationCommandData": apllicationCommands(data.applicationCommandData); break;
+
+            // Reminder Section
+            case "postReminder": ManagerReminder.save(data.reminderData as ReminderType, undefined); break;
+            case "removeReminder": ManagerReminder.remove(data.id); break;
+            case "updateReminder": ManagerReminder.start(data.reminderData); break;
+            // ----------------
 
             // Twitch Section
             case "updateManyStreamers": ManagerTwitch.updateManyStreamer(data.updateManyTwitchStreamer); break;
@@ -171,10 +183,29 @@ export default (socket: Socket) => {
     // Cache
     socket.on("getCache", (data: GetAndDeleteCacheType, callback: CallbackType) => getCache(data?.id, data?.type, callback))
     socket.on("getMultipleCache", (data: GetMultiplecacheDataType, callback: CallbackType) => getMultipleCache(data?.ids, data?.type, callback))
+    socket.on("getApplicationCommands", (_, callback: CallbackType) => callback(applicationCommands.toJSON()))
 
     // Shards
     socket.on("getShardsData", (_: any, callback: CallbackType) => callback(Object.fromEntries(shards.entries())))
 
+    // Reminder
+    socket.on("getReminder", (reminderId: string, callback: CallbackType) => ManagerReminder.get(reminderId, callback))
+    socket.on("postReminder", (data: ReminderType, callback: CallbackType) => ManagerReminder.save(data, callback))
+    socket.on("moveReminder", (data: any, callback: CallbackType) => ManagerReminder.move(data?.reminderId, data?.guildId, data?.channelId, callback))
+    socket.on("getReminders", (userId: string, callback: CallbackType) => {
+        const data = ManagerReminder
+            .allReminders
+            .filter(rm => rm?.userId == userId)
+            .toJSON()
+            .map(rm => {
+                rm.timeout = false
+                return rm
+            })
+
+        return callback(data)
+    })
+    //---------
+    return
 }
 
 function setShardStatus(data: ShardsStatus, socket: Socket) {
@@ -208,4 +239,8 @@ function newGuild(guildId: string, guildName: string) {
 function siteStaffData(staffData: staffData[]) {
     if (!Array.isArray(staffData) || !staffData?.length) return
     for (const staff of staffData) staffs.set(staff.id, staff)
+}
+
+function apllicationCommands(commands: APIApplicationCommand[]) {
+    for (const cmd of commands) applicationCommands.set(cmd.name, cmd)
 }

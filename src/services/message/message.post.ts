@@ -1,4 +1,4 @@
-import { REST, Routes, APIEmbed, MessageReference, DiscordAPIError, APIMessageComponent } from "discord.js"
+import { Routes, APIEmbed, MessageReference, DiscordAPIError, APIMessageComponent } from "discord.js"
 import { GuildDatabase, MessageSaphireRequest, MessageToSendSaphireData, MessageToSendThroughWebsocket } from "../../@types"
 import { server } from "../../server"
 import { Response } from "express"
@@ -8,7 +8,7 @@ import { shardsAndSockets } from "../../websocket/connection"
 import Database from "../../database"
 import { guilds } from "../../websocket/cache/get.cache"
 import twitchCache from "../../websocket/cache/twitch.cache"
-export const Rest = new REST().setToken(process.env.DISCORD_TOKEN)
+import { Rest } from "../../index"
 export const messagesToSend = <MessageToSendSaphireData[]>[]
 executeMessages()
 
