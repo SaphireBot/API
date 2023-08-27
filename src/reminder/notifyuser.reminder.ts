@@ -2,11 +2,11 @@ import { shardsAndSockets } from "../websocket/connection";
 import { ReminderType } from "../@types/reminder";
 import { getTimeout } from "./time.reminder";
 import { emojis } from "../json/data.json";
-import managerReminder from "./manager.reminder";
+import ManagerReminder from "./manager.reminder";
 
 export default (data: ReminderType) => {
     if (!data) return
-    if (![1, 2, 3].includes(data.interval)) managerReminder.remove(data.id)
+    if (![1, 2, 3].includes(data.interval)) ManagerReminder.remove(data.id)
 
     const oneDay = 1000 * 60 * 60 * 24
     const intervalTime = {

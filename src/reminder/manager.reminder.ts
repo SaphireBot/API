@@ -155,15 +155,28 @@ export default new class ReminderManager {
         return reminder
     }
 
-    async remove(reminderId: string | undefined) {
+    async remove(reminderId: string | undefined, fromDeleteMany?: boolean) {
         if (!reminderId) return
 
-        await Database.Reminder.deleteOne({ id: reminderId })
+        if (!fromDeleteMany)
+            await Database.Reminder.deleteOne({ id: reminderId })
 
         await this.removeTimeout(reminderId)
         this.allReminders.delete(reminderId)
         this.reminders.delete(reminderId)
         this.over32Bits.delete(reminderId)
+        return
+    }
+
+    async removeMany(remindersId: string[]) {
+
+        if (!remindersId?.length) return
+
+        await Database.Reminder.deleteMany({ id: remindersId })
+
+        for (const id of remindersId)
+            this.remove(id, true)
+        return
     }
 
     async removeAllRemindersFromAnUser(userId: string | undefined) {
@@ -201,17 +214,16 @@ export default new class ReminderManager {
         )
             .then(doc => {
                 if (!doc) return
-                return this.start(doc.toObject() as ReminderType)
+                return this.start(doc.toObject())
             })
             .catch(() => { })
     }
 
-    async setAlert(reminderId: string) {
-        if (!this.reminders.has(reminderId)) return
-        const doc = await Database.Reminder.findOneAndUpdate({ id: reminderId }, { Alerted: true }, { new: true })
+    async setAlert(reminderId: string, deleteAt: number, messageId: string) {
+        if (!this.reminders.has(reminderId) || !deleteAt || !messageId) return
+        const doc = await Database.Reminder.findOneAndUpdate({ id: reminderId }, { Alerted: true, deleteAt, messageId }, { new: true })
         this.allReminders.set(doc?.id, doc?.toObject() as ReminderType)
         this.reminders.set(doc?.id, doc?.toObject() as ReminderType)
-        return
     }
 
     get(reminderId: string, callback: CallbackType | undefined): void | ReminderType {
@@ -312,10 +324,24 @@ export default new class ReminderManager {
             .then(doc => {
                 if (!doc) return callback("Error to save reminder")
                 this.start(doc.toObject())
-                return callback("success")
+                return callback("Success")
             })
-            .catch(err => callback(`Error: ${err}`))
+            .catch(err => callback(`error: ${err}`))
 
+    }
+
+    async refresh(reminder: ReminderType, callback: CallbackType) {
+
+        if (!reminder?.id)
+            return callback("Not Found")
+
+        await this.removeTimeout(reminder.id)
+        this.allReminders.delete(reminder.id)
+        this.reminders.delete(reminder.id)
+        this.over32Bits.delete(reminder.id)
+
+        this.start(reminder)
+        return callback("Success")
     }
 
 }

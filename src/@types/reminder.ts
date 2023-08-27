@@ -8,6 +8,7 @@ export interface ReminderType {
     guildId: string
     RemindMessage: string
     Time: number
+    deleteAt?: number | undefined
     snoozed: boolean
     timeout: NodeJS.Timeout | false
     isAutomatic: boolean

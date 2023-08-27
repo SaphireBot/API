@@ -32,8 +32,8 @@ export interface MessageSaphireRequest {
   isTwitchNotification?: boolean | undefined
   body?: any
   isReminder?: boolean
-  components: APIMessageComponent[] | []
-  embeds: APIEmbed[]
+  components?: APIMessageComponent[] | []
+  embeds?: APIEmbed[]
   tts?: boolean
 }
 
@@ -155,7 +155,7 @@ export interface SaphireApiDataResponse {
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateManyStreamers" | "removeChannel" | "transactions" | "notification" | "chatMessage" | "ApplicationCommandData" | "postReminder" | "removeReminder" | "updateReminder" | undefined
+  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateManyStreamers" | "removeChannel" | "transactions" | "notification" | "chatMessage" | "ApplicationCommandData" | "postReminder" | "removeReminder" | "updateReminder" | "removeReminders" | "refreshReminder" | undefined
   message: string | undefined
   shardId: number | undefined
   commandName: string | undefined
@@ -180,6 +180,7 @@ export interface WebsocketMessageRecieveData {
   chatMessage: ChatMessage
   applicationCommandData: APIApplicationCommand[]
   reminderData: ReminderType
+  remindersToRemove: string[]
 }
 
 export interface staffData extends APIUser {

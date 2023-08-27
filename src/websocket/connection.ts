@@ -125,6 +125,7 @@ export default (socket: Socket) => {
             case "postReminder": ManagerReminder.save(data.reminderData as ReminderType, undefined); break;
             case "removeReminder": ManagerReminder.remove(data.id); break;
             case "updateReminder": ManagerReminder.start(data.reminderData); break;
+            case "removeReminders": ManagerReminder.removeMany(data.remindersToRemove); break;
             // ----------------
 
             // Twitch Section
@@ -192,6 +193,7 @@ export default (socket: Socket) => {
     socket.on("getReminder", (reminderId: string, callback: CallbackType) => ManagerReminder.get(reminderId, callback))
     socket.on("postReminder", (data: ReminderType, callback: CallbackType) => ManagerReminder.save(data, callback))
     socket.on("moveReminder", (data: any, callback: CallbackType) => ManagerReminder.move(data?.reminderId, data?.guildId, data?.channelId, callback))
+    socket.on("refreshReminder", (reminder: ReminderType, callback: CallbackType) => ManagerReminder.refresh(reminder, callback))
     socket.on("getReminders", (userId: string, callback: CallbackType) => {
         const data = ManagerReminder
             .allReminders

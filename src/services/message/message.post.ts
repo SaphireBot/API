@@ -48,7 +48,7 @@ server.post("/message", async (req, res) => {
 
 async function executeMessages(): Promise<any> {
 
-    if (messagesToSend.length) {
+    if (messagesToSend.length && Rest) {
         const toSendData = messagesToSend.slice(0, 40)
 
         for (const { data, res, socket } of toSendData) {
@@ -154,7 +154,7 @@ async function deleteMessage(data: MessageSaphireRequest, res: Response | undefi
             return
         })
         .catch(err => {
-            if (socket) return socket.emit("errorInPostingMessage", { data, err })
+            if (socket) return report(undefined, socket, { data, message: err })
             if (res) {
                 res.statusCode = 400
                 return res.send(err)

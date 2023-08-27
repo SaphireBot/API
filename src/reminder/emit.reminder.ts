@@ -1,11 +1,12 @@
 import { ReminderType } from "../@types/reminder";
-import { messagesToSend } from "../services/message/message.post";
+// import { messagesToSend } from "../services/message/message.post";
 import { getTimeout } from "./time.reminder";
 import { emojis as e } from "../json/data.json";
 import { siteSocket } from "../websocket/connection";
 import notifyUser from "./notifyuser.reminder";
 import ManagerReminder from "./manager.reminder";
-import { APIMessageComponentEmoji, ButtonStyle, parseEmoji } from "discord.js";
+import { APIMessage, APIMessageComponentEmoji, ButtonStyle, Routes, parseEmoji } from "discord.js";
+import { Rest } from "..";
 
 export default async (data: ReminderType) => {
 
@@ -22,45 +23,49 @@ export default async (data: ReminderType) => {
 
     data.privateOrChannel
         ? notifyUser(data)
-        : messagesToSend.push({
-            data: {
-                channelId: data.ChannelId,
-                method: "post",
-                isReminder: true,
-                content: `${e.Notification} | <@${data.userId}>, lembrete pra você.\n🗒️ | **${data.RemindMessage.slice(0, 3500)}**\n${intervalMessage}`,
-                components: [1, 2, 3].includes(data.interval)
-                    ? []
-                    : [
-                        {
-                            type: 1,
-                            components: [
-                                {
-                                    type: 2,
-                                    label: "+10 Min",
-                                    emoji: parseEmoji(e.Notification) as APIMessageComponentEmoji,
-                                    custom_id: JSON.stringify({ c: "rmd", until: Date.now() + (1000 * 60 * 5), src: "snooze" }),
-                                    style: ButtonStyle.Primary
-                                },
-                                {
-                                    type: 2,
-                                    label: "Agendar",
-                                    emoji: parseEmoji("📅") as APIMessageComponentEmoji,
-                                    custom_id: JSON.stringify({ c: "rmd", until: Date.now() + (1000 * 60 * 5), src: "revalidate" }),
-                                    style: ButtonStyle.Primary
-                                },
-                                {
-                                    type: 2,
-                                    label: "Deletar",
-                                    emoji: parseEmoji(e.Trash) as APIMessageComponentEmoji,
-                                    custom_id: JSON.stringify({ c: "delete", userId: data.userId }),
-                                    style: ButtonStyle.Danger
-                                },
-                            ]
-                        }
-                    ],
-                embeds: []
-            }
-        })
+        : emitReminder()
+
+    // data.privateOrChannel
+    //     ? notifyUser(data)
+    //     : messagesToSend.push({
+    //         data: {
+    //             channelId: data.ChannelId,
+    //             method: "post",
+    //             isReminder: true,
+    //             content: `${e.Notification} | <@${data.userId}>, lembrete pra você.\n🗒️ | **${data.RemindMessage.slice(0, 3500)}**\n${intervalMessage}`,
+    //             components: [1, 2, 3].includes(data.interval)
+    //                 ? []
+    //                 : [
+    //                     {
+    //                         type: 1,
+    //                         components: [
+    //                             {
+    //                                 type: 2,
+    //                                 label: "+10 Min",
+    //                                 emoji: parseEmoji(e.Notification) as APIMessageComponentEmoji,
+    //                                 custom_id: JSON.stringify({ c: "rmd", until: Date.now() + (1000 * 60 * 5), src: "snooze", uId: data.userId }),
+    //                                 style: ButtonStyle.Primary
+    //                             },
+    //                             {
+    //                                 type: 2,
+    //                                 label: "Agendar",
+    //                                 emoji: parseEmoji("📅") as APIMessageComponentEmoji,
+    //                                 custom_id: JSON.stringify({ c: "rmd", until: Date.now() + (1000 * 60 * 5), src: "revalidate", uId: data.userId }),
+    //                                 style: ButtonStyle.Primary
+    //                             },
+    //                             {
+    //                                 type: 2,
+    //                                 label: "Deletar",
+    //                                 emoji: parseEmoji(e.Trash) as APIMessageComponentEmoji,
+    //                                 custom_id: JSON.stringify({ c: "delete", userId: data.userId }),
+    //                                 style: ButtonStyle.Danger
+    //                             }
+    //                         ]
+    //                     }
+    //                 ],
+    //             embeds: []
+    //         }
+    //     })
 
     siteSocket?.emit("notification", {
         userId: data.userId,
@@ -68,10 +73,66 @@ export default async (data: ReminderType) => {
         title: "Lembrete"
     })
 
-    if (data.isAutomatic) return ManagerReminder.remove(data.id)
-    if (intervalTime) return ManagerReminder.revalide(data.id, intervalTime)
+    // if (data.isAutomatic) return ManagerReminder.remove(data.id)
+    // if (intervalTime) return ManagerReminder.revalide(data.id, intervalTime)
 
-    ManagerReminder.setAlert(data.id)
+    async function emitReminder() {
+        await Rest.post(
+            Routes.channelMessages(data.ChannelId),
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: {
+                    content: `${e.Notification} | <@${data.userId}>, lembrete pra você.\n🗒️ | **${data.RemindMessage.slice(0, 3500)}**\n${intervalMessage}`,
+                    components: [1, 2, 3].includes(data.interval)
+                        ? []
+                        : [
+                            {
+                                type: 1,
+                                components: [
+                                    {
+                                        type: 2,
+                                        label: "+10 Min",
+                                        emoji: parseEmoji(e.Notification) as APIMessageComponentEmoji,
+                                        custom_id: JSON.stringify({ c: "rmd", src: "snooze", uId: data.userId }),
+                                        style: ButtonStyle.Primary
+                                    },
+                                    {
+                                        type: 2,
+                                        label: "Agendar",
+                                        emoji: parseEmoji("📅") as APIMessageComponentEmoji,
+                                        custom_id: JSON.stringify({ c: "rmd", src: "revalidate", uId: data.userId}),
+                                        style: ButtonStyle.Primary
+                                    },
+                                    {
+                                        type: 2,
+                                        label: "Deletar",
+                                        emoji: parseEmoji(e.Trash) as APIMessageComponentEmoji,
+                                        custom_id: JSON.stringify({ c: "delete", userId: data.userId, reminderId: data.id }),
+                                        style: ButtonStyle.Danger
+                                    }
+                                ]
+                            }
+                        ]
+                }
+            }
+        )
+            .then(res => {
+                if (!res) return
+
+                const message = res as APIMessage
+
+                if (!message?.id || !message?.timestamp) return
+
+                if (data.isAutomatic) return ManagerReminder.remove(data.id)
+                if (intervalTime) return ManagerReminder.revalide(data.id, intervalTime)
+            
+                return ManagerReminder.setAlert(data.id, new Date(message.timestamp).valueOf() + (1000 * 60 * 10), message.id)
+            })
+            .catch(() => notifyUser(data))
+        return
+    }
 
     return
 }
