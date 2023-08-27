@@ -9,7 +9,7 @@ import listen from "./webhooks/listen";
 import { server, httpServer } from "./server";
 import { env } from "process";
 import { REST } from "discord.js";
-import { interactions } from "./websocket/connection";
+import { allGuilds, interactions } from "./websocket/connection";
 export const Rest = new REST().setToken(env.DISCORD_TOKEN);
 
 server.get("/", (_, res) => res.status(200).send({ status: "Welcome to Saphire's API" }));
@@ -27,5 +27,6 @@ server.get("/commandscount", (req, res) => {
     })
 
 });
+server.get("/guilds", (_, res) => res.send(allGuilds.toJSON()))
 
 httpServer.listen(Number(env.SERVER_PORT), "0.0.0.0", listen);

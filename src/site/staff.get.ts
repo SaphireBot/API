@@ -25,6 +25,7 @@ export default async (_: Request, res: Response) => {
             if (data.tags.includes("adminstrator")) return admins.push(data)
             if (data.tags.includes("board of directors")) return boards.push(data)
             if (data.tags.includes("staff")) return staff.push(data)
+            staffs.set(data.id, data)
         })
 
     return res.send([developers, admins, boards, staff].flat())

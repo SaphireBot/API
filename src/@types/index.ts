@@ -161,7 +161,6 @@ export interface WebsocketMessageRecieveData {
   commandName: string | undefined
   listener: string | undefined
   guilds: number | undefined
-  guildId: string
   guildName: string
   commandsApi: commandApi[]
   shardData: ShardsStatus
@@ -181,6 +180,7 @@ export interface WebsocketMessageRecieveData {
   applicationCommandData: APIApplicationCommand[]
   reminderData: ReminderType
   remindersToRemove: string[]
+  guildData: APIGuildObject
 }
 
 export interface staffData extends APIUser {
@@ -217,7 +217,7 @@ export interface ShardsStatus {
   shardId: number
   ready: boolean
   ms: number
-  guilds: GuildsThroughShards[]
+  guilds: APIGuildObject[]
   guildsCount: number
   emojisCount: number
   channelsCount: number
@@ -487,4 +487,13 @@ export interface ChatMessage {
   avatar: string
   name: string
   message: string
+}
+
+export interface APIGuildObject {
+  id: string
+  name: string
+  icon: string | null
+  owner: boolean
+  permissions: bigint | string
+  features: string[]
 }

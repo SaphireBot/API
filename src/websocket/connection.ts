@@ -1,10 +1,10 @@
-import { CallbackType, ChatMessage, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, ShardsStatus, WebsocketMessageRecieveData, commandApi, staffData } from "../@types";
+import { APIGuildObject, CallbackType, ChatMessage, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, ShardsStatus, WebsocketMessageRecieveData, commandApi, staffData } from "../@types";
 import { APIApplicationCommand, Collection } from "discord.js";
 import { Socket } from "socket.io";
 import { staffs } from "../site";
 import { env } from "process";
 import postmessage from "./functions/postmessage";
-import getCache from "./cache/get.cache";
+import getCache, { users } from "./cache/get.cache";
 import getMultipleCache from "./cache/multiple.cache";
 import refreshCache from "./cache/update.cache";
 import deleteCache from "./cache/delete.cache";
@@ -15,32 +15,26 @@ import ManagerTwitch from "../twitch/manager.twitch";
 import { UpdateStreamerParams } from "../@types/twitch";
 import ManagerReminder from "../reminder/manager.reminder";
 import { ReminderType } from "../@types/reminder";
+import getSocial from "../site/social.get";
+import getDescription from "../site/description.get";
+import Database from "../database";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
     message: 0
-}
-export const allGuilds = new Collection<string, string>()
-export const apiCommandsData = new Collection<string, commandApi>()
-export const shards = new Collection<number, ShardsStatus>()
-export const shardsAndSockets = new Collection<number, Socket>()
-setInterval(() => shardsAndSockets.random()?.send({ type: "refreshRanking" }), 1000 * 60 * 15)
-setInterval(() => {
-    if (!apiCommandsData.size)
-        shardsAndSockets
-            .random()
-            ?.timeout(1000)
-            .emitWithAck("commands", "get")
-            .then((res: commandApi[]) => {
-                if (!res?.length) return
-                for (const cmd of res)
-                    apiCommandsData.set(cmd.name, cmd)
-            })
-            .catch(() => { })
-}, 1000 * 60)
+};
+export const allGuilds = new Collection<string, APIGuildObject>();
+export const apiCommandsData = new Collection<string, commandApi>();
+export const shards = new Collection<number, ShardsStatus>();
+export const shardsAndSockets = new Collection<number, Socket>();
 export let siteSocket: Socket | undefined;
-const chatMessages = new Collection<number, ChatMessage>()
-export const applicationCommands = new Collection<string, APIApplicationCommand>()
+export const applicationCommands = new Collection<string, APIApplicationCommand>();
+
+setInterval(() => shardsAndSockets.random()?.send({ type: "refreshRanking" }), 1000 * 60 * 15);
+refreshSiteData()
+setInterval(() => refreshSiteData(), 1000 * 15);
+const chatMessages = new Collection<number, ChatMessage>();
+
 
 chatMessages.set(Date.now(), {
     avatar: "https://cdn.discordapp.com/avatars/140926143783108610/77b077b82dffc71f575cc6fc09569b79.webp",
@@ -48,7 +42,7 @@ chatMessages.set(Date.now(), {
     id: "541033481199812628",
     message: "Hello World.",
     name: "Ryuuji"
-})
+});
 
 setTimeout(() => {
     chatMessages.set(Date.now(), {
@@ -58,9 +52,9 @@ setTimeout(() => {
         message: "Hello World 2.",
         name: "Akemy"
     })
-}, 500)
+}, 500);
 
-setTimeout(() => shardsAndSockets.random()?.send({ type: "sendStaffData" }), 1000 * 5)
+setTimeout(() => shardsAndSockets.random()?.send({ type: "sendStaffData" }), 1000 * 60 * 30);
 
 export default (socket: Socket) => {
 
@@ -72,8 +66,22 @@ export default (socket: Socket) => {
     if (socket.handshake.auth?.shardId == "site") {
         // messageAdded
         siteSocket = socket
-        socket.on("getChatMessages", (_, callback: CallbackType) => callback(chatMessages.sort((a, b) => a.date - b.date).toJSON()))
-        socket.emit("message", "Websocket Connected")
+        socket.on("getChatMessages", (_, callback: CallbackType) => callback(chatMessages.sort((a, b) => a.date - b.date).toJSON()));
+        socket.on("baseData", refreshSiteData);
+        socket.on("transactions", async (userId: string, callback: CallbackType) => {
+
+            const userData = users.get(userId) || await Database.User.findOne({ id: userId }).then(doc => doc?.toObject())
+
+            if (userData && !users.has(userId))
+                users.set(userId, userData)
+
+            return callback({
+                Transactions: userData?.Transactions || [],
+                Balance: userData?.Balance || 0
+            })
+
+        })
+        socket.emit("message", "Websocket Connected");
         return
     }
 
@@ -103,13 +111,13 @@ export default (socket: Socket) => {
         switch (data.type) {
             case "addInteraction":
                 interactions.count++
-                if (siteSocket) siteSocket.emit("addInteraction", interactions.count)
+                if (siteSocket) siteSocket.send("addInteraction")
                 break;
             case "addMessage": interactions.message++; break;
             case "registerCommand": registerNewCommand(data?.commandName); break;
             case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[] }); break;
-            case "guildCreate": newGuild(data.guildId, data.guildName); break;
-            case "guildDelete": allGuilds.delete(data.guildId); break;
+            case "guildCreate": newGuild(data.guildData); break;
+            case "guildDelete": allGuilds.delete(data.id); break;
             case "updateCache": refreshCache(data?.to, data?.data); break;
             case "deleteCache": deleteCache(data.id, data.to); break;
             case "postMessage": postmessage(data.messageData, socket); break;
@@ -179,7 +187,7 @@ export default (socket: Socket) => {
     })
 
     socket.on("postMessageWithReply", (data: MessageSaphireRequest, callback: CallbackType) => postmessagewithreply(data, callback))
-    socket.on("getAllGuilds", (_: any, callback: CallbackType) => callback(allGuilds.map((name, id) => ({ name, id }))))
+    socket.on("getAllGuilds", (_: any, callback: CallbackType) => callback(allGuilds.map((data, id) => ({ name: data.name, id }))))
 
     // Cache
     socket.on("getCache", (data: GetAndDeleteCacheType, callback: CallbackType) => getCache(data?.id, data?.type, callback))
@@ -212,7 +220,7 @@ export default (socket: Socket) => {
 
 function setShardStatus(data: ShardsStatus, socket: Socket) {
     if (!data || isNaN(Number(data.shardId))) return
-    for (const guild of data.guilds) allGuilds.set(guild.id, guild.name)
+    for (const guild of data.guilds) allGuilds.set(guild.id, guild)
     data.socketId = socket.id
     shardsAndSockets.set(data.shardId, socket)
     shards.set(data.shardId, data)
@@ -226,23 +234,77 @@ function registerNewCommand(commandName: string | undefined): void {
 }
 
 function registerCommandsApi({ commandApi }: { commandApi: commandApi[] }) {
-
     if (commandApi?.length)
         for (const cmd of commandApi) apiCommandsData.set(cmd?.name, cmd)
 
     return
 }
 
-function newGuild(guildId: string, guildName: string) {
-    if (!guildId || !guildName) return
-    allGuilds.set(guildId, guildName)
+function newGuild(guild: APIGuildObject) {
+    if (!guild) return
+    return allGuilds.set(guild.id, guild)
 }
 
 function siteStaffData(staffData: staffData[]) {
     if (!Array.isArray(staffData) || !staffData?.length) return
     for (const staff of staffData) staffs.set(staff.id, staff)
+    return
 }
 
 function apllicationCommands(commands: APIApplicationCommand[]) {
     for (const cmd of commands) applicationCommands.set(cmd.name, cmd)
+    return
+}
+
+function refreshSiteData() {
+    if (!apiCommandsData.size)
+        shardsAndSockets
+            .random()
+            ?.timeout(1000)
+            .emitWithAck("commands", "get")
+            .then((res: commandApi[]) => {
+                if (!res?.length) return
+                for (const cmd of res)
+                    apiCommandsData.set(cmd.name, cmd)
+                emitSite()
+            })
+            .catch(() => emitSite())
+    else emitSite()
+
+    return
+
+    function emitSite() {
+
+        const developers = [] as staffData[]
+        const admins = [] as staffData[]
+        const boards = [] as staffData[]
+        const staff = [] as staffData[]
+
+        staffs
+            .forEach(data => {
+
+                if (!data.avatarUrl) data.avatarUrl = "https://media.discordapp.net/attachments/893361065084198954/1132515877124841522/No-photo-m.png"
+
+                if (data.id) {
+                    data.social = getSocial(data.id)
+                    data.description = getDescription(data.id)
+                }
+
+                if (data.tags.includes("developer")) return developers.push(data)
+                if (data.tags.includes("adminstrator")) return admins.push(data)
+                if (data.tags.includes("board of directors")) return boards.push(data)
+                if (data.tags.includes("staff")) return staff.push(data)
+                staffs.set(data.id, data)
+            })
+
+        if (siteSocket)
+            siteSocket.emit("refresh", {
+                guilds: allGuilds.toJSON(),
+                commands: apiCommandsData.toJSON(),
+                interactions: interactions.count,
+                staffs: staffs.toJSON()
+            })
+        return
+    }
+
 }
