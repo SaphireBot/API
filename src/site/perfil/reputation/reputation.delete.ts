@@ -48,7 +48,7 @@ export default async (req: Request, res: Response) => {
                 siteSocket?.emit("notification", { userId, message: "Você perdeu uma <a href='https://saphire.one/perfil'>reputação</a>" })
                 return res.send({
                     type: "success",
-                    message: "Reputação deletada com succeso.",
+                    message: "Reputação deletada com sucesso.",
                     reputations: doc?.Perfil?.Reputation || []
                 })
             })
