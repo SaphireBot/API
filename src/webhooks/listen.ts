@@ -6,6 +6,7 @@ import loadCache from "../database/functions/load.cache";
 import { shardsAndSockets } from "../websocket/connection";
 import applicationCommands from "../websocket/functions/application.commands";
 import ManagerReminder from "../reminder/manager.reminder";
+import Blacklist from "../blacklist/manager"
 
 export default async (err?: Error | null, address?: string): Promise<void> => {
     console.log("Connected")
@@ -21,6 +22,7 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
             shardsAndSockets.random()?.send({ type: "sendStaffData" });
             applicationCommands();
             ManagerReminder.load();
+            Blacklist.load();
             sender({
                 url: env.WEBHOOK_STATUS,
                 username: "[API] Connection Status",

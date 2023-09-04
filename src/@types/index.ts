@@ -155,7 +155,7 @@ export interface SaphireApiDataResponse {
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateManyStreamers" | "removeChannel" | "transactions" | "notification" | "chatMessage" | "ApplicationCommandData" | "postReminder" | "removeReminder" | "updateReminder" | "removeReminders" | "refreshReminder" | undefined
+  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateManyStreamers" | "removeChannel" | "transactions" | "notification" | "chatMessage" | "ApplicationCommandData" | "postReminder" | "removeReminder" | "updateReminder" | "removeReminders" | "refreshReminder" | "refreshIDBlacklist" | "clearIDBlacklist" | undefined
   message: string | undefined
   shardId: number | undefined
   commandName: string | undefined

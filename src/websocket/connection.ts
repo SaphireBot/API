@@ -18,6 +18,8 @@ import { ReminderType } from "../@types/reminder";
 import getSocial from "../site/social.get";
 import getDescription from "../site/description.get";
 import Database from "../database";
+import Blacklist from "../blacklist/manager"
+import { ws } from "../server";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -67,6 +69,7 @@ export default (socket: Socket) => {
         // messageAdded
         siteSocket = socket
         socket.on("getChatMessages", (_, callback: CallbackType) => callback(chatMessages.sort((a, b) => a.date - b.date).toJSON()));
+        socket.on("getAllBlacklist", (_, callback: CallbackType) => Blacklist.all(callback));
         socket.on("baseData", refreshSiteData);
         socket.on("transactions", async (userId: string, callback: CallbackType) => {
 
@@ -128,6 +131,13 @@ export default (socket: Socket) => {
             case "notification": siteSocket?.emit("notification", data.notifyData); break;
             case "chatMessage": chatMessages.set(data?.chatMessage.date, data.chatMessage); break;
             case "ApplicationCommandData": apllicationCommands(data.applicationCommandData); break;
+
+            // Blacklist Section
+            case "refreshIDBlacklist": Blacklist.refresh(data.id); break;
+            case "clearIDBlacklist":
+                Blacklist.clear(data.id);
+                ws.send({ type: "blacklistRemove", id: data.id });
+                break;
 
             // Reminder Section
             case "postReminder": ManagerReminder.save(data.reminderData as ReminderType, undefined); break;
@@ -215,6 +225,9 @@ export default (socket: Socket) => {
         return callback(data)
     })
     //---------
+
+    // Blacklist
+    socket.on("getAllBlacklist", (_, callback: CallbackType) => Blacklist.all(callback))
     return
 }
 
@@ -236,6 +249,9 @@ function registerNewCommand(commandName: string | undefined): void {
 function registerCommandsApi({ commandApi }: { commandApi: commandApi[] }) {
     if (commandApi?.length)
         for (const cmd of commandApi) apiCommandsData.set(cmd?.name, cmd)
+
+    if (siteSocket?.connected)
+        siteSocket.emit("refresh", { commands: apiCommandsData.toJSON(), interactions: 95812 })
 
     return
 }
