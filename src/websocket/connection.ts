@@ -37,25 +37,6 @@ refreshSiteData()
 setInterval(() => refreshSiteData(), 1000 * 15);
 const chatMessages = new Collection<number, ChatMessage>();
 
-
-chatMessages.set(Date.now(), {
-    avatar: "https://cdn.discordapp.com/avatars/140926143783108610/77b077b82dffc71f575cc6fc09569b79.webp",
-    date: Date.now(),
-    id: "541033481199812628",
-    message: "Hello World.",
-    name: "Ryuuji"
-});
-
-setTimeout(() => {
-    chatMessages.set(Date.now(), {
-        avatar: "https://cdn.discordapp.com/avatars/854494598533742622/a69a4f99469391885462df7cc3d0fa87.webp",
-        date: Date.now(),
-        id: "854494598533742622",
-        message: "Hello World 2.",
-        name: "Akemy"
-    })
-}, 500);
-
 setTimeout(() => shardsAndSockets.random()?.send({ type: "sendStaffData" }), 1000 * 60 * 30);
 
 export default (socket: Socket) => {
