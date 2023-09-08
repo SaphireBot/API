@@ -33,7 +33,7 @@ export let siteSocket: Socket | undefined;
 export const applicationCommands = new Collection<string, APIApplicationCommand>();
 
 setInterval(() => shardsAndSockets.random()?.send({ type: "refreshRanking" }), 1000 * 60 * 15);
-refreshSiteData()
+refreshSiteData();
 setInterval(() => refreshSiteData(), 1000 * 15);
 const chatMessages = new Collection<number, ChatMessage>();
 
@@ -43,7 +43,7 @@ export default (socket: Socket) => {
 
     if (socket.handshake.auth?.token as string !== env.WEBSOCKET_SAPHIRE_API_LOGIN_PASSWORD) {
         socket.send({ type: "console", message: "Where is the token bro?" })
-        return socket.disconnect(true)
+        return socket.disconnect(true);
     }
 
     if (socket.handshake.auth?.shardId == "site") {
