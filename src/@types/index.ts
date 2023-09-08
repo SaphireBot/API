@@ -431,6 +431,8 @@ export interface commandApi {
   name: string,
   description: string
   category: string
+  aliases: string[] | undefined
+  tags: string[]
   synonyms: string[]
   perms: {
     user: string[]
