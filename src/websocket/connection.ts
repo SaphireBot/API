@@ -251,7 +251,7 @@ function registerCommandsApi({ commandApi }: { commandApi: commandApi[] }) {
         for (const cmd of commandApi) apiCommandsData.set(cmd?.name, cmd)
 
     if (siteSocket?.connected)
-        siteSocket.emit("refresh", { commands: apiCommandsData.toJSON(), interactions: 95812 })
+        siteSocket.emit("refresh", { commands: apiCommandsData.toJSON() })
 
     return
 }
