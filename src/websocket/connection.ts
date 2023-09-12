@@ -52,6 +52,21 @@ export default (socket: Socket) => {
         socket.on("getChatMessages", (_, callback: CallbackType) => callback(chatMessages.sort((a, b) => a.date - b.date).toJSON()));
         socket.on("getAllBlacklist", (_, callback: CallbackType) => Blacklist.all(callback));
         socket.on("baseData", refreshSiteData);
+
+        socket.on("dailyCheck", async (userId, callback: CallbackType) => {
+
+            if (!userId || typeof userId !== "string") return callback(null)
+
+            const userData = await Database.User.findOne({ id: userId })
+            if (!userData) return callback(null)
+
+            return callback({
+                timeout: userData?.Timeouts?.Daily || 0,
+                count: userData?.DailyCount || 0
+            })
+
+        })
+
         socket.on("transactions", async (userId: string, callback: CallbackType) => {
 
             const userData = users.get(userId) || await Database.User.findOne({ id: userId }).then(doc => doc?.toObject())
