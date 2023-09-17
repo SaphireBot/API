@@ -4,7 +4,7 @@ import guild from "./model/guilds";
 import reminder from "./model/reminder";
 import user from "./model/user";
 import blacklist from "./model/blacklist"
-import { guilds, users } from "../websocket/cache/get.cache";
+import { guilds, users, client as clientCache } from "../websocket/cache/get.cache";
 import { Types } from "mongoose";
 
 export default new class Database {
@@ -83,6 +83,21 @@ export default new class Database {
                     const data = users.find(value => value._id?.toString() == change.documentKey._id.toString())
                     if (!data?.id) return;
                     return guilds.delete(data?.id);
+                }
+            })
+
+        this.Client.watch()
+            .on("change", async change => {
+
+                if (["update", "insert"].includes(change.operationType)) {
+                    const data = await this.Client.findById(change.documentKey._id)
+                    if (data?.id) clientCache.set(data.id, data.toObject())
+                }
+
+                if (change.operationType === "delete") {
+                    const data = clientCache.find(value => value._id?.toString() == change.documentKey._id.toString())
+                    if (!data?.id) return;
+                    return clientCache.delete(data?.id);
                 }
             })
     }

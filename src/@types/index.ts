@@ -235,7 +235,7 @@ export interface GuildsThroughShards {
 
 export interface GetAndDeleteCacheType {
   id: string | undefined
-  type: "user" | "guild" | undefined
+  type: "user" | "guild" | "client" | undefined
 }
 
 export interface GetMultiplecacheDataType {
