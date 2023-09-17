@@ -3,7 +3,7 @@ import { env } from "process";
 // import { shardsAndSockets } from "../websocket/connection";
 import Database from "../database";
 import { users } from "../websocket/cache/get.cache";
-import { UserDatabase } from "../@types";
+import { UserSchema } from "../database/model/user";
 
 export default async (req: Request, res: Response) => {
 
@@ -33,16 +33,16 @@ export default async (req: Request, res: Response) => {
 
     const doc = users.get(userId) || await Database.User.findOne({ id: userId })
     if (!doc) return res.send({ message: "Nenhuma informação foi encontrada no banco de dados." })
-    users.set(doc?.id, doc as UserDatabase)
+    if (doc?.id) users.set(doc?.id, doc as UserSchema)
     if (!fields) return res.send(doc)
 
     const userData: Record<string, any> = {}
 
     if (Array.isArray(fields))
         for (const key of fields) {
-            if (doc[key as keyof UserDatabase]) userData[key as keyof UserDatabase] = doc[key as keyof UserDatabase]
+            if (doc[key as keyof UserSchema]) userData[key as keyof UserSchema] = doc[key as keyof UserSchema]
         }
-    else if (doc[fields as keyof UserDatabase]) userData[fields as keyof UserDatabase] = doc[fields as keyof UserDatabase]
+    else if (doc[fields as keyof UserSchema]) userData[fields as keyof UserSchema] = doc[fields as keyof UserSchema]
 
     return res.send(userData)
 

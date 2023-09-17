@@ -7,6 +7,7 @@ import { Socket } from "socket.io";
 import { RemoveChannelParams, UpdateManyStreamerParams, UpdateStreamerParams } from "./twitch";
 import { ReminderType } from "./reminder";
 import { GuildSchema } from "../database/model/guilds";
+import { UserSchema } from "../database/model/user";
 
 export interface WebhookBodyRequest extends Request {
   webhookUrl: string
@@ -167,7 +168,7 @@ export interface WebsocketMessageRecieveData {
   shardData: ShardsStatus
   id: string
   to: "guild" | "user" | undefined
-  data: GuildSchema[] | UserDatabase[] | undefined
+  data: GuildSchema[] | UserSchema[] | undefined
   messageData: MessageToSendThroughWebsocket
   userId: string
   method: "save" | "delete"
@@ -245,90 +246,7 @@ export interface GetMultiplecacheDataType {
 export interface RefreshCache {
   id: string | undefined
   type: "user" | "guild" | undefined
-  data: UserDatabase | GuildSchema
-}
-
-export interface UserDatabase {
-  id: string
-  Likes: number
-  // {
-  //     access_token: string
-  //     refresh_token: tokens.refresh_token
-  //     expires_at: Date.now() + tokens.expires_in * 1000
-  // }
-  Tokens: Record<string, any>
-  Xp: number
-  Level: number
-  Transactions: Record<string, any>[]
-  Balance: number
-  AfkSystem: string
-  DailyCount: number
-  MixCount: number
-  QuizCount: number
-  TicTacToeCount: number
-  CompetitiveMemoryCount: number
-  ForcaCount: number
-  GamingCount: {
-    FlagCount: number
-    AnimeThemeCount: number
-    QuizAnime: number
-    Logomarca: number
-    QuizQuestions: number
-  }
-  Timeouts: {
-    Bug: number
-    Daily: number
-    ImagesCooldown: number
-    Loteria: number
-    Cantada: number
-    Bitcoin: number
-    Porquinho: number
-    TopGGVote: number
-    Reputation: number
-    Rep: number
-  }
-  Cache: { ComprovanteOpen: boolean }
-  Color: {
-    Perm: boolean
-    Set: string
-  }
-  Perfil: {
-    Reputation: any[]
-    Titulo: string
-    Status: string
-    Sexo: string
-    Signo: string
-    Aniversario: string
-    Trabalho: string
-    BalanceOcult: boolean
-    Marry: {
-      Conjugate: string
-      StartAt: number
-    }
-    Bits: number
-    Bitcoins: number
-    Estrela: {
-      Um: boolean
-      Dois: boolean
-      Tres: boolean
-      Quatro: boolean
-      Cinco: boolean
-      Seis: boolean
-    }
-  }
-  Vip: {
-    DateNow: number
-    TimeRemaing: number
-    Permanent: boolean
-  }
-  Walls: {
-    Bg: string[]
-    Set: string
-  }
-  Jokempo: {
-    Wins: number
-    Loses: number
-  }
+  data: UserSchema | GuildSchema
 }
 
 export interface AfkGlobalData {

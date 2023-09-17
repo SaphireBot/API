@@ -6,7 +6,7 @@ import { env } from "process";
 import postmessage from "./functions/postmessage";
 import getCache, { users } from "./cache/get.cache";
 import getMultipleCache from "./cache/multiple.cache";
-import refreshCache from "./cache/update.cache";
+// import refreshCache from "./cache/update.cache";
 import deleteCache from "./cache/delete.cache";
 import twitchCache from "./cache/twitch.cache";
 import postAfk from "./functions/postafk";
@@ -117,7 +117,8 @@ export default (socket: Socket) => {
             case "apiCommandsData": registerCommandsApi({ commandApi: data.commandsApi as commandApi[] }); break;
             case "guildCreate": newGuild(data.guildData); break;
             case "guildDelete": allGuilds.delete(data.id); break;
-            case "updateCache": refreshCache(data?.to, data?.data); break;
+            case "updateCache": ""; break;
+            // case "updateCache": refreshCache(data?.to, data?.data); break;
             case "deleteCache": deleteCache(data.id, data.to); break;
             case "postMessage": postmessage(data.messageData, socket); break;
             case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }); break;

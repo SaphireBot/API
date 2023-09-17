@@ -1,7 +1,8 @@
 import { Collection } from "discord.js";
-import { CallbackType, UserDatabase } from "../../@types";
+import { CallbackType } from "../../@types";
 import { GuildSchema } from "../../database/model/guilds";
-export const users = new Collection<string, UserDatabase>();
+import { UserSchema } from "../../database/model/user";
+export const users = new Collection<string, UserSchema>();
 export const guilds = new Collection<string, GuildSchema>();
 
 export default (id: string | undefined, type: "user" | "guild" | undefined, callback: CallbackType): void => {

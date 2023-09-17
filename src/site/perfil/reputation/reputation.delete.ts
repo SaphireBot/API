@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import Database from "../../../database";
 import { users } from "../../../websocket/cache/get.cache";
-import { UserDatabase } from "../../../@types";
 import { siteSocket } from "../../../websocket/connection";
+import { UserSchema } from "../../../database/model/user";
 
 export default async (req: Request, res: Response) => {
 
@@ -21,7 +21,7 @@ export default async (req: Request, res: Response) => {
     if (!from || !date || !userId || !requesting)
         return res.status(400).send({ type: "error", message: "Date, From, UserId, Requesting field is missing" })
 
-    const userdata = users.get(userId) || await Database.User.findOne({ id: userId })
+    const userdata = users.get(userId) || await Database.User.findOne({ id: userId }) as UserSchema
     if (!userdata) return res.send({ type: "notfound", message: "Nenhum usuário foi encontrado." })
 
     const reputation = userdata?.Perfil?.Reputation?.find(rep => rep?.date == date)
@@ -42,7 +42,7 @@ export default async (req: Request, res: Response) => {
             { upsert: true, new: true }
         )
             .then(doc => {
-                users.set(doc?.id, doc as UserDatabase)
+                users.set(doc?.id, doc.toObject())
 
                 siteSocket?.emit("reputation", { userId, reputations: doc?.Perfil?.Reputation || [] })
                 siteSocket?.emit("notification", { userId, message: "Você perdeu uma <a href='https://saphire.one/perfil'>reputação</a>" })

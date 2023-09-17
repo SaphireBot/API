@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import Database from "../../../database";
 import { users } from "../../../websocket/cache/get.cache";
-import { UserDatabase } from "../../../@types";
 import managerTwitch from "../../../twitch/manager.twitch";
 import { siteSocket } from "../../../websocket/connection";
+import { UserSchema } from "../../../database/model/user";
 
 export default async (req: Request<{ from: string | undefined, text: string | undefined, to: string | undefined, username: string | undefined, date: number | undefined }>, res: Response) => {
 
@@ -12,8 +12,8 @@ export default async (req: Request<{ from: string | undefined, text: string | un
     if (!from || !text || !to || !dateNow)
         return res.status(400).send({ message: "Content Missing" })
 
-    const userdata = users.get(from) || await Database.User.findOne({ id: from })
-    users.set(from, userdata as UserDatabase)
+    const userdata = users.get(from) || await Database.User.findOne({ id: from }) as UserSchema
+    users.set(from, userdata)
 
     const remaingDate = (((userdata?.Timeouts?.Reputation || 0) + (1000 * 60 * 60 * 2)) - dateNow)
     if (remaingDate > 0)
@@ -38,7 +38,7 @@ export default async (req: Request<{ from: string | undefined, text: string | un
         { new: true, upsert: true }
     )
         .then(doc => {
-            users?.set(doc?.id, doc as UserDatabase)
+            users?.set(doc?.id, doc.toObject())
             saved.to = true
         })
         .catch(() => saved.return = true)
@@ -49,7 +49,7 @@ export default async (req: Request<{ from: string | undefined, text: string | un
         { new: true, upsert: true }
     )
         .then(doc => {
-            users?.set(doc?.id, doc as UserDatabase)
+            users?.set(doc?.id, doc.toObject())
             saved.to = true
         })
         .catch(() => saved.return = true)

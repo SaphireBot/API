@@ -1,15 +1,13 @@
-import Mongoose from "mongoose"
-const { Schema, model } = Mongoose
+import { Schema, model, InferSchemaType, Types } from "mongoose";
 
-export default model("User", new Schema({
+const UserSchema = new Schema({
     id: { type: String, unique: true },
     Likes: Number,
-    // {
-    //     access_token: String,
-    //     refresh_token: tokens.refresh_token,
-    //     expires_at: Date.now() + tokens.expires_in * 1000,
-    // }
-    Tokens: Object,
+    Tokens: {
+        access_token: String,
+        refresh_token: Number,
+        expires_at: Number
+    },
     Xp: Number,
     Level: Number,
     Transactions: Array,
@@ -18,7 +16,6 @@ export default model("User", new Schema({
     DailyCount: Number,
     MixCount: Number,
     QuizCount: Number,
-    TicTacToeCount: Number,
     CompetitiveMemoryCount: Number,
     ForcaCount: Number,
     GamingCount: {
@@ -83,4 +80,7 @@ export default model("User", new Schema({
         Wins: Number,
         Loses: Number
     }
-}))
+});
+
+export default model("User", UserSchema);
+export type UserSchema = InferSchemaType<typeof UserSchema> & { _id: Types.ObjectId };

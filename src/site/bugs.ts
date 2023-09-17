@@ -1,10 +1,10 @@
 import { ButtonStyle, parseEmoji } from "discord.js"
 import { Request, Response } from "express"
 import { messagesToSend } from "../services/message/message.post"
-import { UserDatabase } from "../@types"
 import { users } from "../websocket/cache/get.cache"
 import { env } from "process"
 import Database from "../database"
+import { UserSchema } from "../database/model/user"
 
 export default async (req: Request, res: Response) => {
 
@@ -38,7 +38,7 @@ export default async (req: Request, res: Response) => {
         { $set: { "Timeouts.Bug": Date.now() + (1000 * 60 * 5) } },
         { upsert: true, new: true }
     )
-        .then(doc => users.set(doc?.id, doc as UserDatabase))
+        .then(doc => users.set(doc?.id, doc as UserSchema))
 
     messagesToSend.push({
         data: {
