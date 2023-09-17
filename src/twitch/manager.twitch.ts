@@ -4,7 +4,7 @@ import { messagesToSend } from "../services/message/message.post"
 import { ButtonStyle, parseEmoji, time } from "discord.js"
 import { TwitchLanguages } from "../json/data.json"
 import { FetchError, OauthToken, OauthValidade, OfflineStreamersToNotifier, RemoveChannelParams, StreamData, UpdateManyStreamerParams, UpdateStreamerParams, UserData } from "../@types/twitch"
-import { CallbackType, GuildDatabase } from "../@types"
+import { CallbackType } from "../@types"
 import { guilds } from "../websocket/cache/get.cache"
 
 export default new class Twitch {
@@ -685,7 +685,7 @@ export default new class Twitch {
             { $set: { TwitchNotifications: data } },
             { new: true, upsert: true }
         )
-            .then(doc => guilds.set(doc?.id, doc as GuildDatabase))
+            .then(doc => guilds.set(doc?.id, doc.toObject()))
 
         this.toCheckStreamers.push(streamer)
         if (!this.streamers.includes(streamer)) this.streamers.push(streamer)

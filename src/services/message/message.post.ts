@@ -1,5 +1,5 @@
 import { Routes, APIEmbed, MessageReference, DiscordAPIError, APIMessageComponent } from "discord.js"
-import { GuildDatabase, MessageSaphireRequest, MessageToSendSaphireData, MessageToSendThroughWebsocket } from "../../@types"
+import { MessageSaphireRequest, MessageToSendSaphireData, MessageToSendThroughWebsocket } from "../../@types"
 import { server } from "../../server"
 import { Response } from "express"
 import { env } from "process"
@@ -102,7 +102,7 @@ async function postMessage(data: MessageSaphireRequest | MessageToSendThroughWeb
                     { $unset: { [`LogSystem.${data.LogType}`]: true } },
                     { new: true, upsert: true }
                 )
-                    .then(doc => guilds.set(doc?.id, doc as GuildDatabase))
+                    .then(doc => guilds.set(doc?.id, doc.toObject()))
 
             if (
                 data.isTwitchNotification

@@ -1,14 +1,38 @@
-import Mongoose from "mongoose"
-const { Schema, model } = Mongoose
+import { Schema, model, InferSchemaType, Types } from "mongoose";
 
-export default model("Guild", new Schema({
+const GuildSchema = new Schema({
     id: { type: String, unique: true },
-    Giveaways: Array,
+    Giveaways: [{
+        MessageID: { type: String, unique: true },
+        GuildId: String,
+        Prize: String,
+        Winners: { type: Number },
+        WinnersGiveaway: [String],
+        Participants: [String],
+        Emoji: String,
+        TimeMs: { type: Number },
+        DateNow: { type: Number },
+        ChannelId: String,
+        Actived: Boolean,
+        MessageLink: String,
+        CreatedBy: String,
+        Sponsor: String,
+        AllowedRoles: [String],
+        LockedRoles: [String],
+        AllowedMembers: [String],
+        LockedMembers: [String],
+        RequiredAllRoles: [String],
+        AddRoles: [String],
+        MultipleJoinsRoles: [String],
+        MinAccountDays: { type: Number },
+        MinInServerDays: { type: Number },
+    }],
+    Prefixes: [String],
     TempCall: {
         enable: Boolean,
         muteTime: Boolean,
         members: Object,
-        membersMuted: Object
+        membersMuted: Object,
     },
     Spam: {
         enabled: { type: Boolean, default: false },
@@ -17,83 +41,87 @@ export default model("Guild", new Schema({
         filters: {
             capsLock: {
                 enabled: { type: Boolean, default: false },
-                percent: { type: Number, default: 0, max: 100, min: 0 }
+                percent: { type: Number, default: 0, max: 100, min: 0 },
             },
             messagesTimer: {
                 enabled: { type: Boolean, default: false },
                 amount: { type: Number, default: 3 },
-                seconds: { type: Number, default: 2 }
+                seconds: { type: Number, default: 2 },
             },
             repeat: {
-                enabled: { type: Boolean, default: false }
-            }
-        }
+                enabled: { type: Boolean, default: false },
+            },
+        },
     },
     Chest: { type: Boolean, default: true },
-    Polls: Array,
+    // Polls: Array,
     Moeda: String,
     FirstSystem: Boolean,
-    Autorole: Array,
-    CommandBlocks: Array,
+    Autorole: [String],
+    // CommandBlocks: Array,
     TwitchNotifications: [{
-        streamer: { type: String, unique: true },
-        channelId: { type: String },
-        roleId: { type: String },
-        message: { type: String }
-    }], // { channelId: channelId, streamer: streamerName }
+        streamer: String,
+        channelId: String,
+        guildId: String,
+        message: String || undefined,
+        roleId: String || undefined,
+    }],
     MinDay: {
         days: Number,
-        punishment: String // Kick | Ban | Warn
+        punishment: String, // Kick | Ban | Warn
     },
     announce: {
         channel: String,
         allowedRole: String,
         notificationRole: String,
-        crosspost: Boolean
+        crosspost: Boolean,
     },
     LogSystem: {
         channel: String,
         webhookUrl: String,
         ban: {
-            active: Boolean
+            active: Boolean,
         },
         unban: {
-            active: Boolean
+            active: Boolean,
         },
         kick: {
-            active: Boolean
+            active: Boolean,
         },
         mute: {
-            active: Boolean
+            active: Boolean,
         },
         channels: {
-            active: Boolean
+            active: Boolean,
         },
         messages: {
-            active: Boolean
+            active: Boolean,
         },
         botAdd: {
-            active: Boolean
+            active: Boolean,
         },
         roles: {
-            active: Boolean
-        }
+            active: Boolean,
+        },
     },
     XpSystem: {
         Canal: String,
-        Mensagem: String
+        Mensagem: String,
     },
     LeaveChannel: {
         channelId: String,
-        body: Object
+        body: Object,
     },
     WelcomeChannel: {
         channelId: String,
-        body: Object
+        body: Object,
     },
     Stars: {
         limit: Number,
         channel: String,
-        sended: Array
-    }
-}))
+        sended: Array,
+    },
+});
+
+export default model("Guild", GuildSchema);
+export type GuildSchema = InferSchemaType<typeof GuildSchema> & { _id: Types.ObjectId };

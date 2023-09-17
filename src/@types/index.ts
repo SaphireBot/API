@@ -6,6 +6,7 @@ import { Request, Response } from "express"
 import { Socket } from "socket.io";
 import { RemoveChannelParams, UpdateManyStreamerParams, UpdateStreamerParams } from "./twitch";
 import { ReminderType } from "./reminder";
+import { GuildSchema } from "../database/model/guilds";
 
 export interface WebhookBodyRequest extends Request {
   webhookUrl: string
@@ -166,7 +167,7 @@ export interface WebsocketMessageRecieveData {
   shardData: ShardsStatus
   id: string
   to: "guild" | "user" | undefined
-  data: GuildDatabase[] | UserDatabase[] | undefined
+  data: GuildSchema[] | UserDatabase[] | undefined
   messageData: MessageToSendThroughWebsocket
   userId: string
   method: "save" | "delete"
@@ -244,7 +245,7 @@ export interface GetMultiplecacheDataType {
 export interface RefreshCache {
   id: string | undefined
   type: "user" | "guild" | undefined
-  data: UserDatabase | GuildDatabase
+  data: UserDatabase | GuildSchema
 }
 
 export interface UserDatabase {
@@ -327,98 +328,6 @@ export interface UserDatabase {
   Jokempo: {
     Wins: number
     Loses: number
-  }
-}
-
-export interface GuildDatabase {
-  id: string
-  Giveaways: Record<string, any>[]
-  TempCall: {
-    enable: boolean
-    muteTime: boolean
-    members: any
-    membersMuted: any
-  }
-  Spam: {
-    enabled: boolean
-    ignoreChannels: string[]
-    ignoreRoles: string[]
-    filters: {
-      capsLock: {
-        enabled: boolean
-        percent: number
-      }
-      messagesTimer: {
-        enabled: boolean
-        amount: number
-        seconds: number
-      }
-      repeat: {
-        enabled: boolean
-      }
-    }
-  },
-  Chest: boolean
-  Polls: Record<string, any>[]
-  Moeda: string
-  FirstSystem: boolean
-  Autorole: any[]
-  CommandBlocks: any[]
-  TwitchNotifications: Record<string, any>[]
-  MinDay: {
-    days: number
-    punishment: string
-  }
-  announce: {
-    channel: string
-    allowedRole: string
-    notificationRole: string
-    crosspost: boolean
-  }
-  LogSystem: {
-    channel: string
-    webhookUrl: string
-    ban: {
-      active: boolean
-    }
-    unban: {
-      active: boolean
-    }
-    kick: {
-      active: boolean
-    }
-    mute: {
-      active: boolean
-    }
-    channels: {
-      active: boolean
-    }
-    messages: {
-      active: boolean
-    }
-    botAdd: {
-      active: boolean
-    }
-    roles: {
-      active: boolean
-    }
-  }
-  XpSystem: {
-    Canal: string
-    Mensagem: string
-  }
-  LeaveChannel: {
-    channelId: string
-    body: Record<string, any>[]
-  }
-  WelcomeChannel: {
-    channelId: string
-    body: Record<string, any>[]
-  }
-  Stars: {
-    limit: number
-    channel: string
-    sended: Record<string, any>[]
   }
 }
 

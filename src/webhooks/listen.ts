@@ -7,6 +7,7 @@ import { shardsAndSockets } from "../websocket/connection";
 import applicationCommands from "../websocket/functions/application.commands";
 import ManagerReminder from "../reminder/manager.reminder";
 import Blacklist from "../blacklist/manager"
+import database from "../database";
 
 export default async (err?: Error | null, address?: string): Promise<void> => {
     console.log("Connected")
@@ -19,6 +20,7 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
     connect(env.DATABASE_LINK_CONNECTION)
         .then(() => {
             loadCache();
+            database.watch();
             shardsAndSockets.random()?.send({ type: "sendStaffData" });
             applicationCommands();
             ManagerReminder.load();

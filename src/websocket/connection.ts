@@ -174,24 +174,6 @@ export default (socket: Socket) => {
         })
     })
 
-    socket.on("getGuild", (guildId: string, callback: CallbackType) => {
-
-        return callback(null)
-        // if (!guildId) return callback(null)
-
-        shardsAndSockets
-            .forEach(socket => {
-                socket
-                    .timeout(10000)
-                    .emitWithAck("getGuild", guildId)
-                    .then(data => {
-                        if (data) callback(data)
-                    })
-                    .catch(() => callback(null))
-            })
-        return
-    })
-
     socket.on("postMessageWithReply", (data: MessageSaphireRequest, callback: CallbackType) => postmessagewithreply(data, callback))
     socket.on("getAllGuilds", (_: any, callback: CallbackType) => callback(allGuilds.map((data, id) => ({ name: data.name, id }))))
 
