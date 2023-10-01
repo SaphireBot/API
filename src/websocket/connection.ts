@@ -4,7 +4,7 @@ import { Socket } from "socket.io";
 import { staffs } from "../site";
 import { env } from "process";
 import postmessage from "./functions/postmessage";
-import getCache, { ranking, users } from "./cache/get.cache";
+import getCache, { users } from "./cache/get.cache";
 import getMultipleCache from "./cache/multiple.cache";
 // import refreshCache from "./cache/update.cache";
 import deleteCache from "./cache/delete.cache";
@@ -182,7 +182,6 @@ export default (socket: Socket) => {
     socket.on("getCache", (data: GetAndDeleteCacheType, callback: CallbackType) => getCache(data?.id, data?.type, callback))
     socket.on("getMultipleCache", (data: GetMultiplecacheDataType, callback: CallbackType) => getMultipleCache(data?.ids, data?.type, callback))
     socket.on("getApplicationCommands", (_, callback: CallbackType) => callback(applicationCommands.toJSON()))
-    socket.on("getBalance", (userId: string, callback: CallbackType) => callback(ranking.get(userId)))
 
     // Shards
     socket.on("getShardsData", (_: any, callback: CallbackType) => callback(Object.fromEntries(shards.entries())))

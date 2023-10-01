@@ -235,12 +235,12 @@ export interface GuildsThroughShards {
 
 export interface GetAndDeleteCacheType {
   id: string | undefined
-  type: "user" | "guild" | "client" | undefined
+  type: "user" | "guild" | "client" | "ranking" | undefined
 }
 
 export interface GetMultiplecacheDataType {
   ids: string[] | undefined
-  type: "user" | "guild" | undefined
+  type: "user" | "guild" | "ranking" | undefined
 }
 
 export interface RefreshCache {

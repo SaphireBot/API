@@ -1,11 +1,14 @@
-import { Collection } from "discord.js";
 import { CallbackType } from "../../@types";
-import { users, guilds } from "./get.cache";
-import { GuildSchema } from "../../database/model/guilds";
-import { UserSchema } from "../../database/model/user";
+import { users, guilds, ranking } from "./get.cache";
 
-export default (ids: string[] | undefined, type: "user" | "guild" | undefined, callback: CallbackType): void => {
+export default (ids: string[] | undefined, type: "user" | "guild" | "ranking" | undefined, callback: CallbackType): void => {
     if (!ids?.length || !type) return callback([])
-    const cache: Collection<string, UserSchema | GuildSchema | undefined> = type == "user" ? users : guilds
-    return callback(cache.getMany(ids).toJSON().filter(Boolean))
+
+    const cache = type === "ranking"
+        ? ranking
+        : type === "user"
+            ? users
+            : guilds
+
+    return callback(cache.getMany(ids).toJSON())
 }

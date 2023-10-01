@@ -33,6 +33,9 @@ export default async (id: string | undefined, type: "user" | "guild" | "client" 
         return callback(userData)
     }
 
+    if (type == "ranking")
+        return callback(ranking.get(id));
+
     if (type == "client") {
         const data = client.get(id)
         if (data) return callback(data)
