@@ -4,7 +4,7 @@ import guild from "./model/guilds";
 import reminder from "./model/reminder";
 import user from "./model/user";
 import blacklist from "./model/blacklist"
-import { guilds, users, client as clientCache } from "../websocket/cache/get.cache";
+import { guilds, users, client as clientCache, ranking } from "../websocket/cache/get.cache";
 import { Types } from "mongoose";
 
 export default new class Database {
@@ -71,9 +71,16 @@ export default new class Database {
                         const ids = Array.from(new Set(userIds.splice(0)))
                         const documents = await user.find({ _id: { $in: ids } })
 
-                        for await (const doc of documents)
+                        for await (const doc of documents) {
                             if (doc?.id)
                                 users.set(doc.id, doc.toObject())
+
+                            const data = ranking.get(doc?.id)
+                            if (data) {
+                                data.balance = doc?.Balance || 0
+                                ranking.set(doc.id, data);
+                            }
+                        }
 
                     }, 1000)
                     return

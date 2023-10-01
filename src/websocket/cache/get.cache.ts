@@ -7,8 +7,9 @@ import { ClientSchema } from "../../database/model/client";
 export const users = new Collection<string, UserSchema>();
 export const guilds = new Collection<string, GuildSchema>();
 export const client = new Collection<string, ClientSchema>();
+export const ranking = new Collection<string, { balance: number, position: number }>()
 
-export default async (id: string | undefined, type: "user" | "guild" | "client" | undefined, callback: CallbackType): Promise<void> => {
+export default async (id: string | undefined, type: "user" | "guild" | "client" | "ranking" | undefined, callback: CallbackType): Promise<void> => {
 
     if (!id || !type) return callback(null)
 
