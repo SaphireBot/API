@@ -209,7 +209,11 @@ export default new class ReminderManager {
 
         return await Database.Reminder.findOneAndUpdate(
             { id: reminderId },
-            { Time: definedTime, DateNow: Date.now(), Alerted: false },
+            {
+                $set: {
+                    Time: definedTime, DateNow: Date.now(), Alerted: false
+                }
+            },
             { new: true }
         )
             .then(doc => {

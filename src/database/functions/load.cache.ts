@@ -28,7 +28,7 @@ async function refreshRanking() {
         .sort({ "Balance": "descending" })
 
     for (let i = 0; i < data.length; i++)
-        ranking.set(data[i]?.id, { balance: data[i]?.Balance || 0, position: i + 1 })
+        ranking.set(data[i]?.id, { id: data[i]?.id, balance: data[i]?.Balance || 0, position: i + 1 })
 
     setTimeout(() => refreshRanking(), 1000 * 60 * 10)
     return
