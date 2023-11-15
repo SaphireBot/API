@@ -6,6 +6,18 @@ import user from "./model/user";
 import blacklist from "./model/blacklist"
 import { guilds, users, client as clientCache, ranking } from "../websocket/cache/get.cache";
 import { Types } from "mongoose";
+import { createClient } from "redis";
+import { env } from "process";
+const redis = createClient({
+    password: env.REDIS_USER_PASSWORD,
+    socket: {
+        host: env.REDIS_SOCKET_HOST_URL,
+        port: Number(env.REDIS_SOCKET_HOST_PORT)
+    }
+});
+
+redis.connect();
+redis.on("error", err => console.log("REDIS ERROR", err));
 
 export default new class Database {
     Client: typeof client
@@ -43,9 +55,13 @@ export default new class Database {
                         const ids = Array.from(new Set(guildIds.splice(0)))
                         const documents = await guild.find({ _id: { $in: ids } })
 
-                        for await (const doc of documents)
+                        await Promise.all(documents.map(d => redis.json.set(d.id, "$", d.toObject())));
+                        await Promise.all(documents.map(d => redis.expire(d.id, 5 * 60)));
+                        
+                        for await (const doc of documents) {
                             if (doc?.id)
                                 guilds.set(doc.id, doc.toObject())
+                        }
                     }, 1000)
                     return
                 }
@@ -71,6 +87,9 @@ export default new class Database {
                         const ids = Array.from(new Set(userIds.splice(0)))
                         const documents = await user.find({ _id: { $in: ids } })
 
+                        await Promise.all(documents.map(d => redis.json.set(d.id, "$", d.toObject())));
+                        await Promise.all(documents.map(d => redis.expire(d.id, 5 * 60)));
+
                         for await (const doc of documents) {
                             if (doc?.id)
                                 users.set(doc.id, doc.toObject())
@@ -89,6 +108,7 @@ export default new class Database {
                 if (change.operationType === "delete") {
                     const data = users.find(value => value._id?.toString() == change.documentKey._id.toString())
                     if (!data?.id) return;
+                    await redis.json.del(data.id);
                     return guilds.delete(data?.id);
                 }
             })
@@ -98,12 +118,17 @@ export default new class Database {
 
                 if (["update", "insert"].includes(change.operationType)) {
                     const data = await this.Client.findById(change.documentKey._id)
+                    if (!data?.id) return;
                     if (data?.id) clientCache.set(data.id, data.toObject())
+
+                    await redis.json.set(data.id, "$", data.toObject());
+                    await redis.expire(data.id, 5 * 60);
                 }
 
                 if (change.operationType === "delete") {
                     const data = clientCache.find(value => value._id?.toString() == change.documentKey._id.toString())
                     if (!data?.id) return;
+                    await redis.json.del(data?.id, "$");
                     return clientCache.delete(data?.id);
                 }
             })

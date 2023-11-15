@@ -4,9 +4,9 @@
   "description": "Saphire API",
   "main": "dist",
   "scripts": {
+    "compiler": "tsc -w",
     "start": "node .",
-    "build": "tsc",
-    "start:test": "ts-node-test src"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "parse-ms": "^2.1.0",
     "qs": "^6.11.2",
     "quick.db": "^9.1.7",
+    "redis": "^4.6.10",
     "socket.io": "^4.7.1",
     "undici": "^5.22.1"
   },
