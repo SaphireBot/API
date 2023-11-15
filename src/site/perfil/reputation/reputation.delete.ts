@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import Database from "../../../database";
-import { users } from "../../../websocket/cache/get.cache";
+import Database, { redis } from "../../../database";
 import { siteSocket } from "../../../websocket/connection";
 import { UserSchema } from "../../../database/model/user";
 
@@ -21,11 +20,11 @@ export default async (req: Request, res: Response) => {
     if (!from || !date || !userId || !requesting)
         return res.status(400).send({ type: "error", message: "Date, From, UserId, Requesting field is missing" })
 
-    const userdata = users.get(userId) || await Database.User.findOne({ id: userId }) as UserSchema
+    const userdata = await redis.json.get(userId) || await Database.User.findOne({ id: userId }) as UserSchema
     if (!userdata) return res.send({ type: "notfound", message: "Nenhum usuário foi encontrado." })
 
-    const reputation = userdata?.Perfil?.Reputation?.find(rep => rep?.date == date)
-    if (!reputation) return res.send({ type: "notfound", message: "Esta reputação não foi encontrada.", reputations: userdata?.Perfil?.Reputation || [] })
+    const reputation = (userdata as any)?.Perfil?.Reputation?.find((rep: any) => rep?.date == date)
+    if (!reputation) return res.send({ type: "notfound", message: "Esta reputação não foi encontrada.", reputations: (userdata as any)?.Perfil?.Reputation || [] })
 
     /**
      * Can delete any reputation in own profile
@@ -42,8 +41,6 @@ export default async (req: Request, res: Response) => {
             { upsert: true, new: true }
         )
             .then(doc => {
-                users.set(doc?.id, doc.toObject())
-
                 siteSocket?.emit("reputation", { userId, reputations: doc?.Perfil?.Reputation || [] })
                 siteSocket?.emit("notification", { userId, message: "Você perdeu uma <a href='https://saphire.one/perfil'>reputação</a>" })
                 return res.send({

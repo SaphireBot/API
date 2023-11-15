@@ -4,7 +4,7 @@ import { Socket } from "socket.io";
 import { staffs } from "../site";
 import { env } from "process";
 import postmessage from "./functions/postmessage";
-import getCache, { users } from "./cache/get.cache";
+import getCache, { set } from "./cache/get.cache";
 import getMultipleCache from "./cache/multiple.cache";
 // import refreshCache from "./cache/update.cache";
 import deleteCache from "./cache/delete.cache";
@@ -17,9 +17,10 @@ import ManagerReminder from "../reminder/manager.reminder";
 import { ReminderType } from "../@types/reminder";
 import getSocial from "../site/social.get";
 import getDescription from "../site/description.get";
-import Database from "../database";
+import Database, { redis } from "../database";
 import Blacklist from "../blacklist/manager"
 import { ws } from "../server";
+import { UserSchema } from "../database/model/user";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -69,14 +70,16 @@ export default (socket: Socket) => {
 
         socket.on("transactions", async (userId: string, callback: CallbackType) => {
 
-            const userData = users.get(userId) || await Database.User.findOne({ id: userId }).then(doc => doc?.toObject())
+            let data = (await redis.json.get(userId) as any) as UserSchema | any;
 
-            if (userData && !users.has(userId))
-                users.set(userId, userData)
+            if (!data) {
+                data = await Database.User.findOne({ id: userId });
+                if (data?.id) set(data.id, data?.toObject());
+            }
 
             return callback({
-                Transactions: userData?.Transactions || [],
-                Balance: userData?.Balance || 0
+                Transactions: data?.Transactions || [],
+                Balance: data?.Balance || 0
             })
 
         })

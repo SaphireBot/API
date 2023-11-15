@@ -1,10 +1,7 @@
-import { users, guilds } from "./get.cache"
+import { redis } from "../../database"
 
-export default (id: string | undefined, to: "user" | "guild" | undefined) => {
-
-    if (!id || !to) return
-
-    if (to == "guild") guilds.delete(id)
-    if (to == "user") users.delete(id)
-    return
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default async (id: string | undefined, _: "user" | "guild" | undefined) => {
+    if (!id) return
+    return await redis.json.del(id, "$");
 }

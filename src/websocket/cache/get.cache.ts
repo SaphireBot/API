@@ -1,50 +1,38 @@
 import { Collection } from "discord.js";
 import { CallbackType } from "../../@types";
-import { GuildSchema } from "../../database/model/guilds";
-import { UserSchema } from "../../database/model/user";
-import database from "../../database";
-import { ClientSchema } from "../../database/model/client";
-export const users = new Collection<string, UserSchema>();
-export const guilds = new Collection<string, GuildSchema>();
-export const client = new Collection<string, ClientSchema>();
+// import { GuildSchema } from "../../database/model/guilds";
+// import { UserSchema } from "../../database/model/user";
+import database, { redis } from "../../database";
+// import { ClientSchema } from "../../database/model/client";
+// export const users = new Collection<string, UserSchema>();
+// export const guilds = new Collection<string, GuildSchema>();
+// export const client = new Collection<string, ClientSchema>();
 export const ranking = new Collection<string, { id: string, balance: number, position: number }>()
 
 export default async (id: string | undefined, type: "user" | "guild" | "client" | "ranking" | undefined, callback: CallbackType): Promise<void> => {
 
     if (!id || !type) return callback(null)
 
-    if (type == "guild") {
-        const data = guilds.get(id)
-        if (data) return callback(data)
+    if (type === "ranking") return callback(ranking.get(id));
 
-        const guildData = await database.Guild.findOne({ id }).then(doc => doc?.toObject())
-        if (guildData) guilds.set(id, guildData)
+    const cache = await redis.json.get(id);
+    if (cache) return callback(cache);
 
-        return callback(guildData)
-    }
+    let data: any = undefined;
 
-    if (type == "user") {
-        const data = users.get(id)
-        if (data) return callback(data)
+    if (type === "guild") data = await database.Guild.findOne({ id }).then(doc => doc?.toObject());
+    if (type === "user") data = await database.User.findOne({ id }).then(doc => doc?.toObject());
+    if (type === "client") data = await database.Client.findOne({ id }).then(doc => doc?.toObject());
 
-        const userData = await database.User.findOne({ id }).then(doc => doc?.toObject())
-        if (userData) users.set(id, userData)
+    if (!data) return callback({ id });
+    set(id, data);
+    return callback(data);
 
-        return callback(userData)
-    }
+}
 
-    if (type == "ranking")
-        return callback(ranking.get(id));
-
-    if (type == "client") {
-        const data = client.get(id)
-        if (data) return callback(data)
-
-        const clientData = await database.Client.findOne({ id }).then(doc => doc?.toObject())
-        if (clientData) client.set(id, clientData);
-
-        return callback(clientData)
-    }
-
-    return callback(null)
+export async function set(id: string | undefined, value: any) {
+    if (!id || !value) return;
+    await redis.json.set(id, "$", value);
+    await redis.expire(id, 5 * 60);
+    return;
 }

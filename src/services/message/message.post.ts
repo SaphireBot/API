@@ -6,7 +6,6 @@ import { env } from "process"
 import { Socket } from "socket.io"
 import { shardsAndSockets } from "../../websocket/connection"
 import Database from "../../database"
-import { guilds } from "../../websocket/cache/get.cache"
 import twitchCache from "../../websocket/cache/twitch.cache"
 import { Rest } from "../../index"
 export const messagesToSend = <MessageToSendSaphireData[]>[]
@@ -97,12 +96,11 @@ async function postMessage(data: MessageSaphireRequest | MessageToSendThroughWeb
                 && "LogType" in data
                 && [50001, 10003].includes(err.code as number)
             )
-                return await Database.Guild.findOneAndUpdate(
+                return await Database.Guild.updateOne(
                     { id: data.guildId },
                     { $unset: { [`LogSystem.${data.LogType}`]: true } },
                     { new: true, upsert: true }
                 )
-                    .then(doc => guilds.set(doc?.id, doc.toObject()))
 
             if (
                 data.isTwitchNotification

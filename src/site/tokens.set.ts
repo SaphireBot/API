@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { env } from "process";
 import { DiscordSnowflake } from "@sapphire/snowflake"
 import Database from "../database";
-import { users } from "../websocket/cache/get.cache";
 
 export default async (req: Request, res: Response) => {
 
@@ -22,8 +21,6 @@ export default async (req: Request, res: Response) => {
         { upsert: true, new: true }
     )
         .then(doc => {
-            users.set(doc?.id, doc.toObject())
-
             return res.send({
                 id: doc.id,
                 Balance: doc.Balance,

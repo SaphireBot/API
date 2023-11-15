@@ -1,11 +1,12 @@
 import { env } from "process"
-import Database from "../database"
+import Database, { redis } from "../database"
 import { messagesToSend } from "../services/message/message.post"
 import { ButtonStyle, parseEmoji, time } from "discord.js"
 import { TwitchLanguages } from "../json/data.json"
 import { FetchError, OauthToken, OauthValidade, OfflineStreamersToNotifier, RemoveChannelParams, StreamData, UpdateManyStreamerParams, UpdateStreamerParams, UserData } from "../@types/twitch"
 import { CallbackType } from "../@types"
-import { guilds } from "../websocket/cache/get.cache"
+import { set } from "../websocket/cache/get.cache"
+import { GuildSchema } from "../database/model/guilds"
 
 export default new class Twitch {
     streamers: string[] // ['alanzoka', 'cellbit', ...]
@@ -20,6 +21,7 @@ export default new class Twitch {
     onTimeout: boolean // If API Request is under 50 requests remaining
     notifications: number
     allGuildsID: number
+    guildsId: string[]
     awaitingRequests: number
     notificationInThisSeason: number
     rateLimit: {
@@ -44,6 +46,7 @@ export default new class Twitch {
         this.allGuildsID = 0
         this.awaitingRequests = 0
         this.notificationInThisSeason = 0
+        this.guildsId = []
         this.rateLimit = {
             MaxLimit: 800,
             remaining: 800,
@@ -126,8 +129,9 @@ export default new class Twitch {
             )
         ).flat().length
 
-        const guildsDocuments = guilds.filter((data) => Array.isArray(data?.TwitchNotifications))?.toJSON() || await Database.Guild.find({ TwitchNotifications: { $exists: true } }, "id TwitchNotifications").then(doc => doc.filter(d => d.TwitchNotifications.length && d.id)) || []
+        const guildsDocuments = await Database.Guild.find({ TwitchNotifications: { $exists: true } }, "id TwitchNotifications").then(doc => doc.filter(d => d.TwitchNotifications.length && d.id)) || []
         this.allGuildsID = guildsDocuments.length
+        this.guildsId = guildsDocuments.map(d => d.id)
 
         for (const { TwitchNotifications } of guildsDocuments)
             for (const { streamer, channelId, roleId, message } of TwitchNotifications) { // [..., { channelId: '123', streamer: 'alanzoka', roleId: '123' }, ...]
@@ -669,7 +673,14 @@ export default new class Twitch {
     async updateStreamer({ streamer, channelId, guildId }: UpdateStreamerParams, callback: CallbackType) {
 
         if (!streamer || !guildId || !channelId) return
-        const dataFromDatabase = guilds.get(guildId) || await Database.Guild.findOne({ id: guildId })
+        let dataFromDatabase = (await redis.json.get(guildId) as any) as GuildSchema | undefined;
+
+        if (!dataFromDatabase) {
+            const data = await Database.Guild.findOne({ id: guildId });
+            set(data?.id, data?.toObject());
+            if (data) dataFromDatabase = data;
+        }
+
         const notifications = dataFromDatabase?.TwitchNotifications || []
         const has = dataFromDatabase?.TwitchNotifications?.some(d => d?.streamer == streamer && d?.channelId == channelId)
         if (has) return callback("already")
@@ -680,12 +691,11 @@ export default new class Twitch {
 
         data.push({ streamer, channelId })
 
-        await Database.Guild.findOneAndUpdate(
+        await Database.Guild.updateOne(
             { id: guildId },
             { $set: { TwitchNotifications: data } },
-            { new: true, upsert: true }
+            { upsert: true }
         )
-            .then(doc => guilds.set(doc?.id, doc.toObject()))
 
         this.toCheckStreamers.push(streamer)
         if (!this.streamers.includes(streamer)) this.streamers.push(streamer)

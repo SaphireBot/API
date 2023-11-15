@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { env } from "process";
 // import { shardsAndSockets } from "../websocket/connection";
-import Database from "../database";
-import { users } from "../websocket/cache/get.cache";
+import Database, { redis } from "../database";
 import { UserSchema } from "../database/model/user";
+import { set } from "../websocket/cache/get.cache";
 
 export default async (req: Request, res: Response) => {
 
@@ -31,9 +31,16 @@ export default async (req: Request, res: Response) => {
         return
     }
 
-    const doc = users.get(userId) || await Database.User.findOne({ id: userId })
+    let doc = await redis.json.get(userId) as any;
+
+    if (!doc) {
+        const d = await Database.User.findOne({ id: userId });
+        if (d?.id) set(d?.id, d);
+        doc = d;
+    }
+
     if (!doc) return res.send({ message: "Nenhuma informação foi encontrada no banco de dados." })
-    if (doc?.id) users.set(doc?.id, doc as UserSchema)
+
     if (!fields) return res.send(doc)
 
     const userData: Record<string, any> = {}
