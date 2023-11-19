@@ -77,9 +77,6 @@ export default new class Database {
                         const ids = Array.from(new Set(userIds.splice(0)))
                         const documents = await user.find({ _id: { $in: ids } })
 
-                        await Promise.all(documents.map(d => redis.json.set(d.id, "$", d.toObject())));
-                        await Promise.all(documents.map(d => redis.expire(d.id, 5 * 60)));
-
                         for await (const doc of documents) {
                             if (doc?.id) set(doc.id, doc.toObject());
 

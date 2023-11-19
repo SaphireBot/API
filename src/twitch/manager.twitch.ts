@@ -1,11 +1,11 @@
 import { env } from "process"
-import Database, { redis } from "../database"
+import Database from "../database"
 import { messagesToSend } from "../services/message/message.post"
 import { ButtonStyle, parseEmoji, time } from "discord.js"
 import { TwitchLanguages } from "../json/data.json"
 import { FetchError, OauthToken, OauthValidade, OfflineStreamersToNotifier, RemoveChannelParams, StreamData, UpdateManyStreamerParams, UpdateStreamerParams, UserData } from "../@types/twitch"
 import { CallbackType } from "../@types"
-import { set } from "../websocket/cache/get.cache"
+import { get, set } from "../websocket/cache/get.cache"
 import { GuildSchema } from "../database/model/guilds"
 
 export default new class Twitch {
@@ -673,7 +673,7 @@ export default new class Twitch {
     async updateStreamer({ streamer, channelId, guildId }: UpdateStreamerParams, callback: CallbackType) {
 
         if (!streamer || !guildId || !channelId) return
-        let dataFromDatabase = (await redis.json.get(guildId) as any) as GuildSchema | undefined;
+        let dataFromDatabase = await get(guildId) as GuildSchema | undefined;
 
         if (!dataFromDatabase) {
             const data = await Database.Guild.findOne({ id: guildId });

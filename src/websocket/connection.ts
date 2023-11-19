@@ -4,7 +4,7 @@ import { Socket } from "socket.io";
 import { staffs } from "../site";
 import { env } from "process";
 import postmessage from "./functions/postmessage";
-import getCache, { set } from "./cache/get.cache";
+import getCache, { get, set } from "./cache/get.cache";
 import getMultipleCache from "./cache/multiple.cache";
 // import refreshCache from "./cache/update.cache";
 import deleteCache from "./cache/delete.cache";
@@ -17,7 +17,7 @@ import ManagerReminder from "../reminder/manager.reminder";
 import { ReminderType } from "../@types/reminder";
 import getSocial from "../site/social.get";
 import getDescription from "../site/description.get";
-import Database, { redis } from "../database";
+import Database from "../database";
 import Blacklist from "../blacklist/manager"
 import { ws } from "../server";
 import { UserSchema } from "../database/model/user";
@@ -70,7 +70,7 @@ export default (socket: Socket) => {
 
         socket.on("transactions", async (userId: string, callback: CallbackType) => {
 
-            let data = (await redis.json.get(userId) as any) as UserSchema | any;
+            let data = await get(userId) as UserSchema | any;
 
             if (!data) {
                 data = await Database.User.findOne({ id: userId });

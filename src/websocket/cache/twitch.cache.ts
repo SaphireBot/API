@@ -1,5 +1,4 @@
-import Database, { redis } from "../../database"
-import { GuildSchema } from "../../database/model/guilds"
+import Database from "../../database"
 import ManagerTwitch from "../../twitch/manager.twitch"
 import { set } from "./get.cache"
 
@@ -16,10 +15,7 @@ export default async (channelId: string | undefined) => {
         { $pull: { TwitchNotifications: { channelId } } }
     )
 
-    const guilds = (
-        await redis.json.mGet(ManagerTwitch.guildsId, "$",) as any
-        || await Database.Guild.find({ id: { $in: ManagerTwitch.guildsId } })
-    ) as GuildSchema[];
+    const guilds = await Database.Guild.find({ id: { $in: ManagerTwitch.guildsId } });
 
     guilds
         .forEach(data => {

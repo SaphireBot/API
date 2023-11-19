@@ -1,6 +1,6 @@
 import { CallbackType } from "../../@types";
-import database, { redis } from "../../database";
-import { ranking, set } from "./get.cache";
+import database from "../../database";
+import { mGet, ranking, set } from "./get.cache";
 
 export default async (ids: string[] | undefined, type: "user" | "guild" | "ranking" | undefined, callback: CallbackType) => {
     if (!ids?.length || !type) return callback([])
@@ -8,14 +8,14 @@ export default async (ids: string[] | undefined, type: "user" | "guild" | "ranki
     if (type === "ranking")
         return callback(ranking.getMany(ids).toJSON());
 
-    let cache = await redis.json.mGet(ids, "$") as any[];
+    let cache = await mGet(ids);
 
     if (!cache?.length) {
         cache = type === "user"
             ? await database.User.find({ id: { $in: ids } })
             : await database.Guild.find({ id: { $in: ids } })
 
-        for (const d of cache) set(d?.id, d);
+        for (const doc of cache) set(doc?.id, doc);
     }
 
     return callback(cache)
