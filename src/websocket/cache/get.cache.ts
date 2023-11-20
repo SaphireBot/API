@@ -1,6 +1,6 @@
 import { Collection } from "discord.js";
 import { CallbackType } from "../../@types";
-import database, { redis } from "../../database";
+import database, { RedisRanking, redis } from "../../database";
 export const ranking = new Collection<string, { id: string, balance: number, position: number }>()
 
 export default async (id: string | undefined, type: "user" | "guild" | "client" | "ranking" | undefined, callback: CallbackType): Promise<void> => {
@@ -25,23 +25,25 @@ export default async (id: string | undefined, type: "user" | "guild" | "client" 
 }
 
 export async function set(key: string | undefined, value: any) {
+    if (typeof key !== "string" || !value) return;
 
-    if (!key || !value) return;
+    if (value?.Balance > 0)
+        await RedisRanking.zAdd("balance", [{ score: value.Balance, value: key }])
 
-    if ("toObject" in value) {
-        await redis.set(key, JSON.stringify(value.toObject()), { "EX": 5 * 60 })
-    } else await redis.set(key, JSON.stringify(value), { "EX": 5 * 60 })
+    await redis.json.set(
+        key,
+        "$",
+        "toObject" in value ? value.toObject() : value
+    )
 
-    return;
+    return await redis.expire(key, 60 * 5);
 }
 
 export async function get(key: string): Promise<any> {
-    const data = await redis.get(key) || "{}";
-    if (typeof data !== "string") return {};
-    return JSON.parse(data) as any
+    const data = await redis.json.get(key)
+    return data as any
 }
 
-export async function mGet(keys: string[]): Promise<any> {
-    return (await redis.mGet(keys) || ["{}"])
-        .map(d => JSON.parse(d || "{}")) as any[]
+export async function mGet(keys: string[]): Promise<any[]> {
+    return (await redis.json.mGet(keys, "$") as any[]);
 }

@@ -62,6 +62,9 @@ declare global {
       TWITCH_CLIENT_SECRET: string
       SERVER_BUG_REPORT: string
       REQUESTER1: string
+      REDIS_RANKING_PASSWORD: string
+      REDIS_RANKING_HOST_URL: string
+      REDIS_RANKING_HOST_PORT: string
     }
   }
 
