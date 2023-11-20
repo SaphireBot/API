@@ -25,6 +25,7 @@ export default async (id: string | undefined, type: "user" | "guild" | "client" 
 }
 
 export async function set(key: string | undefined, value: any) {
+
     if (!key || !value) return;
 
     if ("toObject" in value) {

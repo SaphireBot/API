@@ -99,9 +99,10 @@ export default new class Database {
                 if (["update", "insert"].includes(change.operationType)) {
                     const data = await this.Client.findById(change.documentKey._id);
                     if (!data?.id) return;
-                    if (data?.id) set(data.id, data.toObject());
+                    return set(data.id, data.toObject());
                 }
 
+                return;
             })
     }
 }
