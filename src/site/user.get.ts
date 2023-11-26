@@ -33,14 +33,13 @@ export default async (req: Request, res: Response) => {
 
     let doc = await get(userId) as any;
 
-    if ((!("id" in doc))) {
+    if (!doc?.id) {
         const document = await Database.User.findOne({ id: userId });
         if (document?.id) set(document?.id, document);
         doc = document?.toObject();
     }
 
-    if (!doc) return res.send({ message: "Nenhuma informação foi encontrada no banco de dados." })
-
+    if (!doc?.id) return res.send({ message: "Nenhuma informação foi encontrada no banco de dados." })
     if (!fields) return res.send(doc)
 
     const userData: Record<string, any> = {}

@@ -5,6 +5,7 @@ import "./services";
 import "./webhooks";
 import "./routes";
 import "./websocket";
+import "./site"
 import listen from "./webhooks/listen";
 import { server, httpServer } from "./server";
 import { env } from "process";

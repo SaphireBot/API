@@ -203,12 +203,20 @@ export interface notifyData {
 }
 
 export interface TransactionsNotificationSite {
-  value: number
   userId: string
-  transaction: {
-    time: string
-    data: string
-  }
+  value: number,
+  method: "add" | "sub" | "set",
+  transaction: TransactionsType
+}
+
+export interface TransactionsType {
+  createdAt: Date
+  value: number
+  type: string
+  method: string
+  mode: string
+  userIdentify?: string;
+  keywordTranslate: string
 }
 
 export interface CallbackType {

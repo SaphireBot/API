@@ -10,11 +10,11 @@ const tokens = [
 
 export default async (req: Request, res: Response) => {
 
-    const id = req.query.id as string | string[]
+    const id = (req.query.id || req.path?.split("/")?.pop()) as string | string[]
     const token = () => tokens[Math.floor(Math.random() * tokens.length)]
+    if (!id) return res.send([]);
 
     if (Array.isArray(id)) return await fetcher()
-
     const cached = await RedisUsers.json.get(id)
     if (cached) return res.send([cached]);
 

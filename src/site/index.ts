@@ -18,7 +18,8 @@ import commandsdata from "./commandsdata";
 export const staffs = new Collection<string, staffData>();
 
 server.get("/staffs", staffGet);
-server.get("/getusers/", getUsers);
+server.get("/getusers", getUsers);
+server.get("/getusers/:id", getUsers);
 server.get("/users/:CreatedBy/:Sponsor", usersGet);
 server.get("/user/:userId", userGet);
 server.get("/giveaway/:guildId/:giveawayId", giveawayGet);
