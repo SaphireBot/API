@@ -65,6 +65,9 @@ declare global {
       REDIS_RANKING_PASSWORD: string
       REDIS_RANKING_HOST_URL: string
       REDIS_RANKING_HOST_PORT: string
+      REDIS_USER_CACHE_PASSWORD: string
+      REDIS_USER_CACHE_HOST_URL: string
+      REDIS_USER_CACHE_HOST_PORT: string
     }
   }
 

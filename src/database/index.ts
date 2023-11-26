@@ -4,6 +4,7 @@ import guild from "./model/guilds";
 import reminder from "./model/reminder";
 import user from "./model/user";
 import blacklist from "./model/blacklist"
+import vote from "./model/vote"
 import { ranking, set } from "../websocket/cache/get.cache";
 import { Types } from "mongoose";
 import { createClient } from "redis";
@@ -29,6 +30,16 @@ export const RedisRanking = createClient({
 RedisRanking.connect();
 RedisRanking.on("error", err => console.log("REDIS RANKING ERROR", err));
 
+export const RedisUsers = createClient({
+    password: env.REDIS_USER_CACHE_PASSWORD,
+    socket: {
+        host: env.REDIS_USER_CACHE_HOST_URL,
+        port: Number(env.REDIS_USER_CACHE_HOST_PORT)
+    }
+});
+RedisUsers.connect();
+RedisUsers.on("error", err => console.log("REDIS USER ERROR", err));
+
 export default new class Database {
     Client: typeof client
     Cache: typeof cache
@@ -36,6 +47,7 @@ export default new class Database {
     User: typeof user
     Reminder: typeof reminder
     Blacklist: typeof blacklist
+    Vote: typeof vote
 
     constructor() {
         this.Client = client
@@ -44,6 +56,7 @@ export default new class Database {
         this.User = user
         this.Reminder = reminder
         this.Blacklist = blacklist
+        this.Vote = vote
     }
 
     watch() {

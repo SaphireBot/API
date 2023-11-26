@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { env } from "process";
-import { APIUser, Collection } from "discord.js";
-const cache = new Collection<string, APIUser>()
+import { APIUser } from "discord.js";
+import { RedisUsers } from "../database";
 const tokens = [
     env.BOT_TOKEN_REQUEST,
     env.BOT_USERS_TOKEN_REQUEST,
@@ -13,10 +13,10 @@ export default async (req: Request, res: Response) => {
     const id = req.query.id as string | string[]
     const token = () => tokens[Math.floor(Math.random() * tokens.length)]
 
-    if (Array.isArray(id)) return fetcher()
+    if (Array.isArray(id)) return await fetcher()
 
-    if (cache.has(id))
-        return res.send([cache.get(id)])
+    const cached = await RedisUsers.json.get(id)
+    if (cached) return res.send([cached]);
 
     await fetch(
         `https://discord.com/api/v10/users/${id}`,
@@ -31,17 +31,21 @@ export default async (req: Request, res: Response) => {
 
     async function fetcher() {
 
-        const ids = Array.from(new Set(id.slice(0, 10)))
+        const ids = Array.from(new Set(id.slice(0, 40)))
         let gets = 0
         const usersData: APIUser[] = []
 
+        const data = ((await RedisUsers.json.mGet(ids, "$") as any) as APIUser[][])?.flat()?.filter(d => d?.id);
+        if (data?.length)
+            for (const d of data)
+                if (d?.id)
+                    usersData.push(d)
+
         for (const userId of ids) {
 
-            const cached = cache.get(userId)
-            if (cached) {
-                usersData.push(cached)
-                verifyAndSend()
-                continue
+            if (usersData.some(d => d.id === userId)) {
+                verifyAndSend();
+                continue;
             }
 
             fetch(
@@ -57,18 +61,19 @@ export default async (req: Request, res: Response) => {
                 .catch(() => verifyAndSend())
 
         }
+
         function verifyAndSend() {
             gets++
             if (gets !== ids?.length) return
-            return res.send(usersData)
+            return res.send(usersData);
         }
 
     }
 
-    function set(data: APIUser | undefined) {
-        if (!data?.id) return
-        if (!cache.has(data?.id)) setTimeout(() => cache.delete(data?.id), 1000 * 60 * 60)
-        cache.set(data?.id, data)
-        return
+    async function set(data: APIUser | undefined) {
+        if (!data?.id) return;
+        await RedisUsers.json.set(data.id, "$", { ...data });
+        await RedisUsers.expire(data.id, 86400);
+        return;
     }
 }
