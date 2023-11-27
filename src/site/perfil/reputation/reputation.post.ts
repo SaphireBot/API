@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import Database from "../../../database";
-import managerTwitch from "../../../twitch/manager.twitch";
 import { siteSocket } from "../../../websocket/connection";
 import { UserSchema } from "../../../database/model/user";
 import { get, set } from "../../../websocket/cache/get.cache";
@@ -24,7 +23,7 @@ export default async (req: Request<{ from: string | undefined, text: string | un
 
     const remaingDate = (((userdata?.Timeouts?.Reputation || 0) + (1000 * 60 * 60 * 2)) - dateNow)
     if (remaingDate > 0)
-        return res.status(400).send({ status: 200, type: "timeout", message: `Você só pode mandar outra requisição em ${managerTwitch.stringDate(remaingDate)}` })
+        return res.status(400).send({ status: 200, type: "timeout", message: "Você só pode mandar outra requisição dentro de duas horas" })
 
     const saved = {
         from: false,
@@ -63,7 +62,7 @@ export default async (req: Request<{ from: string | undefined, text: string | un
     return res.status(200).send({
         status: 200,
         type: "success",
-        message: `Muito bem! Você pode enviar outra reputação em ${managerTwitch.stringDate(1000 * 60 * 60 * 2)}`,
+        message: "Muito bem! Você pode enviar outra reputação em duas horas",
         reputations
     })
 }

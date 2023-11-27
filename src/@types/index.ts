@@ -4,7 +4,6 @@ import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
 import { Request, Response } from "express"
 import { Socket } from "socket.io";
-import { RemoveChannelParams, UpdateManyStreamerParams, UpdateStreamerParams } from "./twitch";
 import { ReminderType } from "./reminder";
 import { GuildSchema } from "../database/model/guilds";
 import { UserSchema } from "../database/model/user";
@@ -31,7 +30,6 @@ export interface MessageSaphireRequest {
   method: string | null
   channelId: string | null
   messageId?: string | null
-  isTwitchNotification?: boolean | undefined
   body?: any
   isReminder?: boolean
   components?: APIMessageComponent[] | []
@@ -49,7 +47,6 @@ export interface MessageToSendThroughWebsocket {
   authorization: string
   isWebsocket: boolean
   isReminder?: boolean
-  isTwitchNotification: boolean | undefined
   LogType: string | undefined
 }
 export interface MessageToSendSaphireData {
@@ -157,7 +154,7 @@ export interface SaphireApiDataResponse {
 }
 
 export interface WebsocketMessageRecieveData {
-  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "removeChannelFromTwitchManager" | "AfkGlobalSystem" | "siteStaffData" | "updateManyStreamers" | "removeChannel" | "transactions" | "notification" | "chatMessage" | "ApplicationCommandData" | "postReminder" | "removeReminder" | "updateReminder" | "removeReminders" | "refreshReminder" | "refreshIDBlacklist" | "clearIDBlacklist" | undefined
+  type: "registerCommand" | "addInteraction" | "addMessage" | "apiCommandsData" | "guildCreate" | "guildDelete" | "shardStatus" | "updateCache" | "postMessage" | "deleteCache" | "AfkGlobalSystem" | "siteStaffData" | "updateManyStreamers" | "removeChannel" | "transactions" | "notification" | "chatMessage" | "ApplicationCommandData" | "postReminder" | "removeReminder" | "updateReminder" | "removeReminders" | "refreshReminder" | "refreshIDBlacklist" | "clearIDBlacklist" | undefined
   message: string | undefined
   shardId: number | undefined
   commandName: string | undefined
@@ -173,9 +170,6 @@ export interface WebsocketMessageRecieveData {
   userId: string
   method: "save" | "delete"
   staffData: staffData[]
-  updateTwitchStreamer: UpdateStreamerParams
-  updateManyTwitchStreamer: UpdateManyStreamerParams
-  channelData: RemoveChannelParams
   transactionsData: TransactionsNotificationSite
   notifyData: notifyData
   chatMessage: ChatMessage

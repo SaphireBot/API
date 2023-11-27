@@ -22,7 +22,7 @@ server.get("/getusers", getUsers);
 server.get("/getusers/:id", getUsers);
 server.get("/users/:CreatedBy/:Sponsor", usersGet);
 server.get("/user/:userId", userGet);
-server.get("/giveaway/:guildId/:giveawayId", giveawayGet);
+server.get("/giveaway/:giveawayId", giveawayGet);
 server.get("/clientdata", clientGet);
 server.get("/status", statusGet);
 server.get("/home", (_, res) => res.send({ guilds: allGuilds.size, commands: apiCommandsData.size, interactions: interactions.count }));

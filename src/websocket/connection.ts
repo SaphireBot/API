@@ -6,15 +6,9 @@ import { env } from "process";
 import postmessage from "./functions/postmessage";
 import getCache, { get, set } from "./cache/get.cache";
 import getMultipleCache from "./cache/multiple.cache";
-// import refreshCache from "./cache/update.cache";
 import deleteCache from "./cache/delete.cache";
-import twitchCache from "./cache/twitch.cache";
 import postAfk from "./functions/postafk";
 import postmessagewithreply from "./functions/postmessagewithreply";
-import ManagerTwitch from "../twitch/manager.twitch";
-import { UpdateStreamerParams } from "../@types/twitch";
-import ManagerReminder from "../reminder/manager.reminder";
-import { ReminderType } from "../@types/reminder";
 import getSocial from "../site/social.get";
 import getDescription from "../site/description.get";
 import Database from "../database";
@@ -139,34 +133,10 @@ export default (socket: Socket) => {
                 ws.send({ type: "blacklistRemove", id: data.id });
                 break;
 
-            // Reminder Section
-            case "postReminder": ManagerReminder.save(data.reminderData as ReminderType, undefined); break;
-            case "removeReminder": ManagerReminder.remove(data.id); break;
-            case "updateReminder": ManagerReminder.start(data.reminderData); break;
-            case "removeReminders": ManagerReminder.removeMany(data.remindersToRemove); break;
-            // ----------------
-
-            // Twitch Section
-            case "updateManyStreamers": ManagerTwitch.updateManyStreamer(data.updateManyTwitchStreamer); break;
-            case "removeChannel": ManagerTwitch.removeChannel(data.channelData); break;
-            case "removeChannelFromTwitchManager": twitchCache(data.id); break;
-            // --------------
             default: console.log(data); break;
         }
         return
     })
-
-    // Twitch Section
-    socket.on("updateStreamer", (data: UpdateStreamerParams, callback: CallbackType) => ManagerTwitch.updateStreamer(data, callback))
-    socket.on("twitchFetcher", async (url: string, callback: CallbackType) => callback(await ManagerTwitch.fetcher(url)))
-    socket.on("twitchdata", (_, callback: CallbackType) => callback({
-        notifications: ManagerTwitch.notifications,
-        streamersOffline: ManagerTwitch.streamersOffline,
-        streamersOnline: ManagerTwitch.streamersOnline,
-        allGuildsID: ManagerTwitch.allGuildsID,
-        awaitingRequests: ManagerTwitch.awaitingRequests
-    }))
-    // --------------
 
     socket.on("ping", (_, callback: CallbackType) => callback("pong"))
     socket.on("getSaphireData", (data: any, callback: CallbackType) => {
@@ -188,25 +158,6 @@ export default (socket: Socket) => {
 
     // Shards
     socket.on("getShardsData", (_: any, callback: CallbackType) => callback(Object.fromEntries(shards.entries())))
-
-    // Reminder
-    socket.on("getReminder", (reminderId: string, callback: CallbackType) => ManagerReminder.get(reminderId, callback))
-    socket.on("postReminder", (data: ReminderType, callback: CallbackType) => ManagerReminder.save(data, callback))
-    socket.on("moveReminder", (data: any, callback: CallbackType) => ManagerReminder.move(data?.reminderId, data?.guildId, data?.channelId, callback))
-    socket.on("refreshReminder", (reminder: ReminderType, callback: CallbackType) => ManagerReminder.refresh(reminder, callback))
-    socket.on("getReminders", (userId: string, callback: CallbackType) => {
-        const data = ManagerReminder
-            .allReminders
-            .filter(rm => rm?.userId == userId)
-            .toJSON()
-            .map(rm => {
-                rm.timeout = false
-                return rm
-            })
-
-        return callback(data)
-    })
-    //---------
 
     // Blacklist
     socket.on("getAllBlacklist", (_, callback: CallbackType) => Blacklist.all(callback))

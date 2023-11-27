@@ -4,17 +4,17 @@ import { GiveawayResponseData } from "../@types";
 
 export default (req: Request, res: Response) => {
 
-    const { giveawayId, guildId } = req.params
+    const { giveawayId } = req.params
 
-    if (!giveawayId || !guildId) return res.status(400).send({ message: "O ID do servidor ou do Sorteio não foram definidos corretamente." })
-    const timeout = setTimeout(() => res.status(404).send({ message: "O Discord demorou demais para entregar os participantes do sorteio." }), 1000 * 10)
+    if (!giveawayId) return res.status(400).send({ message: "O ID do sorteio não foi definido corretamente." })
+    const timeout = setTimeout(() => res.status(404).send({ message: "O Discord demorou demais para entregar os participantes do sorteio." }), 1000 * 20)
     const size = shardsAndSockets.size
     let responses = 0
 
     for (const socket of shardsAndSockets.values())
         socket
-            .timeout(7000)
-            .emitWithAck("getGuildAndGiveaway", { guildId, giveawayId })
+            .timeout(10000)
+            .emitWithAck("getGiveaway", giveawayId)
             .then((data: GiveawayResponseData) => {
                 responses++
 
@@ -26,17 +26,8 @@ export default (req: Request, res: Response) => {
                     return
                 }
 
-                const { giveaway, guild } = data
-
-                if (!giveaway || !guild) {
-                    clearTimeout(timeout)
-                    return res.status(404).send({ message: "Os dados deste sorteio foram entregues, porém, incompletos.", data })
-                }
-
-                if (giveaway && guild) {
-                    clearTimeout(timeout)
-                    return res.send(data)
-                }
+                clearTimeout(timeout)
+                return res.send(data)
             })
             .catch(() => null)
 

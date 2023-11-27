@@ -6,7 +6,6 @@ import { env } from "process"
 import { Socket } from "socket.io"
 import { shardsAndSockets } from "../../websocket/connection"
 import Database from "../../database"
-import twitchCache from "../../websocket/cache/twitch.cache"
 import { Rest } from "../../index"
 export const messagesToSend = <MessageToSendSaphireData[]>[]
 executeMessages()
@@ -101,12 +100,6 @@ async function postMessage(data: MessageSaphireRequest | MessageToSendThroughWeb
                     { $unset: { [`LogSystem.${data.LogType}`]: true } },
                     { new: true, upsert: true }
                 )
-
-            if (
-                data.isTwitchNotification
-                || [50001, 10003].includes(err.code as number)
-            )
-                return twitchCache(data.channelId as string)
 
             console.log(err, data)
             return shardsAndSockets
