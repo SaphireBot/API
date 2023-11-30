@@ -1,5 +1,5 @@
 import { APIGuildObject, CallbackType, ChatMessage, GetAndDeleteCacheType, GetMultiplecacheDataType, MessageSaphireRequest, ShardsStatus, WebsocketMessageRecieveData, commandApi, staffData } from "../@types";
-import { APIApplicationCommand, Collection } from "discord.js";
+import { APIApplicationCommand, Collection, Routes } from "discord.js";
 import { Socket } from "socket.io";
 import { staffs } from "../site";
 import { env } from "process";
@@ -11,10 +11,12 @@ import postAfk from "./functions/postafk";
 import postmessagewithreply from "./functions/postmessagewithreply";
 import getSocial from "../site/social.get";
 import getDescription from "../site/description.get";
-import Database from "../database";
+import Database, { redis } from "../database";
 import Blacklist from "../blacklist/manager"
 import { ws } from "../server";
 import { UserSchema } from "../database/model/user";
+import database from "../database";
+import { Rest } from "..";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -32,7 +34,55 @@ refreshSiteData();
 setInterval(() => refreshSiteData(), 1000 * 15);
 const chatMessages = new Collection<number, ChatMessage>();
 
+export const partners = [
+    {
+        name: "TTS AutoMod",
+        type: "bot",
+        description: "Fornece um intermediário para acessar e configurar o Discord AutoMod, visa facilitar os usuários de dispositivos móveis.",
+        icon: "https://cdn.discordapp.com/avatars/1170935729589866507/de9767c9d7d26f589cde451edd28865b.webp",
+        url: "https://is.gd/ttsautomod"
+    },
+    {
+        name: "872962755538350110", // Animes Paradise
+        type: "guild",
+        description: "",
+        icon: "",
+        url: "https://discord.gg/animebr"
+    },
+    {
+        name: "Discloud", // Discloud
+        type: "site",
+        description: "Transformando a forma como você hospeda suas aplicações",
+        icon: "https://cdn.discordapp.com/avatars/584499142902939691/3ba9da1a01cecff00177e1c73d4226d1.png",
+        url: "https://discloudbot.com/"
+    },
+    {
+        name: "1128713242693349466", // Bunker
+        type: "guild",
+        description: "",
+        icon: "",
+        url: "https://discord.gg/6sSqmUEfHt"
+    }
+];
+
 setTimeout(() => shardsAndSockets.random()?.send({ type: "sendStaffData" }), 1000 * 60 * 30);
+
+export async function refreshPartnersStatus() {
+
+    for (const partner of partners) {
+        if (partner.type === "bot") continue;
+
+        if (partner.type === "guild") {
+            const guild = await Rest.get(Routes.guild(partner.name)).catch(() => null) as any;
+            if (guild) {
+                partner.name = guild.name;
+                partner.description = guild.description || "Este servidor não possui nenhuma descrição";
+                partner.icon = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${guild?.icon?.includes("a_") ? "gif" : "png"}`;
+            }
+        }
+    }
+
+}
 
 export default (socket: Socket) => {
 
@@ -49,19 +99,26 @@ export default (socket: Socket) => {
         socket.on("baseData", refreshSiteData);
 
         socket.on("dailyCheck", async (userId, callback: CallbackType) => {
+            if (!userId || typeof userId !== "string") return callback(null);
+            let data = await get(userId);
+            if (!data)
+                data = (await database.User.findOne({ id: userId })) || { id: userId };
 
-            if (!userId || typeof userId !== "string") return callback(null)
+            let client = (await redis.json.get(env.SAPHIRE_BOT_ID) as any) as any;
+            if (!client) client = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
 
-            const userData = await Database.User.findOne({ id: userId })
-            if (!userData) return callback(null)
+            if (client) {
+                delete client?.SpotifyAccessToken;
+                delete client?.TwitchAccessToken;
+                delete client?.TwitchAccessTokenSecond;
+                delete client?.TwitchAccessTokenThird;
+                delete client?.TwitchAccessTokenFourth;
+            }
 
-            return callback({
-                timeout: userData?.Timeouts?.Daily || 0,
-                count: userData?.DailyCount || 0
-            })
-
+            return callback({ data, client });
         })
 
+        socket.on("partners", async (_: any, callback: CallbackType) => callback(partners))
         socket.on("transactions", async (userId: string, callback: CallbackType) => {
 
             let data = await get(userId) as UserSchema | any;

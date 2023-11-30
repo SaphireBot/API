@@ -15,6 +15,7 @@ import getUsers from "./getUsers";
 import staffGet from "./staff.get";
 import { allGuilds, apiCommandsData, interactions } from "../websocket/connection";
 import commandsdata from "./commandsdata";
+import partners from "./partners";
 export const staffs = new Collection<string, staffData>();
 
 server.get("/staffs", staffGet);
@@ -25,8 +26,9 @@ server.get("/user/:userId", userGet);
 server.get("/giveaway/:giveawayId", giveawayGet);
 server.get("/clientdata", clientGet);
 server.get("/status", statusGet);
-server.get("/home", (_, res) => res.send({ guilds: allGuilds.size, commands: apiCommandsData.size, interactions: interactions.count }));
+server.get("/partners", partners);
 server.get("/commandsdata", commandsdata);
+server.get("/home", (_, res) => res.send({ guilds: allGuilds.size, commands: apiCommandsData.size, interactions: interactions.count }));
 server.get("/servers", (_, res) => res.send(Array.from(new Set(allGuilds.keys()))));
 
 server.post("/topgg", topggPost);

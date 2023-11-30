@@ -2,7 +2,7 @@ import sender from "./sender";
 import { CallbackError, connect, set } from "mongoose";
 import { env } from "node:process";
 import dataJSON from "../json/data.json";
-import { shardsAndSockets } from "../websocket/connection";
+import { refreshPartnersStatus, shardsAndSockets } from "../websocket/connection";
 import applicationCommands from "../websocket/functions/application.commands";
 import Blacklist from "../blacklist/manager"
 import database from "../database";
@@ -21,6 +21,7 @@ export default async (err?: Error | null, address?: string): Promise<void> => {
             shardsAndSockets.random()?.send({ type: "sendStaffData" });
             applicationCommands();
             Blacklist.load();
+            refreshPartnersStatus();
             sender({
                 url: env.WEBHOOK_STATUS,
                 username: "[API] Connection Status",
