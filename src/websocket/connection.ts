@@ -11,12 +11,12 @@ import postAfk from "./functions/postafk";
 import postmessagewithreply from "./functions/postmessagewithreply";
 import getSocial from "../site/social.get";
 import getDescription from "../site/description.get";
-import Database, { redis } from "../database";
+import Database from "../database";
 import Blacklist from "../blacklist/manager"
 import { ws } from "../server";
 import { UserSchema } from "../database/model/user";
-import database from "../database";
 import { Rest } from "..";
+import daily from "./functions/daily";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -97,28 +97,9 @@ export default (socket: Socket) => {
         socket.on("getChatMessages", (_, callback: CallbackType) => callback(chatMessages.sort((a, b) => a.date - b.date).toJSON()));
         socket.on("getAllBlacklist", (_, callback: CallbackType) => Blacklist.all(callback));
         socket.on("baseData", refreshSiteData);
-
-        socket.on("dailyCheck", async (userId, callback: CallbackType) => {
-            if (!userId || typeof userId !== "string") return callback(null);
-            let data = await get(userId);
-            if (!data)
-                data = (await database.User.findOne({ id: userId })) || { id: userId };
-
-            let client = (await redis.json.get(env.SAPHIRE_BOT_ID) as any) as any;
-            if (!client) client = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
-
-            if (client) {
-                delete client?.SpotifyAccessToken;
-                delete client?.TwitchAccessToken;
-                delete client?.TwitchAccessTokenSecond;
-                delete client?.TwitchAccessTokenThird;
-                delete client?.TwitchAccessTokenFourth;
-            }
-
-            return callback({ data, client });
-        })
-
+        socket.on("daily", daily);
         socket.on("partners", async (_: any, callback: CallbackType) => callback(partners))
+
         socket.on("transactions", async (userId: string, callback: CallbackType) => {
 
             let data = await get(userId) as UserSchema | any;

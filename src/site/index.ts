@@ -16,6 +16,8 @@ import staffGet from "./staff.get";
 import { allGuilds, apiCommandsData, interactions } from "../websocket/connection";
 import commandsdata from "./commandsdata";
 import partners from "./partners";
+import daily from "../websocket/functions/daily";
+import save_login from "./save_login";
 export const staffs = new Collection<string, staffData>();
 
 server.get("/staffs", staffGet);
@@ -31,9 +33,11 @@ server.get("/commandsdata", commandsdata);
 server.get("/home", (_, res) => res.send({ guilds: allGuilds.size, commands: apiCommandsData.size, interactions: interactions.count }));
 server.get("/servers", (_, res) => res.send(Array.from(new Set(allGuilds.keys()))));
 
+server.post("/daily", (req, res) => daily(req.body as any, res));
 server.post("/topgg", topggPost);
 server.post("/discordtokens", tokensSet);
 server.post("/bugs", bugs);
 server.post("/reputation", reputationPost);
+server.post("/save_login", save_login)
 
 server.delete("/reputation", reputationDelete);

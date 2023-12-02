@@ -40,6 +40,7 @@ export default async (req: Request, res: Response) => {
     }
 
     if (!doc?.id) return res.send({ message: "Nenhuma informação foi encontrada no banco de dados." })
+    delete doc?.Tokens;
     if (!fields) return res.send(doc)
 
     const userData: Record<string, any> = {}

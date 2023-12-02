@@ -3,7 +3,7 @@ import { staffs } from "."
 import { staffData } from "../@types"
 import getDescription from "./description.get"
 import getSocial from "./social.get"
-import { shardsAndSockets } from "../websocket/connection"
+// import { shardsAndSockets } from "../websocket/connection"
 
 export default async (_: Request, res: Response) => {
 
@@ -12,14 +12,14 @@ export default async (_: Request, res: Response) => {
     const boards = [] as staffData[]
     const staff = [] as staffData[]
 
-    shardsAndSockets
-        .random()
-        ?.timeout(5000)
-        .emitWithAck("staffs", "get")
-        .then(res => {
-            console.log(res);
-        })
-        .catch(console.log)
+    // shardsAndSockets
+    //     .random()
+    //     ?.timeout(5000)
+    //     .emitWithAck("staffs", "get")
+    //     .then(res => {
+    //         console.log(res);
+    //     })
+    //     .catch(console.log)
 
     staffs
         .forEach(data => {
