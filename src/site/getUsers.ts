@@ -23,8 +23,8 @@ export default async (req: Request, res: Response) => {
         { headers: { authorization: `Bot ${token()}` } }
     )
         .then(res => res.json())
-        .then((data: APIUser) => {
-            set(data)
+        .then(data => {
+            set(data as any)
             return res.send([data])
         })
         .catch(err => res.status(500).send(err))
@@ -53,9 +53,9 @@ export default async (req: Request, res: Response) => {
                 { headers: { authorization: `Bot ${token()}` } }
             )
                 .then(res => res.json())
-                .then((data: APIUser) => {
-                    set(data)
-                    if (data?.id) usersData.push(data)
+                .then(data => {
+                    set(data as any)
+                    if ((data as any)?.id) usersData.push(data as any)
                     verifyAndSend()
                 })
                 .catch(() => verifyAndSend())

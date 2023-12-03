@@ -18,6 +18,7 @@ import commandsdata from "./commandsdata";
 import partners from "./partners";
 import daily from "../websocket/functions/daily";
 import save_login from "./save_login";
+import database from "../database";
 export const staffs = new Collection<string, staffData>();
 
 server.get("/staffs", staffGet);
@@ -39,5 +40,8 @@ server.post("/discordtokens", tokensSet);
 server.post("/bugs", bugs);
 server.post("/reputation", reputationPost);
 server.post("/save_login", save_login)
+
+server.get("/admins", async (_, res) => res.send(await database.Client.findOne({ id: process.env.SAPHIRE_BOT_ID })?.then(res => res?.Administradores || [])));
+server.get("/mods", async (_, res) => res.send(await database.Client.findOne({ id: process.env.SAPHIRE_BOT_ID })?.then(res => res?.Moderadores || [])));
 
 server.delete("/reputation", reputationDelete);

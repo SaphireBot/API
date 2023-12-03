@@ -39,14 +39,18 @@ const prizes = {
     31: { day: 31, money: 30000, xp: 1000 }
 };
 
-export default async function daily({ userId, guilds, access_token }: { userId: string, guilds: any[], access_token: string }, res: CallbackType | Response) {
+export default async function daily(params: { userId: string, guilds: any[], access_token: string }, res: CallbackType | Response) {
 
     function callback(data: any) {
         if ("send" in res) return res.send(data);
         return res(data);
     }
 
-    if (!userId || typeof userId !== "string" || !Array.isArray(guilds)) return callback("<p>Os parametros repassados não estão completos, por favor, contacte alguém da minha equipe.</p>");
+    const userId = params?.userId;
+    const guilds = params?.guilds;
+    const access_token = params?.access_token;
+
+    if (!userId || typeof userId !== "string" || !guilds || !guilds?.length || !Array.isArray(guilds)) return callback("<p>Os parametros repassados não estão completos, por favor, contacte alguém da minha equipe.</p>");
     if (dailyCooldown.has(userId))
         return callback("<p>Você está tentando fazer isso rápido demais, sabia?</p>");
     dailyCooldown.add(userId);
@@ -59,7 +63,7 @@ export default async function daily({ userId, guilds, access_token }: { userId: 
     }
 
     if (!data?.Tokens?.access_token)
-        return callback("<p>Parece que seus dados estão incompletos no seu banco de dados, você pode fazer login no site? Para mim, você é um completo desconhecido</p>");
+        return callback("<p>Parece que seus dados estão incompletos no meu banco de dados, você pode fazer login no site? Para mim, você é um completo desconhecido</p>");
 
     if (data?.Tokens?.access_token !== access_token)
         return callback("<p>Qual foi, esse perfil não é seu, sabia?</p>");
@@ -112,7 +116,7 @@ export default async function daily({ userId, guilds, access_token }: { userId: 
 
     if (
         (count > 0 && timeout > 0)
-        && !(timeout - (dateNow - oneDayInMilliseconds) > 0)
+        && !(172800000 - (Date.now() - timeout) > 0)
     ) {
         await database.User.updateOne(
             { id: userId },

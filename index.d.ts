@@ -12,10 +12,6 @@ declare global {
       GUILDS_ACCESS: string
       PHRASES_ACCESS: string
       CONNECTION_URL: string
-      ROUTE_TOP_GG: string
-      ROUTE_SAPHIRE_TOP_GG: string
-      ROUTE_SAPHIRE_COMMANDS: string
-      ROUTE_SAPHIRE_GUILDS: string
       WEBHOOK_TOP_GG_COUNTER: string
       WEBHOOK_STATUS: string
       TOP_GG_WEBHOOK_AVATAR: string
@@ -58,8 +54,6 @@ declare global {
       LINKED_ROLES_AUTHORIZATION: string
       SAPHIRE_BOT_ID: string
       DATABASE_LINK_CONNECTION: string
-      TWITCH_CLIENT_ID: string
-      TWITCH_CLIENT_SECRET: string
       SERVER_BUG_REPORT: string
       REQUESTER1: string
       REDIS_RANKING_PASSWORD: string

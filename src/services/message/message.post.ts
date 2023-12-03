@@ -5,7 +5,6 @@ import { Response } from "express"
 import { env } from "process"
 import { Socket } from "socket.io"
 import { shardsAndSockets } from "../../websocket/connection"
-import Database from "../../database"
 import { Rest } from "../../index"
 export const messagesToSend = <MessageToSendSaphireData[]>[]
 executeMessages()
@@ -89,17 +88,6 @@ async function postMessage(data: MessageSaphireRequest | MessageToSendThroughWeb
                 res.statusCode = 400
                 return res.send(err)
             }
-
-            if (
-                "guildId" in data
-                && "LogType" in data
-                && [50001, 10003].includes(err.code as number)
-            )
-                return await Database.Guild.updateOne(
-                    { id: data.guildId },
-                    { $unset: { [`LogSystem.${data.LogType}`]: true } },
-                    { new: true, upsert: true }
-                )
 
             console.log(err, data)
             return shardsAndSockets

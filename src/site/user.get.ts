@@ -24,7 +24,7 @@ export default async (req: Request, res: Response) => {
         )
             .then(res => res.json())
             .then(data => {
-                if (name) return res.send(data.username)
+                if (name) return res.send((data as any)?.username)
                 if (data) return res.send(data)
             })
             .catch(() => res.send("No Name"))

@@ -5,7 +5,7 @@ const UserSchema = new Schema({
     Likes: Number,
     Tokens: {
         access_token: String,
-        token_type: Number,
+        token_type: String,
         expires_in: Number
     },
     Xp: Number,

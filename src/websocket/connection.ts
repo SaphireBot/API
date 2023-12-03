@@ -203,7 +203,8 @@ export default (socket: Socket) => {
 }
 
 function setShardStatus(data: ShardsStatus, socket: Socket) {
-    if (!data || isNaN(Number(data.shardId))) return
+    console.log("received", `shard ${data.shardId}`);
+    if (!data || typeof data.shardId !== "number") return
     for (const guild of data.guilds) allGuilds.set(guild.id, guild)
     data.socketId = socket.id
     shardsAndSockets.set(data.shardId, socket)

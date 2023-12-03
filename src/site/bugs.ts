@@ -24,7 +24,7 @@ export default async (req: Request, res: Response) => {
             method: "GET",
             headers: { authorization: `Bot ${env.BOT_TOKEN_REQUEST}` }
         }
-    ).then(res => res.json()).catch(() => null)
+    ).then(res => res.json()).catch(() => null) as any
 
     const userData = await Database.User.findOne({ id: userId })
 

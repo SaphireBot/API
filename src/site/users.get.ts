@@ -15,7 +15,7 @@ export default async (req: Request, res: Response) => {
         headers: { authorization: `Bot ${env.BOT_TOKEN_REQUEST}` }
     })
         .then(data => data.json())
-        .then(user => data.CreatedBy = user)
+        .then(user => data.CreatedBy = user as any)
         .catch(() => ({ username: null }))
 
     await fetch(`https://discord.com/api/users/${Sponsor}`, {
@@ -25,7 +25,7 @@ export default async (req: Request, res: Response) => {
         }
     })
         .then(data => data.json())
-        .then(user => data.Sponsor = user)
+        .then(user => data.Sponsor = user as any)
         .catch(() => ({ username: null }))
 
     return res.send(data)

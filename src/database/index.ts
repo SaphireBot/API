@@ -7,38 +7,8 @@ import blacklist from "./model/blacklist"
 import vote from "./model/vote"
 import { ranking, set } from "../websocket/cache/get.cache";
 import { Types } from "mongoose";
-import { createClient } from "redis";
-import { env } from "process";
-
-export const redis = createClient({
-    password: env.REDIS_USER_PASSWORD,
-    socket: {
-        host: env.REDIS_SOCKET_HOST_URL,
-        port: Number(env.REDIS_SOCKET_HOST_PORT)
-    }
-});
-redis.connect();
-redis.on("error", err => console.log("REDIS ERROR", err));
-
-export const RedisRanking = createClient({
-    password: env.REDIS_RANKING_PASSWORD,
-    socket: {
-        host: env.REDIS_RANKING_HOST_URL,
-        port: Number(env.REDIS_RANKING_HOST_PORT)
-    }
-});
-RedisRanking.connect();
-RedisRanking.on("error", err => console.log("REDIS RANKING ERROR", err));
-
-export const RedisUsers = createClient({
-    password: env.REDIS_USER_CACHE_PASSWORD,
-    socket: {
-        host: env.REDIS_USER_CACHE_HOST_URL,
-        port: Number(env.REDIS_USER_CACHE_HOST_PORT)
-    }
-});
-RedisUsers.connect();
-RedisUsers.on("error", err => console.log("REDIS USER ERROR", err));
+import { redis, RedisRanking, RedisUsers } from "./redis";
+export { redis, RedisRanking, RedisUsers }
 
 export default new class Database {
     Client: typeof client

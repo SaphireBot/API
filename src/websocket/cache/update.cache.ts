@@ -6,6 +6,6 @@ export default (to: "user" | "guild" | undefined, cacheData: UserSchema[] | Guil
 
     if (!to || !cacheData?.length || !["user", "guild"].includes(to)) return
 
-    for (const data of cacheData) set(data?.id, data)
+    for (const data of cacheData) set((data as any)?.id, data as any)
     return
 }

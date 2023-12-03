@@ -4,7 +4,6 @@ import database from "../database";
 export default async function save_login(req: Request, res: Response) {
 
     const data = req?.body;
-    console.log(data);
     if (!data?.Tokens || !data?.id) return res.send({ message: "no data given", data });
 
     await database.User.updateOne(
