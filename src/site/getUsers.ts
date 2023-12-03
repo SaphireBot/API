@@ -10,7 +10,11 @@ const tokens = [
 
 export default async (req: Request, res: Response) => {
 
-    const id = (req.query.id || req.path?.split("/")?.pop()) as string | string[]
+    const id = (() => {
+        if (!req.body) return undefined;
+        if (!Array.isArray(req.body)) return undefined;
+        return Array.from(new Set(req.body));
+    })() || (req.query.id || req.path?.split("/")?.pop()) as string | string[]
     const token = () => tokens[Math.floor(Math.random() * tokens.length)]
     if (!id) return res.send([]);
 
