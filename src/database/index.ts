@@ -16,7 +16,7 @@ export { redis, RedisRanking, RedisUsers }
 
 export default new class Database {
     Cache = typeof cache
-    Client = SaphireMongooseCluster.model("Guild", ClientSchema);
+    Client = SaphireMongooseCluster.model("Client", ClientSchema);
     Guild = SaphireMongooseCluster.model("Guilds", GuildSchema);
     User = SaphireMongooseCluster.model("Users", UserSchema);
     Blacklist = SaphireMongooseCluster.model("Blacklist", BlacklistSchema);
