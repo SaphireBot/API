@@ -1,17 +1,18 @@
-import { Schema, model, InferSchemaType, Types } from "mongoose";
+import { Schema, InferSchemaType, Types } from "mongoose";
 
-const GuildSchema = new Schema({
+export const GuildSchema = new Schema({
     id: { type: String, unique: true },
     Giveaways: [{
         MessageID: { type: String, unique: true },
         GuildId: String,
         Prize: String,
-        Winners: { type: Number },
+        Winners: Number,
+        LauchDate: Number,
         WinnersGiveaway: [String],
         Participants: [String],
         Emoji: String,
-        TimeMs: { type: Number },
-        DateNow: { type: Number },
+        TimeMs: Number,
+        DateNow: Number,
         ChannelId: String,
         Actived: Boolean,
         MessageLink: String,
@@ -21,13 +22,14 @@ const GuildSchema = new Schema({
         LockedRoles: [String],
         AllowedMembers: [String],
         LockedMembers: [String],
-        RequiredAllRoles: [String],
+        RequiredAllRoles: Boolean,
         AddRoles: [String],
-        MultipleJoinsRoles: [String],
-        MinAccountDays: { type: Number },
-        MinInServerDays: { type: Number },
+        MultipleJoinsRoles: [{ id: String, joins: Number }],
+        MinAccountDays: Number,
+        MinInServerDays: Number
     }],
     Prefixes: [String],
+    Bans: [{ userId: String, unbanAt: Date }],
     TempCall: {
         enable: Boolean,
         muteTime: Boolean,
@@ -80,29 +82,29 @@ const GuildSchema = new Schema({
         channel: String,
         webhookUrl: String,
         ban: {
-            active: Boolean,
+            active: Boolean
         },
         unban: {
-            active: Boolean,
+            active: Boolean
         },
         kick: {
-            active: Boolean,
+            active: Boolean
         },
         mute: {
-            active: Boolean,
+            active: Boolean
         },
         channels: {
-            active: Boolean,
+            active: Boolean
         },
         messages: {
-            active: Boolean,
+            active: Boolean
         },
         botAdd: {
-            active: Boolean,
+            active: Boolean
         },
         roles: {
-            active: Boolean,
-        },
+            active: Boolean
+        }
     },
     XpSystem: {
         Canal: String,
@@ -123,5 +125,4 @@ const GuildSchema = new Schema({
     },
 });
 
-export default model("Guild", GuildSchema);
-export type GuildSchema = InferSchemaType<typeof GuildSchema> & { _id: Types.ObjectId };
+export type GuildSchemaType = InferSchemaType<typeof GuildSchema> & { _id: Types.ObjectId };

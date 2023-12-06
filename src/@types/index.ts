@@ -5,8 +5,8 @@ import { DocumentSetOptions } from "mongoose";
 import { Request, Response } from "express"
 import { Socket } from "socket.io";
 import { ReminderType } from "./reminder";
-import { GuildSchema } from "../database/model/guilds";
-import { UserSchema } from "../database/model/user";
+import { GuildSchemaType } from "../database/model/guilds";
+import { UserSchemaType } from "../database/model/user";
 
 export interface WebhookBodyRequest extends Request {
   webhookUrl: string
@@ -165,7 +165,7 @@ export interface WebsocketMessageRecieveData {
   shardData: ShardsStatus
   id: string
   to: "guild" | "user" | undefined
-  data: GuildSchema[] | UserSchema[] | undefined
+  data: GuildSchemaType[] | UserSchemaType[] | undefined
   messageData: MessageToSendThroughWebsocket
   userId: string
   method: "save" | "delete"
@@ -248,7 +248,7 @@ export interface GetMultiplecacheDataType {
 export interface RefreshCache {
   id: string | undefined
   type: "user" | "guild" | undefined
-  data: UserSchema | GuildSchema
+  data: UserSchemaType | GuildSchemaType
 }
 
 export interface AfkGlobalData {

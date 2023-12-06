@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import database, { redis } from "../database";
 import { env } from "process";
-import { ClientSchema } from "../database/model/client";
+import { ClientSchemaType } from "../database/model/client";
 import { set } from "../websocket/cache/get.cache";
 
 export default async (_: Request, res: Response) => {
 
-    const cache = (await redis.json.get(env.SAPHIRE_BOT_ID) as any) as ClientSchema;
+    const cache = (await redis.json.get(env.SAPHIRE_BOT_ID) as any) as ClientSchemaType;
     if (cache) {
         for (const key of Object.keys(cache || {}))
             if (key?.toLowerCase()?.includes("token"))

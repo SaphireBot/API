@@ -1,20 +1,21 @@
-import Mongoose from "mongoose"
-const { Schema, model } = Mongoose
+import { Schema, InferSchemaType, Types } from "mongoose";
 
-export default model("Reminders", new Schema({
+export const ReminderSchema = new Schema({
     id: { type: String, unique: true },
-    userId: { type: String, default: "" },
-    guildId: { type: String, default: "" },
-    RemindMessage: { type: String, default: "" },
-    Time: { type: Number, default: 0 },
-    snoozed: { type: Boolean, default: false },
-    timeout: { type: Schema.Types.Mixed, default: false },
+    userId: String,
+    guildId: String,
+    message: String,
+    lauchAt: Date,
     isAutomatic: { type: Boolean, default: false },
-    DateNow: { type: Number, default: 0 },
-    ChannelId: { type: String, default: "" },
-    Alerted: { type: Boolean, default: false },
-    privateOrChannel: { type: Boolean, default: false },
-    interval: { type: Number, default: 0 },
-    messageId: { type: String, default: "" },
-    deleteAt: { type: Number, default: 0 }
-}))
+    createdAt: Date,
+    channelId: String,
+    alerted: { type: Boolean, default: false },
+    sendToDM: { type: Boolean, default: false },
+    interval: Number,
+    messageId: String,
+    disableComponents: Date,
+    deleteAt: Date,
+    reminderIdToRemove: String
+});
+
+export type ReminderSchemaType = InferSchemaType<typeof ReminderSchema> & { _id: Types.ObjectId };

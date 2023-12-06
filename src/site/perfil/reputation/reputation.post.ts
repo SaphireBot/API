@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Database from "../../../database";
 import { siteSocket } from "../../../websocket/connection";
-import { UserSchema } from "../../../database/model/user";
+import { UserSchemaType } from "../../../database/model/user";
 import { get, set } from "../../../websocket/cache/get.cache";
 
 export default async (req: Request<{ from: string | undefined, text: string | undefined, to: string | undefined, username: string | undefined, date: number | undefined }>, res: Response) => {
@@ -11,7 +11,7 @@ export default async (req: Request<{ from: string | undefined, text: string | un
     if (!from || !text || !to || !dateNow)
         return res.status(400).send({ message: "Content Missing" })
 
-    let userdata = await get(from) as UserSchema
+    let userdata = await get(from) as UserSchemaType
 
     if (!userdata) {
         const doc = await Database.User.findOne({ id: from });
@@ -56,7 +56,7 @@ export default async (req: Request<{ from: string | undefined, text: string | un
 
     if (saved.return) return res.status(500).send({ status: 200, type: "partial", message: "Os dados foram salvos particialmente." })
 
-    const reputations = (await get(to) as UserSchema)?.Perfil?.Reputation || []
+    const reputations = (await get(to) as UserSchemaType)?.Perfil?.Reputation || []
     siteSocket?.emit("reputation", { userId: to, reputations })
     siteSocket?.emit("notification", { userId: to, message: `Você recebeu uma <a href='https://saphire.one/perfil'>reputação</a> de ${username}` })
     return res.status(200).send({

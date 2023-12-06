@@ -54,6 +54,8 @@ declare global {
       LINKED_ROLES_AUTHORIZATION: string
       SAPHIRE_BOT_ID: string
       DATABASE_LINK_CONNECTION: string
+      DATABASE_BET_LINK_CONNECTION: string
+      DATABASE_RECORD_LINK_CONNECTION: string
       SERVER_BUG_REPORT: string
       REQUESTER1: string
       REDIS_RANKING_PASSWORD: string

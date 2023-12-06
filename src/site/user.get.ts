@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { env } from "process";
 // import { shardsAndSockets } from "../websocket/connection";
 import Database from "../database";
-import { UserSchema } from "../database/model/user";
+import { UserSchemaType } from "../database/model/user";
 import { get, set } from "../websocket/cache/get.cache";
 
 export default async (req: Request, res: Response) => {
@@ -47,9 +47,9 @@ export default async (req: Request, res: Response) => {
 
     if (Array.isArray(fields))
         for (const key of fields) {
-            if (doc[key as keyof UserSchema]) userData[key as keyof UserSchema] = doc[key as keyof UserSchema]
+            if (doc[key as keyof UserSchemaType]) userData[key as keyof UserSchemaType] = doc[key as keyof UserSchemaType]
         }
-    else if (doc[fields as keyof UserSchema]) userData[fields as keyof UserSchema] = doc[fields as keyof UserSchema]
+    else if (doc[fields as keyof UserSchemaType]) userData[fields as keyof UserSchemaType] = doc[fields as keyof UserSchemaType]
 
     return res.send(userData)
 

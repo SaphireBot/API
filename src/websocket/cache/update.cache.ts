@@ -1,8 +1,8 @@
-import { GuildSchema } from "../../database/model/guilds"
-import { UserSchema } from "../../database/model/user"
+import { GuildSchemaType } from "../../database/model/guilds"
+import { UserSchemaType } from "../../database/model/user"
 import { set } from "./get.cache"
 
-export default (to: "user" | "guild" | undefined, cacheData: UserSchema[] | GuildSchema[] | undefined) => {
+export default (to: "user" | "guild" | undefined, cacheData: UserSchemaType[] | GuildSchemaType[] | undefined) => {
 
     if (!to || !cacheData?.length || !["user", "guild"].includes(to)) return
 

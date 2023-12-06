@@ -1,6 +1,6 @@
-import { Schema, model, InferSchemaType, Types } from "mongoose";
+import { Schema, InferSchemaType, Types } from "mongoose";
 
-const Vote = new Schema({
+export const VoteSchema = new Schema({
     userId: String,
     messageId: String,
     channelId: String,
@@ -11,5 +11,4 @@ const Vote = new Schema({
     enableReminder: Boolean
 });
 
-export default model("Vote", Vote);
-export type VoteSchema = InferSchemaType<typeof Vote> & { _id: Types.ObjectId };
+export type VoteSchemaType = InferSchemaType<typeof VoteSchema> & { _id: Types.ObjectId };

@@ -5,13 +5,22 @@ import "./webhooks";
 import "./services/message/message.post";
 import "./websocket";
 import "./site"
-import load from "./load";
+import "./load";
 import { server, httpServer } from "./server";
 import { env } from "process";
 import { REST } from "discord.js";
+import sender from "./webhooks/sender";
+import { emojis } from "./json/data.json";
 export const Rest = new REST().setToken(env.DISCORD_TOKEN);
 
 server.get("/", (_, res) => res.status(200).send({ status: "Welcome to Saphire's API" }));
 server.get("/ping", (_, res) => res.status(200).send("Saphire's API PING"));
 
-httpServer.listen(Number(env.SERVER_PORT), "0.0.0.0", load);
+httpServer.listen(Number(env.SERVER_PORT), "0.0.0.0", () => {
+    sender({
+        url: env.WEBHOOK_STATUS,
+        username: "[API] Connection Status",
+        content: `${emojis.check} | API conectada com sucesso.\n📅 | ${new Date().toLocaleString("pt-BR").replace(" ", " ás ")}`,
+        avatarURL: env.WEBHOOK_GSN_AVATAR
+    }).catch(() => null);
+});

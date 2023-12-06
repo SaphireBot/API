@@ -6,7 +6,6 @@ import { env } from "process";
 import postmessage from "./functions/postmessage";
 import getCache, { get, set } from "./cache/get.cache";
 import getMultipleCache from "./cache/multiple.cache";
-import deleteCache from "./cache/delete.cache";
 import postAfk from "./functions/postafk";
 import postmessagewithreply from "./functions/postmessagewithreply";
 import getSocial from "../site/social.get";
@@ -14,7 +13,7 @@ import getDescription from "../site/description.get";
 import Database from "../database";
 import Blacklist from "../blacklist/manager"
 import { ws } from "../server";
-import { UserSchema } from "../database/model/user";
+import { UserSchemaType } from "../database/model/user";
 import { Rest } from "..";
 import daily from "./functions/daily";
 export const interactions = {
@@ -102,7 +101,7 @@ export default (socket: Socket) => {
 
         socket.on("transactions", async (userId: string, callback: CallbackType) => {
 
-            let data = await get(userId) as UserSchema | any;
+            let data = await get(userId) as UserSchemaType | any;
 
             if (!data) {
                 data = await Database.User.findOne({ id: userId });
@@ -154,7 +153,6 @@ export default (socket: Socket) => {
             case "guildDelete": allGuilds.delete(data.id); break;
             case "updateCache": ""; break;
             // case "updateCache": refreshCache(data?.to, data?.data); break;
-            case "deleteCache": deleteCache(data.id, data.to); break;
             case "postMessage": postmessage(data.messageData, socket); break;
             case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }); break;
             case "siteStaffData": siteStaffData(data.staffData); break;
@@ -203,7 +201,6 @@ export default (socket: Socket) => {
 }
 
 function setShardStatus(data: ShardsStatus, socket: Socket) {
-    console.log("received", `shard ${data.shardId}`);
     if (!data || typeof data.shardId !== "number") return
     for (const guild of data.guilds) allGuilds.set(guild.id, guild)
     data.socketId = socket.id

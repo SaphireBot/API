@@ -1,11 +1,9 @@
-import { Schema, model, InferSchemaType, Types } from "mongoose";
+import { Schema, InferSchemaType, Types } from "mongoose";
 
-const ClientSchema = new Schema({
+export const ClientSchema = new Schema({
     id: { type: String, unique: true },
     TwitchAccessToken: { type: String, unique: true },
-    TwitchAccessTokenSecond: { type: String, unique: true },
-    TwitchAccessTokenThird: { type: String, unique: true },
-    TwitchAccessTokenFourth: { type: String, unique: true },
+    TotalBalanceSended: { type: Number, default: 0 },
     uptime: {
         primary: Date,
         accumulate: Number
@@ -14,12 +12,10 @@ const ClientSchema = new Schema({
     ComandosUsados: Number,
     SpotifyAccessToken: String,
     TwitchNotifications: Number,
-    CommandsCount: Object,
     Moderadores: [String],
     Administradores: [String],
     TopGlobal: Object,
-    ComandosBloqueados: Array,
-    ComandosBloqueadosSlash: Array,
+    BlockedCommands: [{ cmd: String, error: String }],
     VipCodes: Array,
     BackgroundAcess: [String],
     BlockedUsers: Array,
@@ -67,5 +63,4 @@ const ClientSchema = new Schema({
     QuizQuestionsReports: Array
 });
 
-export default model("Client", ClientSchema);
-export type ClientSchema = InferSchemaType<typeof ClientSchema> & { _id: Types.ObjectId };
+export type ClientSchemaType = InferSchemaType<typeof ClientSchema> & { _id: Types.ObjectId };
