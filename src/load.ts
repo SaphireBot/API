@@ -1,9 +1,20 @@
 import { Mongoose } from "mongoose";
+import database from "./database";
+import { refreshPartnersStatus, shardsAndSockets } from "./websocket/connection";
+import applicationCommands from "./websocket/functions/application.commands";
+import Blacklist from "./blacklist/manager"
 
 // Users, Guilds, ..., Database
 const SaphireMongoose = new Mongoose();
 export const SaphireMongooseCluster = SaphireMongoose.set("strictQuery", true).createConnection(process.env.DATABASE_LINK_CONNECTION);
-SaphireMongooseCluster.on("connected", () => console.log("[Mongoose] Cluster Saphire Connected"));
+SaphireMongooseCluster.on("connected", () => {
+    console.log("[Mongoose] Cluster Saphire Connected");
+    database.watch();
+    shardsAndSockets.random()?.send({ type: "sendStaffData" });
+    applicationCommands();
+    Blacklist.load();
+    refreshPartnersStatus();
+});
 SaphireMongooseCluster.on("disconnected", () => console.log("[Mongoose] Cluster Saphire Disconnected"));
 SaphireMongooseCluster.on("error", error => console.log("[Mongoose] Cluster Saphire | FAIL\n--> " + error));
 
