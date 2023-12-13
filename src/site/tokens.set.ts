@@ -17,15 +17,24 @@ export default async (req: Request, res: Response) => {
     if (notResponse) return res.sendStatus(200)
 
     return await Database.User.findOneAndUpdate(
-        { id: userId }, { $set: { Tokens: tokens } },
+        { id: userId },
+        {
+            $set: {
+                Tokens: {
+                    access_token: `${tokens.access_token || "0"}`,
+                    refresh_token: `${tokens.refresh_token || "0"}`,
+                    expires_at: tokens.expires_at
+                }
+            }
+        },
         { upsert: true, new: true }
     )
         .then(doc => {
             return res.send({
                 id: doc.id,
-                Balance: doc.Balance,
-                Level: doc.Level,
-                Likes: doc.Likes,
+                Balance: doc.Balance || 0,
+                Level: doc.Level || 0,
+                Likes: doc.Likes || 0,
                 createdAt: new Date(DiscordSnowflake.timestampFrom(userId)), // CARALHO!
                 Tokens: doc.Tokens
             })

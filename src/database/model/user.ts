@@ -6,7 +6,7 @@ export const UserSchema = new Schema({
     locale: { type: String, default: "pt-BR" },
     Tokens: {
         access_token: String,
-        refresh_token: Number,
+        refresh_token: String,
         expires_at: Number
     },
     Xp: Number,
