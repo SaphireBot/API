@@ -70,7 +70,7 @@ export default new class Database {
                     // const ids = Array.from(new Set(userIds.splice(0)))
                     // const documents = await this.User.find({ _id: { $in: ids } })
                     const document = await this.User.findById(change.documentKey._id);
-                    if (document?.id) set(document.id, document.toObject());
+                    if (document?.id) await set(document.id, document.toObject());
 
                     // for await (const doc of documents) {
                     // if (doc?.id) set(doc.id, doc.toObject());

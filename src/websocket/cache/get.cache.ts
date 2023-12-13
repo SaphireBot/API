@@ -27,8 +27,8 @@ export default async (id: string | undefined, type: "user" | "guild" | "client" 
 export async function set(key: string | undefined, value: any) {
     if (typeof key !== "string" || !value) return;
 
-    if (value?.Balance > 0)
-        await RedisRanking.zAdd("balance", [{ score: value.Balance, value: key }])
+    if (typeof value?.Balance === "number")
+        await RedisRanking.zAdd("balance", [{ score: value.Balance || 0, value: key }]);
 
     await redis.json.set(
         key,
