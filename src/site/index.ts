@@ -20,7 +20,12 @@ import daily from "../websocket/functions/daily";
 import save_login from "./save_login";
 import database from "../database";
 import commandBlocker from "./commands.block";
+
 export const staffs = new Collection<string, staffData>();
+const admins = new Set<string>();
+
+setInterval(() => refreshAdmins(), 1000 * 60);
+refreshAdmins()
 
 server.get("/staffs", staffGet);
 server.get("/getusers", getUsers);
@@ -43,7 +48,15 @@ server.post("/reputation", reputationPost);
 server.post("/save_login", save_login)
 server.post("/commands", commandBlocker)
 
-server.get("/admins", async (_, res) => res.send(await database.Client.findOne({ id: process.env.SAPHIRE_BOT_ID })?.then(res => res?.Administradores || [])));
+server.get("/admins", async (_, res) => res.send(Array.from(admins)));
 server.get("/mods", async (_, res) => res.send(await database.Client.findOne({ id: process.env.SAPHIRE_BOT_ID })?.then(res => res?.Moderadores || [])));
 
 server.delete("/reputation", reputationDelete);
+
+async function refreshAdmins() {
+    admins.clear();
+    const adminsAtDatabase = await database.Client.findOne({ id: process.env.SAPHIRE_BOT_ID })?.then(res => res?.Administradores || []).catch(() => []);
+    for (const adminId of adminsAtDatabase)
+        admins.add(adminId);
+    return;
+}
