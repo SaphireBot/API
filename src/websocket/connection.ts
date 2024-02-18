@@ -26,6 +26,7 @@ export const apiCommandsData = new Collection<string, commandApi>();
 export const shards = new Collection<number, ShardsStatus>();
 export const shardsAndSockets = new Collection<number, Socket>();
 export let siteSocket: Socket | undefined;
+export let reactSocket: Socket | undefined;
 export const applicationCommands = new Collection<string, APIApplicationCommand>();
 
 setInterval(() => shardsAndSockets.random()?.send({ type: "refreshRanking" }), 1000 * 60 * 15);
@@ -90,9 +91,10 @@ export default (socket: Socket) => {
         return socket.disconnect(true);
     }
 
-    if (socket.handshake.auth?.shardId == "site") {
+    if (["site", "react"].includes(socket.handshake.auth?.shardId)) {
         // messageAdded
-        siteSocket = socket
+        if (socket.handshake.auth?.shardId === "site") siteSocket = socket
+        if (socket.handshake.auth?.shardId === "react") reactSocket = socket
         socket.on("getChatMessages", (_, callback: CallbackType) => callback(chatMessages.sort((a, b) => a.date - b.date).toJSON()));
         socket.on("getAllBlacklist", (_, callback: CallbackType) => Blacklist.all(callback));
         socket.on("baseData", refreshSiteData);
@@ -145,6 +147,7 @@ export default (socket: Socket) => {
             case "addInteraction":
                 interactions.count++
                 if (siteSocket) siteSocket.send("addInteraction")
+                if (reactSocket) reactSocket.send("addInteraction")
                 break;
             case "addMessage": interactions.message++; break;
             case "registerCommand": registerNewCommand(data?.commandName); break;
@@ -157,8 +160,14 @@ export default (socket: Socket) => {
             case "AfkGlobalSystem": postAfk({ message: data.message, method: data.method, userId: data.userId }); break;
             case "siteStaffData": siteStaffData(data.staffData); break;
             case "shardStatus": setShardStatus(data.shardData, socket); break;
-            case "transactions": siteSocket?.emit("transactions", data.transactionsData); break;
-            case "notification": siteSocket?.emit("notification", data.notifyData); break;
+            case "transactions":
+                siteSocket?.emit("transactions", data.transactionsData);
+                reactSocket?.emit("transactions", data.transactionsData);
+                break;
+            case "notification":
+                siteSocket?.emit("notification", data.notifyData);
+                reactSocket?.emit("notification", data.notifyData);
+                break;
             case "chatMessage": chatMessages.set(data?.chatMessage.date, data.chatMessage); break;
             case "ApplicationCommandData": apllicationCommands(data.applicationCommandData); break;
 
@@ -219,8 +228,8 @@ function registerCommandsApi({ commandApi }: { commandApi: commandApi[] }) {
     if (commandApi?.length)
         for (const cmd of commandApi) apiCommandsData.set(cmd?.name, cmd)
 
-    if (siteSocket?.connected)
-        siteSocket.emit("refresh", { commands: apiCommandsData.toJSON() })
+    if (siteSocket?.connected) siteSocket.emit("refresh", { commands: apiCommandsData.toJSON() })
+    if (reactSocket?.connected) reactSocket.emit("refresh", { commands: apiCommandsData.toJSON() })
 
     return
 }
@@ -284,6 +293,14 @@ function refreshSiteData() {
 
         if (siteSocket)
             siteSocket.emit("refresh", {
+                guilds: allGuilds.toJSON(),
+                commands: apiCommandsData.toJSON(),
+                interactions: interactions.count,
+                staffs: staffs.toJSON()
+            })
+
+        if (reactSocket)
+            reactSocket.emit("refresh", {
                 guilds: allGuilds.toJSON(),
                 commands: apiCommandsData.toJSON(),
                 interactions: interactions.count,

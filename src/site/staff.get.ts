@@ -5,7 +5,7 @@ import getDescription from "./description.get"
 import getSocial from "./social.get"
 // import { shardsAndSockets } from "../websocket/connection"
 
-export default async (_: Request, res: Response) => {
+export default (_: Request, res: Response) => {
 
     const developers = [] as staffData[]
     const admins = [] as staffData[]
