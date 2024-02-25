@@ -11,7 +11,9 @@ import { env } from "process";
 import { REST } from "discord.js";
 import sender from "./webhooks/sender";
 import { emojis } from "./json/data.json";
+import * as ApplicationCommands from "./bot/application_commands";
 export const Rest = new REST().setToken(env.DISCORD_TOKEN);
+ApplicationCommands.loadApplicationCommands();
 
 server.get("/", (_, res) => res.status(200).send({ status: "Welcome to Saphire's API" }));
 server.get("/ping", (_, res) => res.status(200).send("Saphire's API PING"));

@@ -1,8 +1,7 @@
 import { APIApplicationCommand, APIAttachment, APIEmbed, Attachment, AttachmentBuilder, AttachmentPayload, BufferResolvable, JSONEncodable, MessageReference, APIRole, APIMessageComponent, APIUser } from "discord.js";
 import { Stream } from "node:stream";
-import { Response as UndiciResponse } from "undici"
 import { DocumentSetOptions } from "mongoose";
-import { Request, Response } from "express"
+import { Request, Response } from "express";
 import { Socket } from "socket.io";
 import { ReminderType } from "./reminder";
 import { GuildSchemaType } from "../database/model/guilds";
@@ -60,10 +59,6 @@ export interface CommandsSaphire {
   id: string
   category: string
   description: string
-}
-
-export interface ResponseGetIp extends UndiciResponse {
-  ip: string
 }
 
 export interface ModelType extends DocumentSetOptions {

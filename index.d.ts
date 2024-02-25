@@ -1,5 +1,4 @@
-import "discord.js"
-import { Dispatcher } from "undici"
+import "discord.js";
 
 declare global {
   namespace NodeJS {
@@ -64,14 +63,8 @@ declare global {
       REDIS_USER_CACHE_PASSWORD: string
       REDIS_USER_CACHE_HOST_URL: string
       REDIS_USER_CACHE_HOST_PORT: string
+      APPLICATION_COMMANDS_PASSWORD: string
     }
-  }
-
-}
-
-declare namespace Dispatcher {
-  interface ResponseData {
-    content?: string
   }
 
 }
