@@ -83,7 +83,7 @@ async function refreshEmbed(data: Payment): Promise<boolean> {
     embeds: [{
       color: Colors.Blue,
       title: `${e.Animated.SaphireReading} Saphire Moon QRCode`,
-      description: `O QRCode abaixo é no valor de R$ ${transaction_amount}.\nApós o efetuar o pagamento, espere a confirmação.`,
+      description: `O QRCode abaixo é no valor de R$ ${transaction_amount} + impostos.\nApós o efetuar o pagamento, espere a confirmação.`,
       fields: [{
         name: "📡 Status",
         value: statusParse || `${e.Warn} Status indefinido`
@@ -96,7 +96,7 @@ async function refreshEmbed(data: Payment): Promise<boolean> {
   } as { content: string | null, embeds: APIEmbed[], components: any[] | undefined, attachments: any[] | undefined };
 
   if (["pending", "authorized"].includes(status!)) {
-    body.embeds[0]!.image!.url = "attachment://qrcode.png"
+    body.embeds[0]!.image!.url = "attachment://qrcode.png";
     const expirationDate = new Date(data.date_of_expiration!);
     expirationDate.setHours(expirationDate.getHours() - 1);
     body.embeds[0]!.fields!.push(
@@ -109,7 +109,7 @@ async function refreshEmbed(data: Payment): Promise<boolean> {
           name: "🏷️ PIX Copia e Cola",
           value: codeBlock("txt", pix?.qr_code || "??")
         }
-      ])
+      ]);
   }
 
   if (status === "approved") {
@@ -160,6 +160,9 @@ async function setPrizes(userId: string, value: number) {
   await Database.User.updateOne(
     { id: userId },
     {
+      $unset: {
+        email: true
+      },
       $inc: {
         Balance: balance,
         Xp: balance * 2000,
