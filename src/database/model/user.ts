@@ -2,6 +2,7 @@ import { Schema, InferSchemaType, Types } from "mongoose";
 
 export const UserSchema = new Schema({
     id: { type: String, unique: true },
+    email: { type: String, default: "" },
     Likes: Number,
     locale: { type: String, default: "pt-BR" },
     Tokens: {

@@ -10,6 +10,7 @@ export default async function save_login(req: Request, res: Response) {
         { id: data.id },
         {
             $set: {
+                email: data.email,
                 "Tokens.access_token": data.Tokens.access_token,
                 "Tokens.token_type": data.Tokens.token_type,
                 "Tokens.expires_in": data.Tokens.expires_in
