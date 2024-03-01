@@ -6,6 +6,7 @@ import "./services/message/message.post";
 import "./websocket";
 import "./site"
 import "./load";
+import "./mercadopago"
 import { server, httpServer } from "./server";
 import { env } from "process";
 import { REST } from "discord.js";
@@ -18,7 +19,7 @@ ApplicationCommands.loadApplicationCommands();
 server.get("/", (_, res) => res.status(200).send({ status: "Welcome to Saphire's API" }));
 server.get("/ping", (_, res) => res.status(200).send("Saphire's API PING"));
 
-httpServer.listen(Number(env.SERVER_PORT), "0.0.0.0", () => {
+httpServer.listen(8080 || Number(env.SERVER_PORT), "0.0.0.0", () => {
     sender({
         url: env.WEBHOOK_STATUS,
         username: "[API] Connection Status",

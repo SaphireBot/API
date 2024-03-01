@@ -11,14 +11,14 @@ const request = new REST().setToken(process.env.BOT_TOKEN_REQUEST)
 
 async function execute(): Promise<void> {
 
-    const webhookFetch: DiscordWebhook[] | unknown = await request.get(Routes.channelWebhooks(env.CHANNEL_WEBHOOK_STATUS)).catch(() => [])
+    const webhookFetch: DiscordWebhook[] | unknown = await request.get(Routes.channelWebhooks(env.CHANNEL_WEBHOOK_STATUS!)).catch(() => [])
 
     let apiWebhook: DiscordWebhook = Array.isArray(webhookFetch)
         ? webhookFetch.find(wh => wh?.user?.username == "Saphire API")
         : undefined
 
     if (!apiWebhook)
-        apiWebhook = <DiscordWebhook>await request.post(Routes.channelWebhooks(env.CHANNEL_WEBHOOK_STATUS), {
+        apiWebhook = <DiscordWebhook>await request.post(Routes.channelWebhooks(env.CHANNEL_WEBHOOK_STATUS!), {
             body: {
                 name: "[API] Database Backup Manager",
                 avatar: `data:image/png;base64,${avatar}`,

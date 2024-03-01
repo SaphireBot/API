@@ -32,8 +32,11 @@ export async function loadApplicationCommands() {
   if (timeout) return;
 
   await fetch(
-    "https://api.saphire.one/applicationcommands",
-    { headers: { authorization: `Bot ${env.APPLICATION_COMMANDS_PASSWORD}` } }
+    `https://discord.com/api/v10/applications/${env.SAPHIRE_BOT_ID}/commands`,
+    {
+      method: "GET",
+      headers: { authorization: `Bot ${env.DISCORD_TOKEN}` }
+    }
   )
     .then(res => res.json())
     .then(res => {
@@ -50,6 +53,6 @@ export async function loadApplicationCommands() {
 
       return;
     })
-    .catch(console.log);
+    .catch(() => { });
 
 }

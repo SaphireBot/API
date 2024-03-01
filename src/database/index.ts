@@ -5,13 +5,14 @@ import { UserSchema } from "./model/user";
 import { set } from "../websocket/cache/get.cache";
 import { Types } from "mongoose";
 import { redis, RedisRanking, RedisUsers } from "./redis";
-import { SaphireMongooseCluster } from "../load";
+import { RecordMongooseCluster, SaphireMongooseCluster } from "../load";
 import { BlacklistSchema } from "./model/blacklist";
 import { TwitchSchema } from "./model/twitch";
 import { ReminderSchema } from "./model/reminder";
 import { CommandSchema } from "./model/commands";
 import { AfkSchema } from "./model/afk";
 import { VoteSchema } from "./model/vote";
+import { MercadoPagoPaymentSchema } from "./model/mercadoPagoSchema";
 export { redis, RedisRanking, RedisUsers }
 
 export default new class Database {
@@ -25,6 +26,7 @@ export default new class Database {
     Commands = SaphireMongooseCluster.model("Commands", CommandSchema);
     Afk = SaphireMongooseCluster.model("Afk", AfkSchema);
     Vote = SaphireMongooseCluster.model("Vote", VoteSchema);
+    Payments = RecordMongooseCluster.model("MercadoPago", MercadoPagoPaymentSchema);
     Ranking = RedisRanking;
 
     constructor() { }
@@ -58,32 +60,10 @@ export default new class Database {
 
         this.User.watch()
             .on("change", async change => {
-                // console.log(change);
 
                 if (["update", "insert"].includes(change.operationType)) {
-                    // if (userIds.length)
-                    //     return userIds.push(change.documentKey._id)
-
-                    // userIds.push(change.documentKey._id)
-                    // setTimeout(async () => {
-                    // if (!userIds.length) return
-                    // const ids = Array.from(new Set(userIds.splice(0)))
-                    // const documents = await this.User.find({ _id: { $in: ids } })
                     const document = await this.User.findById(change.documentKey._id);
                     if (document?.id) await set(document.id, document.toObject());
-
-                    // for await (const doc of documents) {
-                    // if (doc?.id) set(doc.id, doc.toObject());
-
-                    // await this.Ranking.zAdd("balance", [{ value: doc?.id, score: doc?.Balance || 0 }]);
-                    // const data = ranking.get(doc?.id)
-                    // if (data) {
-                    //     data.balance = doc?.Balance || 0
-                    //     ranking.set(doc.id, data);
-                    // }
-                    // }
-
-                    // }, 1000)
                     return;
                 }
 
