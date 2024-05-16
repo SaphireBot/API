@@ -55,7 +55,7 @@ server.post("/payments", async (req, res) => {
     body: {
       payment_method_id: "pix",
       installments: 1,
-      transaction_amount: Number(`${amount.toFixed(2)}`),
+      transaction_amount: amount,
       date_of_expiration,
       payer: {
         first_name: username,

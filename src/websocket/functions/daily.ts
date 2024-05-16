@@ -48,7 +48,7 @@ export default async function daily(params: { userId: string, guilds: any[], acc
 
     const userId = params?.userId;
     const guilds = params?.guilds;
-    const access_token = params?.access_token;
+    // const access_token = params?.access_token;
 
     if (!userId || typeof userId !== "string" || !guilds || !guilds?.length || !Array.isArray(guilds)) return callback("<p>Os parametros repassados não estão completos, por favor, contacte alguém da minha equipe.</p>");
     if (dailyCooldown.has(userId))
@@ -62,11 +62,11 @@ export default async function daily(params: { userId: string, guilds: any[], acc
         set(userId, ("toObject" in data) ? data?.toObject() : data)
     }
 
-    if (!data?.Tokens?.access_token)
-        return callback("<p>Parece que seus dados estão incompletos no meu banco de dados, você pode fazer login no site? Para mim, você é um completo desconhecido</p>");
+    // if (!data?.Tokens?.access_token)
+    //     return callback("<p>Parece que seus dados estão incompletos no meu banco de dados, você pode fazer login no site? Para mim, você é um completo desconhecido</p>");
 
-    if (data?.Tokens?.access_token !== access_token)
-        return callback("<p>Qual foi, esse perfil não é seu, sabia?</p>");
+    // if (data?.Tokens?.access_token !== access_token)
+    //     return callback("<p>Qual foi, esse perfil não é seu, sabia?</p>");
 
     const count = (data?.DailyCount || 0) + 1;
     const timeout = data?.Timeouts?.Daily || 0;
