@@ -38,7 +38,13 @@ server.get("/clientdata", clientGet);
 server.get("/status", statusGet);
 server.get("/partners", partners);
 server.get("/commandsdata", commandsdata);
-server.get("/home", (_, res) => res.send({ guilds: allGuilds.size, commands: apiCommandsData.size, interactions: interactions.count }));
+server.get("/home", async (_, res) => {
+    res.send({
+        guilds: allGuilds.size,
+        commands: apiCommandsData.size,
+        interactions: (await database.getClientData())?.ComandosUsados || interactions.count || 0
+    })
+});
 server.get("/servers", (_, res) => res.send(Array.from(new Set(allGuilds.keys()))));
 
 server.post("/daily", (req, res) => daily(req.body as any, res));

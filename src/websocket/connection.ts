@@ -35,13 +35,20 @@ refreshSiteData();
 setInterval(() => refreshSiteData(), 1000 * 15);
 const chatMessages = new Collection<number, ChatMessage>();
 
-export const partners = [
+let partners = [
     {
-        name: "TTS AutoMod",
-        type: "bot",
-        description: "Fornece um intermediário para acessar e configurar o Discord AutoMod, visa facilitar os usuários de dispositivos móveis.",
-        icon: "https://cdn.discordapp.com/avatars/1170935729589866507/de9767c9d7d26f589cde451edd28865b.webp",
-        url: "https://is.gd/ttsautomod"
+        name: "690225890357018669", // Candylang
+        type: "guild",
+        description: "",
+        icon: "",
+        url: "https://discord.gg/candylandbr"
+    },
+    {
+        name: "1172228418985791488", // Vegas
+        type: "guild",
+        description: "",
+        icon: "",
+        url: "https://discord.gg/cassinovegas"
     },
     {
         name: "872962755538350110", // Animes Paradise
@@ -66,6 +73,8 @@ export const partners = [
     }
 ];
 
+export { partners };
+
 setTimeout(() => shardsAndSockets.random()?.send({ type: "sendStaffData" }), 1000 * 60 * 30);
 
 export async function refreshPartnersStatus() {
@@ -79,7 +88,8 @@ export async function refreshPartnersStatus() {
                 partner.name = guild.name;
                 partner.description = guild.description || "Este servidor não possui nenhuma descrição";
                 partner.icon = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.${guild?.icon?.includes("a_") ? "gif" : "png"}`;
-            }
+                if (guild.vanity_url_code) partner.url = `https://discord.gg/${guild.vanity_url_code}`
+            } else partners = partners.filter(g => g.name !== partner.name);
         }
     }
 
