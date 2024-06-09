@@ -70,7 +70,7 @@ server.post("/payments", async (req, res) => {
     }
   })
     .catch(error => {
-      console.log(error);
+      console.log("Mercado Pago SDK Error", error);
       return { message: "Mercado Pago SDK Error", error: `${error?.message}` };
     })
 

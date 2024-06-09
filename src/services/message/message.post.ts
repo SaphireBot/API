@@ -89,7 +89,7 @@ async function postMessage(data: MessageSaphireRequest | MessageToSendThroughWeb
                 return res.send(err)
             }
 
-            console.log(err, data)
+            console.log("postMessage", err, data)
             return shardsAndSockets
                 .random()
                 ?.send({

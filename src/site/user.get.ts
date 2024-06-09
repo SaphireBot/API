@@ -3,7 +3,6 @@ import { env } from "process";
 // import { shardsAndSockets } from "../websocket/connection";
 import Database from "../database";
 import { UserSchemaType } from "../database/model/user";
-import { get, set } from "../websocket/cache/get.cache";
 
 export default async (req: Request, res: Response) => {
 
@@ -31,13 +30,7 @@ export default async (req: Request, res: Response) => {
         return
     }
 
-    let doc = await get(userId) as any;
-
-    if (!doc?.id) {
-        const document = await Database.User.findOne({ id: userId });
-        if (document?.id) set(document?.id, document);
-        doc = document?.toObject();
-    }
+    const doc = await Database.User.findOne({ id: userId });
 
     if (!doc?.id) return res.send({ message: "Nenhuma informação foi encontrada no banco de dados." })
     delete doc?.Tokens;

@@ -10,13 +10,16 @@ export default async (req: Request, res: Response) => {
         { title: string | undefined, description: string, isCommandBuggued: boolean, command: string | undefined, userId: string } = req.body
 
     if (!description || !userId)
-        return res.status(400).send({ message: "Descrição & ID de usuário estão faltando" })
+        return res.status(400).send({ message: "Descrição & ID de usuário estão faltando" });
 
     if (description.length > 3900)
-        return res.status(400).send({ message: "O tamanho da descrição não pode ultrapassar 3900 caracteres." })
+        return res.status(400).send({ message: "O tamanho da descrição não pode ultrapassar 3900 caracteres." });
 
     if ((title?.length || 0) > 50)
-        return res.status(400).send({ message: "O tamanho da título não pode ultrapassar 3900 caracteres." })
+        return res.status(400).send({ message: "O tamanho da título não pode ultrapassar 3900 caracteres." });
+
+    if (!env.SERVER_BUG_REPORT)
+        return res.status(500).send({ message: "ID do canal de origem não especificado." });
 
     const user = await fetch(
         `https://discord.com/api/v10/users/${userId}`,

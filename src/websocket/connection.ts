@@ -4,7 +4,7 @@ import { Socket } from "socket.io";
 import { staffs } from "../site";
 import { env } from "process";
 import postmessage from "./functions/postmessage";
-import getCache, { get, set } from "./cache/get.cache";
+import getCache from "./cache/get.cache";
 import getMultipleCache from "./cache/multiple.cache";
 import postAfk from "./functions/postafk";
 import postmessagewithreply from "./functions/postmessagewithreply";
@@ -103,12 +103,7 @@ export default (socket: Socket) => {
 
         socket.on("transactions", async (userId: string, callback: CallbackType) => {
 
-            let data = await get(userId) as UserSchemaType | any;
-
-            if (!data) {
-                data = await Database.User.findOne({ id: userId });
-                if (data?.id) set(data.id, data?.toObject());
-            }
+            const data = await Database.User.findOne({ id: userId }) as UserSchemaType | any;
 
             return callback({
                 Transactions: data?.Transactions || [],

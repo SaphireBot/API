@@ -13,7 +13,11 @@ import { REST } from "discord.js";
 import sender from "./webhooks/sender";
 import { emojis } from "./json/data.json";
 import * as ApplicationCommands from "./bot/application_commands";
-export const Rest = new REST().setToken(env.DISCORD_TOKEN);
+import { discloud } from "discloud.app";
+discloud.rest.setToken(env.DISCLOUD_TOKEN);
+
+const discordToken = env.MACHINE === "localhost" ? env.CANARY_DISCORD_TOKEN : env.SAPHIRE_DISCORD_TOKEN;
+export const Rest = new REST().setToken(discordToken);
 ApplicationCommands.loadApplicationCommands();
 
 server.get("/", (_, res) => res.status(200).send({ status: "Welcome to Saphire's API" }));

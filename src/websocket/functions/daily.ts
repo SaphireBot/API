@@ -1,7 +1,6 @@
 import { env } from "process";
 import { CallbackType } from "../../@types";
-import database, { redis } from "../../database";
-import { get, set } from "../cache/get.cache";
+import database from "../../database";
 import { Response } from "express";
 const dailyCooldown = new Set();
 
@@ -55,12 +54,9 @@ export default async function daily(params: { userId: string, guilds: any[], acc
         return callback("<p>Você está tentando fazer isso rápido demais, sabia?</p>");
     dailyCooldown.add(userId);
     setTimeout(() => dailyCooldown.delete(userId), 2000);
-    let data = await get(userId);
 
-    if (!data) {
-        data = (await database.User.findOne({ id: userId })) || { id: userId };
-        set(userId, ("toObject" in data) ? data?.toObject() : data)
-    }
+    const data = await database.User.findOne({ id: userId }) || {} as any;
+    if (!data?.id) data.id = userId;
 
     // if (!data?.Tokens?.access_token)
     //     return callback("<p>Parece que seus dados estão incompletos no meu banco de dados, você pode fazer login no site? Para mim, você é um completo desconhecido</p>");
@@ -76,8 +72,7 @@ export default async function daily(params: { userId: string, guilds: any[], acc
     if (86400000 - (dateNow - (timeout || 0)) > 0)
         return callback(`<p>Você ainda não pode pegar o seu prêmio diário, tenta de novo nessa data;<br/>${Intl.DateTimeFormat("pt-BR", { dateStyle: "full", timeStyle: "medium" }).format(new Date(timeout + oneDayInMilliseconds))}</p>`);
 
-    let client = (await redis.json.get(env.SAPHIRE_BOT_ID) as any) as any;
-    if (!client) client = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
+    const client = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
 
     let html = "";
 
@@ -134,7 +129,7 @@ export default async function daily(params: { userId: string, guilds: any[], acc
 
     html += `<p>No seu ${prize.day}° dia, você recebeu ${prize.money} Safiras e ${prize.xp} Experiências</p>`;
 
-    const uerData = await database.User.findOneAndUpdate(
+    await database.User.updateOne(
         { id: userId },
         {
             $set: { "Timeouts.Daily": dateNow },
@@ -161,7 +156,6 @@ export default async function daily(params: { userId: string, guilds: any[], acc
         },
         { upsert: true, new: true }
     );
-    set(userId, uerData?.toObject());
     return callback(html);
 
     function bonusCalculate(porcent: number) {

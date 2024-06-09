@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import Database from "../../../database";
 import { siteSocket } from "../../../websocket/connection";
 import { UserSchemaType } from "../../../database/model/user";
-import { get } from "../../../websocket/cache/get.cache";
 
 export default async (req: Request, res: Response) => {
 
@@ -21,7 +20,7 @@ export default async (req: Request, res: Response) => {
     if (!from || !date || !userId || !requesting)
         return res.status(400).send({ type: "error", message: "Date, From, UserId, Requesting field is missing" })
 
-    const userdata = await get(userId) || await Database.User.findOne({ id: userId }) as UserSchemaType
+    const userdata = await Database.User.findOne({ id: userId }) as UserSchemaType
     if (!userdata) return res.send({ type: "notfound", message: "Nenhum usuário foi encontrado." })
 
     const reputation = (userdata as any)?.Perfil?.Reputation?.find((rep: any) => rep?.date == date)

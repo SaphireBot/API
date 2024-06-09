@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { env } from "process";
 import { APIUser } from "discord.js";
-import { RedisUsers } from "../database";
+// import { RedisUsers } from "../database";
+const cache = new Map<string, APIUser>();
 const tokens = [
     env.BOT_TOKEN_REQUEST,
     env.BOT_USERS_TOKEN_REQUEST,
@@ -19,7 +20,7 @@ export default async (req: Request, res: Response) => {
     if (!id) return res.send([]);
 
     if (Array.isArray(id)) return await fetcher()
-    const cached = await RedisUsers.json.get(id)
+    const cached = cache.get(id);
     if (cached) return res.send([cached]);
 
     await fetch(
@@ -28,7 +29,9 @@ export default async (req: Request, res: Response) => {
     )
         .then(res => res.json())
         .then(data => {
-            set(data as any)
+            // set(data as any)
+
+            cache.set((data as any).id, data as APIUser);
             return res.send([data])
         })
         .catch(err => res.status(500).send(err))
@@ -39,11 +42,11 @@ export default async (req: Request, res: Response) => {
         let gets = 0
         const usersData: APIUser[] = []
 
-        const data = ((await RedisUsers.json.mGet(ids, "$") as any) as APIUser[][])?.flat()?.filter(d => d?.id);
-        if (data?.length)
-            for (const d of data)
-                if (d?.id)
-                    usersData.push(d)
+        // const data = ((await RedisUsers.json.mGet(ids, "$") as any) as APIUser[][])?.flat()?.filter(d => d?.id);
+        // if (data?.length)
+        //     for (const d of data)
+        //         if (d?.id)
+        //             usersData.push(d)
 
         for (const userId of ids) {
 
@@ -58,8 +61,9 @@ export default async (req: Request, res: Response) => {
             )
                 .then(res => res.json())
                 .then(data => {
-                    set(data as any)
+                    // set(data as any)
                     if ((data as any)?.id) usersData.push(data as any)
+                    cache.set((data as any).id, data as APIUser);
                     verifyAndSend()
                 })
                 .catch(() => verifyAndSend())
@@ -74,10 +78,10 @@ export default async (req: Request, res: Response) => {
 
     }
 
-    async function set(data: APIUser | undefined) {
-        if (!data?.id) return;
-        await RedisUsers.json.set(data.id, "$", { ...data });
-        await RedisUsers.expire(data.id, 86400);
-        return;
-    }
+    // async function set(data: APIUser | undefined) {
+    // if (!data?.id) return;
+    // await RedisUsers.json.set(data.id, "$", { ...data });
+    // await RedisUsers.expire(data.id, 86400);
+    // return;
+    // }
 }
