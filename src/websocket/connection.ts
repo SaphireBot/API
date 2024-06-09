@@ -16,6 +16,7 @@ import { ws } from "../server";
 import { UserSchemaType } from "../database/model/user";
 import { Rest } from "..";
 import daily from "./functions/daily";
+import database from "../database";
 export const interactions = {
     commands: new Collection<string, number>(),
     count: 0,
@@ -245,7 +246,11 @@ function apllicationCommands(commands: APIApplicationCommand[]) {
     return
 }
 
-function refreshSiteData() {
+async function refreshSiteData() {
+
+    const data = await database.getClientData();
+    interactions.count = data?.ComandosUsados || 0;
+
     if (!apiCommandsData.size)
         shardsAndSockets
             .random()
