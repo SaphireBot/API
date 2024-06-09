@@ -10,6 +10,11 @@ export default async (req: Request, res: Response) => {
     )
         return res.sendStatus(200)
 
-    await database.Vote.updateOne({ userId: req.body?.user }, { $set: { voted: true } }, { upsert: true })
-    return res.sendStatus(200)
+    res.sendStatus(200);
+    await database.Vote.updateOne({ userId: req.body?.user }, { $set: { voted: true } }, { upsert: true });
+    await database.User.updateOne(
+        { id: req.body.user },
+        { $set: { "Timeouts.TopGGVote": Date.now() + ((60 * 1000) * 60) * 12 } },
+        { upsert: true }
+    )
 }

@@ -124,15 +124,15 @@ declare global {
       YOUTUBE_CLIENT_ID: string
       YOUTUBE_CLIENT_SECRET_ID: string
       GEMINI_API_KEY: string
-      // REDIS_USER_PASSWORD: string
-      // REDIS_SOCKET_HOST_URL: string
-      // REDIS_SOCKET_HOST_PORT: string
+      REDIS_USER_PASSWORD: string
+      REDIS_SOCKET_HOST_URL: string
+      REDIS_SOCKET_HOST_PORT: string
       REDIS_RANKING_PASSWORD: string
       REDIS_RANKING_HOST_URL: string
       REDIS_RANKING_HOST_PORT: string
-      // REDIS_USER_CACHE_PASSWORD: string
-      // REDIS_USER_CACHE_HOST_URL: string
-      // REDIS_USER_CACHE_HOST_PORT: string
+      REDIS_USER_CACHE_PASSWORD: string
+      REDIS_USER_CACHE_HOST_URL: string
+      REDIS_USER_CACHE_HOST_PORT: string
       APPLICATION_COMMANDS_PASSWORD: string
       MERCADO_PAGO_TEST_PUBLIC_KEY: string
       MERCADO_PAGO_TEST_ACCESS_TOKEN: string
@@ -140,6 +140,8 @@ declare global {
       MERCADO_PAGO_PRODUCTION_ACCESS_TOKEN: string
       MERCADO_PAGO_PRODUCTION_CLIENT_ID: string
       MERCADO_PAGO_PRODUCTION_CLIENT_SECRET: string
+      GOOGLE_IMAGES_CX: string
+      GOOGLE_IMAGES_KEY: string
     }
   }
 

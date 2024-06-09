@@ -22,10 +22,11 @@ import database from "../database";
 import commandBlocker from "./commands.block";
 
 export const staffs = new Collection<string, staffData>();
-const admins = new Set<string>();
+export const admins = new Set<string>();
+export const mods = new Set<string>();
 
-setInterval(() => refreshAdmins(), 1000 * 60);
-refreshAdmins()
+setInterval(() => refreshStaff(), 1000 * 60);
+refreshStaff()
 
 server.get("/staffs", staffGet);
 server.get("/getusers", getUsers);
@@ -49,14 +50,20 @@ server.post("/save_login", save_login)
 server.post("/commands", commandBlocker)
 
 server.get("/admins", async (_, res) => res.send(Array.from(admins)));
-server.get("/mods", async (_, res) => res.send(await database.Client.findOne({ id: process.env.SAPHIRE_BOT_ID })?.then(res => res?.Moderadores || [])));
+server.get("/mods", async (_, res) => res.send(Array.from(mods)));
 
 server.delete("/reputation", reputationDelete);
 
-async function refreshAdmins() {
+async function refreshStaff() {
     admins.clear();
-    const adminsAtDatabase = await database.Client.findOne({ id: process.env.SAPHIRE_BOT_ID })?.then(res => res?.Administradores || []).catch(() => []);
-    for (const adminId of adminsAtDatabase)
-        admins.add(adminId);
+
+    const data = await database.getClientData()
+        ?.then(res => ({
+            admins: res?.Administradores || [],
+            mods: res?.Moderadores || []
+        })).catch(() => { }) as { admins: string[], mods: string[] };
+
+    for (const adminId of data.admins) admins.add(adminId);
+    for (const modId of data.mods) mods.add(modId);
     return;
 }

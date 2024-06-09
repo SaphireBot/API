@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import database from "../database";
-import { env } from "process";
 // import { ClientSchemaType } from "../database/model/client";
 
 export default async (_: Request, res: Response) => {
@@ -13,7 +12,7 @@ export default async (_: Request, res: Response) => {
     //     if (cache) return res.json(cache)
     // }
 
-    const data = await database.Client.findOne({ id: env.SAPHIRE_ID });
+    const data = await database.getClientData();
     if (data) {
         for (const key of Object.keys(data || {}))
             if (key?.toLowerCase()?.includes("token"))

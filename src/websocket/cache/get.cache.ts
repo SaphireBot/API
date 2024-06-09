@@ -1,7 +1,7 @@
 import { Collection } from "discord.js";
 import { CallbackType } from "../../@types";
 import database from "../../database";
-export const ranking = new Collection<string, { id: string, balance: number, position: number }>()
+export const ranking = new Collection<string, { id: string, balance: number, position: number }>();
 
 export default async (id: string | undefined, type: "user" | "guild" | "client" | "ranking" | undefined, callback: CallbackType): Promise<void> => {
 
@@ -16,7 +16,7 @@ export default async (id: string | undefined, type: "user" | "guild" | "client" 
 
     if (type === "guild") data = await database.Guild.findOne({ id }).then(doc => doc?.toObject());
     if (type === "user") data = await database.User.findOne({ id }).then(doc => doc?.toObject());
-    if (type === "client") data = await database.Client.findOne({ id }).then(doc => doc?.toObject());
+    if (type === "client") data = await database.getClientData();
 
     if (!data) return callback({ id });
     // set(id, data);

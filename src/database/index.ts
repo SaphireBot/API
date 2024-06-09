@@ -1,5 +1,5 @@
 import cache from "./model/cache";
-import { ClientSchema } from "./model/client";
+import { ClientSchema, ClientSchemaType } from "./model/client";
 import { GuildSchema } from "./model/guilds";
 import { UserSchema } from "./model/user";
 import { RecordMongooseCluster, SaphireMongooseCluster } from "../load";
@@ -11,6 +11,9 @@ import { AfkSchema } from "./model/afk";
 import { VoteSchema } from "./model/vote";
 import { MercadoPagoPaymentSchema } from "./model/mercadoPagoSchema";
 import { RedisRanking } from "./redis";
+import { env } from "node:process";
+import { mods, admins } from "../site";
+import { interactions } from "../websocket/connection";
 
 export default new class Database {
     Cache = typeof cache
@@ -25,7 +28,36 @@ export default new class Database {
     Vote = SaphireMongooseCluster.model("Vote", VoteSchema);
     Payments = RecordMongooseCluster.model("MercadoPago", MercadoPagoPaymentSchema);
 
+    declare clientData: ClientSchemaType | undefined;
+
     constructor() { }
+
+    async getClientData() {
+
+        if (this.clientData)
+            return this.clientData;
+
+        const data = await this.Client.findOne({ id: env.SAPHIRE_ID });
+
+        if (data) {
+            this.clientData = data.toObject();
+
+            if (this.clientData.Moderadores?.length) {
+                mods.clear();
+                for (const modId of this.clientData.Moderadores) mods.add(modId);
+            }
+            if (this.clientData.Administradores?.length) {
+                admins.clear();
+                for (const adminId of this.clientData.Moderadores) admins.add(adminId);
+            }
+
+            if ((this.clientData.ComandosUsados || 0) > 0)
+                interactions.count = this.clientData.ComandosUsados || 0;
+
+            return this.clientData;
+        }
+
+    }
 
     watch() {
 
@@ -53,6 +85,26 @@ export default new class Database {
         //         }
 
         //     });
+
+        this.Client.watch()
+            .on("change", async () => {
+                const data = await this.Client.findOne({ id: env.SAPHIRE_ID });
+                this.clientData = data?.toObject() || undefined;
+
+                if (data?.Moderadores?.length) {
+                    mods.clear();
+                    for (const modId of data.Moderadores) mods.add(modId);
+                }
+                if (data?.Administradores?.length) {
+                    admins.clear();
+                    for (const adminId of data.Moderadores) admins.add(adminId);
+                }
+
+                if ((data?.ComandosUsados || 0) > 0)
+                    interactions.count = data?.ComandosUsados || 0;
+
+                return;
+            })
 
         this.User.watch()
             .on("change", async change => {

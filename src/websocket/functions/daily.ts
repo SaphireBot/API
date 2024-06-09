@@ -1,12 +1,11 @@
-import { env } from "process";
 import { CallbackType } from "../../@types";
 import database from "../../database";
 import { Response } from "express";
 const dailyCooldown = new Set();
 
 const prizes = {
-    1: { day: 1, money: 200, xp: 150 },
-    2: { day: 2, money: 0, xp: 3000 },
+    1: { day: 1, money: 700, xp: 150 },
+    2: { day: 2, money: 770, xp: 3000 },
     3: { day: 3, money: 300, xp: 100 },
     4: { day: 4, money: 400, xp: 4000 },
     5: { day: 5, money: 500, xp: 250 },
@@ -72,7 +71,7 @@ export default async function daily(params: { userId: string, guilds: any[], acc
     if (86400000 - (dateNow - (timeout || 0)) > 0)
         return callback(`<p>Você ainda não pode pegar o seu prêmio diário, tenta de novo nessa data;<br/>${Intl.DateTimeFormat("pt-BR", { dateStyle: "full", timeStyle: "medium" }).format(new Date(timeout + oneDayInMilliseconds))}</p>`);
 
-    const client = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
+    const client = await database.getClientData();
 
     let html = "";
 

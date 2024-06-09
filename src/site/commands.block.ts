@@ -19,7 +19,7 @@ async function blockCommand(req: Request, res: Response) {
 
     if (Array.isArray(command)) return await blockMultiCommand(req, res);
 
-    const clientData = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
+    const clientData = await database.getClientData();
 
     if (!(clientData?.Administradores || []).includes(userid)) return res.send({ message: "Unauthorized" })
     if (!command || !reason || !userid) return res.send({ message: "missing data" });
@@ -32,7 +32,7 @@ async function blockCommand(req: Request, res: Response) {
     })
 
     return await database.Client.updateOne(
-        { id: env.SAPHIRE_BOT_ID },
+        { id: env.SAPHIRE_ID },
         {
             $push: {
                 BlockedCommands: {
@@ -66,7 +66,7 @@ async function unblockCommand(req: Request, res: Response) {
 
     if (Array.isArray(command)) return unblockMultiCommand(req, res);
 
-    const clientData = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
+    const clientData = await database.getClientData();
 
     if (!(clientData?.Administradores || []).includes(userid)) return res.send({ message: "Unauthorized" })
     if (!command || !userid) return res.send({ message: "missing data" });
@@ -75,7 +75,7 @@ async function unblockCommand(req: Request, res: Response) {
     if (!blocked) return res.send({ message: "command is not blocked" })
 
     return await database.Client.updateOne(
-        { id: env.SAPHIRE_BOT_ID },
+        { id: env.SAPHIRE_ID },
         { $pull: { BlockedCommands: { cmd: command } } }
     )
         .then(() => res.send({
@@ -93,14 +93,14 @@ async function unblockCommand(req: Request, res: Response) {
 async function unblockallCommand(req: Request, res: Response) {
 
     const userid = req?.body?.userid || "";
-    const clientData = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
+    const clientData = await database.getClientData();
 
     if (!(clientData?.Administradores || []).includes(userid)) return res.send({ message: "Unauthorized" })
 
     if (!(clientData?.BlockedCommands || [])?.length) return res.send({ message: "No command blocked" })
 
     return await database.Client.updateOne(
-        { id: env.SAPHIRE_BOT_ID },
+        { id: env.SAPHIRE_ID },
         { $set: { BlockedCommands: [] } }
     )
         .then(() => res.send({
@@ -127,7 +127,7 @@ async function blockMultiCommand(req: Request, res: Response) {
             error: ""
         })
 
-    const clientData = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
+    const clientData = await database.getClientData();
 
     if (!(clientData?.Administradores || []).includes(userid)) return res.send({ message: "Unauthorized" })
     if (!command?.length || !reason || !userid) return res.send({ message: "missing data" });
@@ -147,7 +147,7 @@ async function blockMultiCommand(req: Request, res: Response) {
 
     for await (const cmd of unblocked)
         await database.Client.updateOne(
-            { id: env.SAPHIRE_BOT_ID },
+            { id: env.SAPHIRE_ID },
             {
                 $push: {
                     BlockedCommands: {
@@ -179,7 +179,7 @@ async function unblockMultiCommand(req: Request, res: Response) {
             error: ""
         })
 
-    const clientData = await database.Client.findOne({ id: env.SAPHIRE_BOT_ID });
+    const clientData = await database.getClientData();
 
     if (!(clientData?.Administradores || []).includes(userid)) return res.send({ message: "Unauthorized" })
     if (!command?.length || !userid) return res.send({ message: "missing data" });
@@ -199,7 +199,7 @@ async function unblockMultiCommand(req: Request, res: Response) {
 
     for await (const cmd of blocked)
         await database.Client.updateOne(
-            { id: env.SAPHIRE_BOT_ID },
+            { id: env.SAPHIRE_ID },
             { $pull: { BlockedCommands: { cmd: command } } }
         )
             .then(() => success.push(cmd))
