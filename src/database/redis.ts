@@ -21,10 +21,6 @@ const RedisRanking = createClient({
   }
 });
 (async () => {
-  RedisRanking.on("error", async err => {
-    console.log("REDIS RANKING ERROR", err);
-    setTimeout(async () => await RedisRanking.connect(), 2500);
-  });
   RedisRanking.on("connect", () => console.log("Redis Ranking Connected"));
   await RedisRanking.connect();
 })();
