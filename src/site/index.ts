@@ -65,7 +65,11 @@ async function refreshStaff() {
         ?.then(res => ({
             admins: res?.Administradores || [],
             mods: res?.Moderadores || []
-        })).catch(() => { }) as { admins: string[], mods: string[] };
+        }))
+        .catch(() => ({
+            admins: [],
+            mods: []
+        }));
 
     for (const adminId of data.admins) admins.add(adminId);
     for (const modId of data.mods) mods.add(modId);
