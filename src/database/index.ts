@@ -37,26 +37,30 @@ export default new class Database {
         if (this.clientData)
             return this.clientData;
 
-        const data = await this.Client.findOne({ id: env.SAPHIRE_ID });
+        try {
 
-        if (data) {
-            this.clientData = data.toObject();
+            const data = await this.Client.findOne({ id: env.SAPHIRE_ID });
 
-            if (this.clientData.Moderadores?.length) {
-                mods.clear();
-                for (const modId of this.clientData.Moderadores) mods.add(modId);
+            if (data) {
+                this.clientData = data.toObject();
+
+                if (this.clientData.Moderadores?.length) {
+                    mods.clear();
+                    for (const modId of this.clientData.Moderadores) mods.add(modId);
+                }
+                if (this.clientData.Administradores?.length) {
+                    admins.clear();
+                    for (const adminId of this.clientData.Moderadores) admins.add(adminId);
+                }
+
+                if ((this.clientData.ComandosUsados || 0) > 0)
+                    interactions.count = this.clientData.ComandosUsados || 0;
+
+                return this.clientData;
             }
-            if (this.clientData.Administradores?.length) {
-                admins.clear();
-                for (const adminId of this.clientData.Moderadores) admins.add(adminId);
-            }
 
-            if ((this.clientData.ComandosUsados || 0) > 0)
-                interactions.count = this.clientData.ComandosUsados || 0;
-
-            return this.clientData;
-        }
-
+        } catch (err) { }
+        return;
     }
 
     watch() {
@@ -87,21 +91,24 @@ export default new class Database {
         //     });
 
         this.Client.watch()
-            .on("change", async () => {
-                const data = await this.Client.findOne({ id: env.SAPHIRE_ID });
-                this.clientData = data?.toObject() || undefined;
+            .on("change", async change => {
 
-                if (data?.Moderadores?.length) {
-                    mods.clear();
-                    for (const modId of data.Moderadores) mods.add(modId);
-                }
-                if (data?.Administradores?.length) {
-                    admins.clear();
-                    for (const adminId of data.Moderadores) admins.add(adminId);
-                }
+                try {
+                    const data = await this.Client.findOne({ id: env.SAPHIRE_ID });
+                    this.clientData = data?.toObject() || undefined;
 
-                if ((data?.ComandosUsados || 0) > 0)
-                    interactions.count = data?.ComandosUsados || 0;
+                    if (data?.Moderadores?.length) {
+                        mods.clear();
+                        for (const modId of data.Moderadores) mods.add(modId);
+                    }
+                    if (data?.Administradores?.length) {
+                        admins.clear();
+                        for (const adminId of data.Moderadores) admins.add(adminId);
+                    }
+
+                    if ((data?.ComandosUsados || 0) > 0)
+                        interactions.count = data?.ComandosUsados || 0;
+                } catch (err) { }
 
                 return;
             })
