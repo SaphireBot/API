@@ -91,7 +91,7 @@ export default new class Database {
         //     });
 
         this.Client.watch()
-            .on("change", async change => {
+            .on("change", async _ => {
 
                 try {
                     const data = await this.Client.findOne({ id: env.SAPHIRE_ID });

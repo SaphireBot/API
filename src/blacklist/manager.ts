@@ -13,8 +13,8 @@ export default new class Blacklist {
 
     async load() {
 
-        const documents = await Database.Blacklist.find()
-            .then(docs => docs.map(doc => doc.toObject() as BlacklistData))
+        const documents: BlacklistData[] = await Database.Blacklist.find()
+            .then(docs => docs.map(doc => doc.toObject() as any))
             .catch(() => [])
 
         if (!documents?.length) return this.checkOverDays()
@@ -95,6 +95,7 @@ export default new class Blacklist {
         return await Database.Blacklist.findOne({ id })
             .then(doc => {
                 if (!doc) return
+                // @ts-ignore
                 const data = doc.toObject() as BlacklistData
                 if (!data?.id) return
 

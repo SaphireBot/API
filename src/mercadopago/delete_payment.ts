@@ -2,7 +2,7 @@ import { server } from "../server";
 import { Pay, accessToken } from "./util";
 import Database from "../database";
 
-server.delete("/payments", async (req, res) => {
+server.delete("/payments", async (req, res): Promise<any> => {
 
   if (req.headers.authorization !== accessToken)
     return res.status(401).json({ message: "Unauthorized" });

@@ -2,6 +2,7 @@ import { shards } from "../websocket/connection"
 import { Request, Response } from "express"
 import { SaphireMongooseCluster, BetMongooseCluster, RecordMongooseCluster } from "../load"
 import { env } from "process"
+import { redis, RedisRanking, RedisUsers } from "../database/redis"
 
 export default async (_: Request, res: Response) => {
 
@@ -17,9 +18,9 @@ export default async (_: Request, res: Response) => {
         SaphireMongooseCluster.db?.admin()?.ping().then(() => ms.push({ name: "database1", ms: calculate() })).catch(() => ms.push({ name: "database1", ms: 0 })),
         BetMongooseCluster.db?.admin()?.ping().then(() => ms.push({ name: "database2", ms: calculate() })).catch(() => ms.push({ name: "database2", ms: 0 })),
         RecordMongooseCluster.db?.admin()?.ping().then(() => ms.push({ name: "database3", ms: calculate() })).catch(() => ms.push({ name: "database3", ms: 0 })),
-        ms.push({ name: "rediscache", ms: 0 }),
-        ms.push({ name: "redisranking", ms: 0 }),
-        ms.push({ name: "redisuser", ms: 0 })
+        await redis.ping().then(() => ms.push({ name: "rediscache", ms: calculate() })).catch(() => ms.push({ name: "database3", ms: 0 })),
+        await RedisRanking.ping().then(() => ms.push({ name: "redisranking", ms: calculate() })).catch(() => ms.push({ name: "database3", ms: 0 })),
+        await RedisUsers.ping().then(() => ms.push({ name: "redisuser", ms: calculate() })).catch(() => ms.push({ name: "database3", ms: 0 })),
     ]);
 
     ms.push(

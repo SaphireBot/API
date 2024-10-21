@@ -20,8 +20,12 @@ const discordToken = env.MACHINE === "localhost" ? env.CANARY_DISCORD_TOKEN : en
 export const Rest = new REST().setToken(discordToken);
 ApplicationCommands.loadApplicationCommands();
 
-server.get("/", (_, res) => res.status(200).send({ status: "Welcome to Saphire's API" }));
-server.get("/ping", (_, res) => res.status(200).send("Saphire's API PING"));
+server.get("/", (_, res) => {
+    res.status(200).send({ status: "Welcome to Saphire's API" });
+});
+server.get("/ping", (_, res) => {
+    res.status(200).send("Saphire's API PING");
+});
 
 httpServer.listen(Number(env.SERVER_PORT), "0.0.0.0", () => {
     sender({

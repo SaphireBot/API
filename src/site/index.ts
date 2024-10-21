@@ -28,35 +28,79 @@ export const mods = new Set<string>();
 setInterval(() => refreshStaff(), 1000 * 60);
 refreshStaff()
 
-server.get("/staffs", staffGet);
-server.get("/getusers", getUsers);
-server.get("/getusers/:id", getUsers);
-server.get("/users/:CreatedBy/:Sponsor", usersGet);
-server.get("/user/:userId", userGet);
-server.get("/giveaway/:giveawayId", giveawayGet);
-server.get("/clientdata", clientGet);
-server.get("/status", statusGet);
-server.get("/partners", partners);
-server.get("/commandsdata", commandsdata);
-server.get("/home", async (_, res) => res.send({
-    guilds: allGuilds.size,
-    commands: apiCommandsData.size,
-    interactions: (await database.getClientData())?.ComandosUsados || interactions.count || 0
-}));
-server.get("/servers", (_, res) => res.send(Array.from(new Set(allGuilds.keys()))));
+server.get("/staffs", (req, res) => {
+    staffGet(req, res);
+});
+server.get("/getusers", async (req, res) => {
+    await getUsers(req, res);
+});
+server.get("/getusers/:id", async (req, res) => {
+    await getUsers(req, res);
+});
+server.get("/users/:CreatedBy/:Sponsor", async (req, res) => {
+    await usersGet(req, res);
+});
+server.get("/user/:userId", async (req, res) => {
+    await userGet(req, res);
+});
+server.get("/giveaway/:giveawayId", (req, res) => {
+    giveawayGet(req, res);
+});
+server.get("/clientdata", async (req, res) => {
+    await clientGet(req, res);
+});
+server.get("/status", async (req, res) => {
+    await statusGet(req, res);
+});
+server.get("/partners", (req, res) => {
+    partners(req, res);
+});
+server.get("/commandsdata", (req, res) => {
+    commandsdata(req, res);
+});
+server.get("/home", async (_, res) => {
+    res.send({
+        guilds: allGuilds.size,
+        commands: apiCommandsData.size,
+        interactions: (await database.getClientData())?.ComandosUsados || interactions.count || 0
+    })
+});
+server.get("/servers", (_, res) => {
+    res.send(Array.from(new Set(allGuilds.keys())));
+});
 
-server.post("/daily", (req, res) => daily(req.body as any, res));
-server.post("/topgg", topggPost);
-server.post("/discordtokens", tokensSet);
-server.post("/bugs", bugs);
-server.post("/reputation", reputationPost);
-server.post("/save_login", save_login)
-server.post("/commands", commandBlocker)
+server.post("/daily", (req, res) => {
+    daily(req.body as any, res);
+});
+server.post("/topgg", async (req, res) => {
+    await topggPost(req, res);
+});
+server.post("/discordtokens", async (req, res) => {
+    await tokensSet(req, res);
+});
+server.post("/bugs", async (req, res) => {
+    await bugs(req, res);
+});
+server.post("/reputation", async (req, res) => {
+    await reputationPost(req as any, res);
+});
+server.post("/save_login", async (req, res) => {
+    await save_login(req, res);
+})
+server.post("/commands", async (req, res) => {
+    await commandBlocker(req, res);
+})
 
-server.get("/admins", async (_, res) => res.send(Array.from(admins)));
-server.get("/mods", async (_, res) => res.send(Array.from(mods)));
+server.get("/admins", (_, res) => {
+    res.send(Array.from(admins))
+});
+server.get("/mods", (_, res) => {
+    res.send(Array.from(mods))
+});
 
-server.delete("/reputation", reputationDelete);
+server.delete("/reputation", async (req, res) => {
+    await reputationDelete(req, res);
+});
 
 async function refreshStaff() {
     admins.clear();

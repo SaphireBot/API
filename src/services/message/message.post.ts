@@ -9,7 +9,7 @@ import { Rest } from "../../index"
 export const messagesToSend = <MessageToSendSaphireData[]>[]
 executeMessages()
 
-server.post("/message", async (req, res) => {
+server.post("/message", async (req, res): Promise<any> => {
 
     if (req.headers?.authorization !== env.POST_MESSAGE)
         return res

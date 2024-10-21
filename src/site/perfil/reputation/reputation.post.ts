@@ -5,7 +5,7 @@ import { UserSchemaType } from "../../../database/model/user";
 
 export default async (req: Request<{ from: string | undefined, text: string | undefined, to: string | undefined, username: string | undefined, date: number | undefined }>, res: Response) => {
 
-    const { from, text, to, username, date: dateNow } = req.body
+    const { from, text, to, username, date: dateNow } = req.body;
 
     if (!from || !text || !to || !dateNow)
         return res.status(400).send({ message: "Content Missing" })

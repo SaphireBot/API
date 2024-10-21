@@ -7,8 +7,10 @@ let timeout: NodeJS.Timeout | undefined;
 
 server.get("/applicationcommands", async (req, res) => {
 
-  if (req.headers.authorization !== env.APPLICATION_COMMANDS_PASSWORD)
-    return res.status(401).json({ message: "unauthorized" });
+  if (req.headers.authorization !== env.APPLICATION_COMMANDS_PASSWORD) {
+    res.status(401).json({ message: "unauthorized" });
+    return;
+  }
 
   if (!commands.size) await loadApplicationCommands();
 
@@ -17,14 +19,17 @@ server.get("/applicationcommands", async (req, res) => {
 
     if (!commands.size) {
       loadApplicationCommands();
-      return res.json({});
+      res.json({});
+      return;
     }
 
     const command = commands.get(name) || Array.from(commands.values()).find(cmd => cmd.id === name);
-    return res.json(command ? command : {});
+    res.json(command ? command : {});
+    return;
   }
 
-  return res.json(Array.from(commands.values()));
+  res.json(Array.from(commands.values()));
+  return;
 })
 
 export async function loadApplicationCommands() {

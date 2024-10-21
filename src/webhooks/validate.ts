@@ -3,7 +3,7 @@ import { WebhookBodyRequest } from "../@types";
 import { server } from "../server";
 import sender from "./sender";
 
-server.post("/sender", async (req, res) => {
+server.post("/sender", async (req, res): Promise<any> => {
 
   const { webhookUrl: url, content, embeds, avatarURL, files, username } = <WebhookBodyRequest>req.body ?? {};
 

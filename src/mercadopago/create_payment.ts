@@ -4,10 +4,12 @@ import Timer from "./timer";
 import { Pay, accessToken } from "./util";
 import Database from "../database";
 
-server.post("/payments", async (req, res) => {
+server.post("/payments", async (req, res): Promise<any> => {
 
-  if (req.headers.authorization !== accessToken)
-    return res.status(401).json({ message: "Unauthorized" });
+  if (req.headers.authorization !== accessToken) {
+    res.status(401).json({ message: "Unauthorized" });
+    return
+  }
 
   const body = req.body as CreateRequestPayment | undefined;
 
@@ -15,13 +17,19 @@ server.post("/payments", async (req, res) => {
     !body
     || typeof body !== "object"
     || Object.keys(body).length !== 7
-  )
-    return res.status(400).json({ message: "Bad Request" });
+  ) {
+    res.status(400).json({ message: "Bad Request" });
+    return
+  }
+
 
   const { amount, channel_id, email, guild_id, message_id, user_id, username } = body;
 
-  if (Timer.has(body.user_id))
-    return res.status(429).json({ message: "Too Many Requests" });
+  if (Timer.has(body.user_id)) {
+    res.status(429).json({ message: "Too Many Requests" });
+    return
+  }
+
 
   if (
     typeof amount !== "number"
