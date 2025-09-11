@@ -57,8 +57,9 @@ export default async function daily(params: { userId: string, guilds: any[], acc
     const data = await database.User.findOne({ id: userId }) || {} as any;
     if (!data?.id) data.id = userId;
 
-    // if (!data?.Tokens?.access_token)
-    //     return callback("<p>Parece que seus dados estão incompletos no meu banco de dados, você pode fazer login no site? Para mim, você é um completo desconhecido</p>");
+    if (!data?.Tokens?.access_token)
+        // Callback access token is necessery to this case
+        return callback("<p>Parece que seus dados estão incompletos no meu banco de dados, você pode fazer login no site? Para mim, você é um completo desconhecido</p>");
 
     // if (data?.Tokens?.access_token !== access_token)
     //     return callback("<p>Qual foi, esse perfil não é seu, sabia?</p>");
